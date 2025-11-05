@@ -60,7 +60,7 @@ const features = [
 
 export const FeaturesSection = () => {
   return (
-    <section className="py-24 bg-gradient-card">
+    <section id="features" className="py-24 bg-gradient-card">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <Badge variant="secondary" className="mb-4">

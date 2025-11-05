@@ -14,11 +14,10 @@ import {
   CheckCircle2,
   XCircle,
   Medal,
-  Copy,
-  Check
 } from 'lucide-react';
 import { battleQuestions, Question } from '@/data/questions';
 import { BattleReport } from '@/components/reports/BattleReport';
+import { BattleLobby, JoinBattleLobby } from './BattleLobby';
 
 const battleModes = [
   {
@@ -45,7 +44,7 @@ const battleModes = [
 
 
 const Battle = () => {
-  const [gameMode, setGameMode] = useState<'menu' | 'game' | 'report'>('menu');
+  const [gameMode, setGameMode] = useState<'menu' | 'lobby' | 'join' | 'game' | 'report'>('menu');
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: number }>({});
   const [showResults, setShowResults] = useState<{ [key: number]: boolean }>({});
@@ -53,8 +52,8 @@ const Battle = () => {
   const [isGameActive, setIsGameActive] = useState(false);
   const [startTime, setStartTime] = useState<number>(0);
   const [roomCode, setRoomCode] = useState<string>('');
-  const [showJoinCode, setShowJoinCode] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [isHost, setIsHost] = useState(false);
+  const [selectedMode, setSelectedMode] = useState<number>(1);
 
   const generateRoomCode = () => {
     return Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -72,18 +71,42 @@ const Battle = () => {
   }, [isGameActive, timeLeft]);
 
   const handleStartGame = (modeId: number) => {
+    setSelectedMode(modeId);
     if (modeId === 2) {
-      // Private Room - generate and show code
-      const code = generateRoomCode();
-      setRoomCode(code);
-      setShowJoinCode(true);
+      // Private Room - show lobby with options to invite or join
+      setGameMode('menu');
+    } else {
+      // Quick Battle - start immediately
+      startBattle(modeId);
     }
+  };
+
+  const handleInvite = () => {
+    const code = generateRoomCode();
+    setRoomCode(code);
+    setIsHost(true);
+    setGameMode('lobby');
+  };
+
+  const handleJoinRequest = () => {
+    setIsHost(false);
+    setGameMode('join');
+  };
+
+  const handleJoinWithCode = (code: string) => {
+    // TODO: Verify room exists in MySQL
+    setRoomCode(code);
+    setIsHost(false);
+    setGameMode('lobby');
+  };
+
+  const startBattle = (modeId: number) => {
     setGameMode('game');
     setIsGameActive(true);
     setCurrentQuestion(0);
     setSelectedAnswers({});
     setShowResults({});
-    setTimeLeft(600);
+    setTimeLeft(modeId === 2 ? 600 : 300);
     setStartTime(Date.now());
   };
 
@@ -113,6 +136,26 @@ const Battle = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  if (gameMode === 'lobby') {
+    return (
+      <BattleLobby
+        roomCode={roomCode}
+        onStart={() => startBattle(selectedMode)}
+        onCancel={() => setGameMode('menu')}
+        isHost={isHost}
+      />
+    );
+  }
+
+  if (gameMode === 'join') {
+    return (
+      <JoinBattleLobby
+        onJoin={handleJoinWithCode}
+        onCancel={() => setGameMode('menu')}
+      />
+    );
+  }
+
   if (gameMode === 'report') {
     const timeTaken = Math.floor((Date.now() - startTime) / 1000);
     return (
@@ -133,31 +176,9 @@ const Battle = () => {
     const selectedAnswer = selectedAnswers[questionId];
     const isCorrect = selectedAnswer === question.correctAnswer;
 
-    const copyRoomCode = () => {
-      navigator.clipboard.writeText(roomCode);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    };
-
     return (
       <div className="min-h-screen bg-background pt-20 pb-16">
         <div className="container mx-auto px-4 max-w-4xl">
-          {/* Room Code Display */}
-          {showJoinCode && roomCode && (
-            <Card className="p-6 bg-gradient-card mb-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm text-muted-foreground mb-1">Share this code with friends</h3>
-                  <div className="text-3xl font-bold tracking-wider">{roomCode}</div>
-                </div>
-                <Button onClick={copyRoomCode} variant="outline">
-                  {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
-                  {copied ? 'Copied!' : 'Copy Code'}
-                </Button>
-              </div>
-            </Card>
-          )}
-
           {/* Battle Header */}
           <div className="flex justify-between items-center mb-8">
             <div>
@@ -319,13 +340,32 @@ const Battle = () => {
                       </div>
                     </div>
                     
-                    <Button 
-                      onClick={() => handleStartGame(mode.id)}
-                      className="w-full group-hover:bg-primary/90"
-                    >
-                      <Play className="w-4 h-4 mr-2" />
-                      {mode.id === 2 ? 'Create Room' : 'Start Battle'}
-                    </Button>
+                    {mode.id === 2 ? (
+                      <div className="space-y-2">
+                        <Button 
+                          onClick={handleInvite}
+                          className="w-full"
+                        >
+                          <Users className="w-4 h-4 mr-2" />
+                          Invite Friends
+                        </Button>
+                        <Button 
+                          onClick={handleJoinRequest}
+                          variant="outline"
+                          className="w-full"
+                        >
+                          Join Room
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button 
+                        onClick={() => handleStartGame(mode.id)}
+                        className="w-full group-hover:bg-primary/90"
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        Start Battle
+                      </Button>
+                    )}
                   </div>
                 </Card>
               ))}
