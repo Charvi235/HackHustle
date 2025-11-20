@@ -22,12 +22,12 @@ const Auth = () => {
     password: '',
   });
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent, role: 'student' | 'faculty') => {
     e.preventDefault();
-    const success = await login(loginData.email, loginData.password);
+    const success = await login(loginData.email, loginData.password, role);
     if (success) {
       toast({ title: 'Login successful!' });
-      navigate('/');
+      navigate(role === 'faculty' ? '/faculty-dashboard' : '/');
     } else {
       toast({ title: 'Login failed', variant: 'destructive' });
     }
@@ -76,7 +76,7 @@ const Auth = () => {
                 <CardDescription>Login to access your account</CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleLogin} className="space-y-4">
+                <form className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="login-email">Email</Label>
                     <Input
@@ -103,9 +103,23 @@ const Auth = () => {
                       required
                     />
                   </div>
-                  <Button type="submit" className="w-full">
-                    Login
-                  </Button>
+                  <div className="space-y-3">
+                    <Button 
+                      type="button" 
+                      className="w-full"
+                      onClick={(e) => handleLogin(e, 'student')}
+                    >
+                      Login as Student
+                    </Button>
+                    <Button 
+                      type="button" 
+                      variant="secondary"
+                      className="w-full"
+                      onClick={(e) => handleLogin(e, 'faculty')}
+                    >
+                      Login as Faculty
+                    </Button>
+                  </div>
                 </form>
               </CardContent>
             </Card>

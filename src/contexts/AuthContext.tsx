@@ -1,19 +1,24 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface User {
-  StudentID: string;
+  StudentID?: string;
+  FacultyID?: string;
   FirstName: string;
   LastName: string;
   Email: string;
-  Points: number;
+  Points?: number;
+  Role: 'student' | 'faculty';
+  Subject?: string;
+  Rating?: number;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string, role: 'student' | 'faculty') => Promise<boolean>;
   signup: (firstName: string, lastName: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
+  isFaculty: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,16 +42,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string, role: 'student' | 'faculty'): Promise<boolean> => {
     // TODO: Connect to MySQL backend
     // For now, mock authentication
-    const mockUser: User = {
-      StudentID: '1',
-      FirstName: 'John',
-      LastName: 'Doe',
-      Email: email,
-      Points: 0,
-    };
+    const mockUser: User = role === 'faculty' 
+      ? {
+          FacultyID: '1',
+          FirstName: 'Dr. Sarah',
+          LastName: 'Smith',
+          Email: email,
+          Role: 'faculty',
+          Subject: 'Object Oriented Programming',
+          Rating: 4.5,
+        }
+      : {
+          StudentID: '1',
+          FirstName: 'John',
+          LastName: 'Doe',
+          Email: email,
+          Points: 0,
+          Role: 'student',
+        };
     setUser(mockUser);
     localStorage.setItem('user', JSON.stringify(mockUser));
     return true;
@@ -66,6 +82,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       LastName: lastName,
       Email: email,
       Points: 0,
+      Role: 'student',
     };
     setUser(newUser);
     localStorage.setItem('user', JSON.stringify(newUser));
@@ -85,6 +102,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         signup,
         logout,
         isAuthenticated: !!user,
+        isFaculty: user?.Role === 'faculty',
       }}
     >
       {children}
