@@ -3,12 +3,15 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, CheckCircle2, XCircle, ChevronRight } from 'lucide-react';
+import { ChevronLeft, CheckCircle2, XCircle, ChevronRight, HelpCircle } from 'lucide-react';
 import { Question } from '@/data/questions';
+import { AskDoubtPanel } from '@/components/practice/AskDoubtPanel';
+import { useAuth } from '@/contexts/AuthContext';
 
 const QuestionDetail = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { question, questionIndex, topicName, subjectName, questions, setNumber } = location.state as {
     question: Question;
     questionIndex: number;
@@ -20,6 +23,7 @@ const QuestionDetail = () => {
 
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [showDoubtPanel, setShowDoubtPanel] = useState(false);
 
   const handleAnswer = (answerIndex: number) => {
     setSelectedAnswer(answerIndex);
@@ -71,10 +75,18 @@ const QuestionDetail = () => {
         </Button>
 
         {/* Header */}
-        <div className="mb-6">
-          <Badge variant="secondary" className="mb-2">{subjectName}</Badge>
-          <Badge variant="outline" className="ml-2 mb-2">{topicName}</Badge>
-          <h1 className="text-2xl font-bold mt-2">Question {questionIndex + 1}</h1>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <Badge variant="secondary" className="mb-2">{subjectName}</Badge>
+            <Badge variant="outline" className="ml-2 mb-2">{topicName}</Badge>
+            <h1 className="text-2xl font-bold mt-2">Question {questionIndex + 1}</h1>
+          </div>
+          {user?.Role === 'student' && (
+            <Button onClick={() => setShowDoubtPanel(true)} variant="outline">
+              <HelpCircle className="w-4 h-4 mr-2" />
+              Ask Doubt
+            </Button>
+          )}
         </div>
 
         {/* Question Card */}
@@ -153,6 +165,14 @@ const QuestionDetail = () => {
             </div>
           )}
         </Card>
+
+        {/* Ask Doubt Panel */}
+        <AskDoubtPanel
+          open={showDoubtPanel}
+          onOpenChange={setShowDoubtPanel}
+          question={question.question}
+          subject={subjectName}
+        />
       </div>
     </div>
   );

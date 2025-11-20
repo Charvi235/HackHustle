@@ -13,6 +13,7 @@ import Battle from "./pages/Battle";
 import QuestionDetail from "./pages/QuestionDetail";
 import Assessment from "./pages/Assessment";
 import Auth from "./pages/Auth";
+import FacultyDashboard from "./pages/FacultyDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
                 <Route path="/battle" element={<Battle />} />
                 <Route path="/question-detail" element={<QuestionDetail />} />
                 <Route path="/assessment" element={<Assessment />} />
+                <Route path="/faculty-dashboard" element={<FacultyDashboard />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
