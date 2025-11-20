@@ -38,6 +38,21 @@ export const Header = () => {
     setIsMenuOpen(false);
   };
 
+  const handleMarkAsRead = (doubtId: string) => {
+    // TODO: Connect to MySQL backend
+    setUnreadDoubtsCount(prev => Math.max(0, prev - 1));
+  };
+
+  const handleRateTeacher = (doubtId: string, rating: number) => {
+    // TODO: Connect to MySQL backend
+    toast({ title: `Rated ${rating} stars!` });
+  };
+
+  const getUserInitials = () => {
+    if (!user) return 'U';
+    return `${user.FirstName?.[0] || ''}${user.LastName?.[0] || ''}`.toUpperCase();
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="container mx-auto px-4">
