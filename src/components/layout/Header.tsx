@@ -2,10 +2,24 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Zap, Trophy, BookOpen, Brain, LogOut } from 'lucide-react';
+import { Menu, X, Zap, Trophy, BookOpen, Brain, LogOut, User } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { ProfileDialog } from '@/components/profile/ProfileDialog';
+import { DoubtsDialog } from '@/components/profile/DoubtsDialog';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [unreadDoubtsCount, setUnreadDoubtsCount] = useState(3);
+  const [showProfileDialog, setShowProfileDialog] = useState(false);
+  const [showDoubtsDialog, setShowDoubtsDialog] = useState(false);
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -36,16 +50,6 @@ export const Header = () => {
     logout();
     navigate('/');
     setIsMenuOpen(false);
-  };
-
-  const handleMarkAsRead = (doubtId: string) => {
-    // TODO: Connect to MySQL backend
-    setUnreadDoubtsCount(prev => Math.max(0, prev - 1));
-  };
-
-  const handleRateTeacher = (doubtId: string, rating: number) => {
-    // TODO: Connect to MySQL backend
-    toast({ title: `Rated ${rating} stars!` });
   };
 
   const getUserInitials = () => {
@@ -95,14 +99,49 @@ export const Header = () => {
           <div className="flex items-center space-x-4">
             <div className="hidden md:flex items-center space-x-2">
               {isAuthenticated ? (
-                <>
-                  <span className="text-sm text-muted-foreground">
-                    {user?.FirstName} ({user?.Points} pts)
-                  </span>
-                  <Button variant="ghost" size="icon" onClick={handleLogout}>
-                    <LogOut className="h-4 w-4" />
-                  </Button>
-                </>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="relative">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                      </Avatar>
+                      {unreadDoubtsCount > 0 && (
+                        <Badge 
+                          variant="destructive" 
+                          className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                        >
+                          {unreadDoubtsCount}
+                        </Badge>
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <div className="flex flex-col space-y-1 p-2">
+                      <p className="text-sm font-medium">{user?.FirstName} {user?.LastName}</p>
+                      <p className="text-xs text-muted-foreground">{user?.Email}</p>
+                      <p className="text-xs text-muted-foreground">{user?.Points} pts</p>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => setShowProfileDialog(true)}>
+                      <User className="mr-2 h-4 w-4" />
+                      My Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setShowDoubtsDialog(true)}>
+                      <BookOpen className="mr-2 h-4 w-4" />
+                      My Doubts
+                      {unreadDoubtsCount > 0 && (
+                        <Badge variant="destructive" className="ml-auto">
+                          {unreadDoubtsCount}
+                        </Badge>
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
                 <>
                   <Button variant="ghost" onClick={() => navigate('/auth')}>
@@ -177,6 +216,21 @@ export const Header = () => {
           </div>
         )}
       </div>
+
+      {/* Dialogs */}
+      <ProfileDialog 
+        open={showProfileDialog} 
+        onOpenChange={setShowProfileDialog}
+      />
+      <DoubtsDialog 
+        open={showDoubtsDialog} 
+        onOpenChange={setShowDoubtsDialog}
+        onMarkAsRead={(doubtId) => setUnreadDoubtsCount(prev => Math.max(0, prev - 1))}
+        onRateTeacher={(doubtId, rating) => {
+          // TODO: Connect to backend
+          console.log(`Rated doubt ${doubtId} with ${rating} stars`);
+        }}
+      />
     </header>
   );
 };
