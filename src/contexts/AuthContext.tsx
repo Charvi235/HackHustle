@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { authService } from '@/services/authService';
+import { toast } from '@/hooks/use-toast';
 
 interface User {
   StudentID?: string;
@@ -43,29 +45,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (email: string, password: string, role: 'student' | 'faculty'): Promise<boolean> => {
-    // TODO: Connect to MySQL backend
-    // For now, mock authentication
-    const mockUser: User = role === 'faculty' 
-      ? {
-          FacultyID: '1',
-          FirstName: 'Dr. Sarah',
-          LastName: 'Smith',
-          Email: email,
-          Role: 'faculty',
-          Subject: 'Object Oriented Programming',
-          Rating: 4.5,
-        }
-      : {
-          StudentID: '1',
-          FirstName: 'John',
-          LastName: 'Doe',
-          Email: email,
-          Points: 0,
-          Role: 'student',
-        };
-    setUser(mockUser);
-    localStorage.setItem('user', JSON.stringify(mockUser));
-    return true;
+    try {
+      const response = await authService.login({ email, password, role });
+      
+      const loggedInUser: User = {
+        ...(role === 'faculty' 
+          ? { FacultyID: response.user.facultyID || response.user.id }
+          : { StudentID: response.user.studentID || response.user.id }
+        ),
+        FirstName: response.user.firstName,
+        LastName: response.user.lastName,
+        Email: response.user.email,
+        Role: role,
+        ...(role === 'student' && { Points: response.user.points || 0 }),
+        ...(role === 'faculty' && { 
+          Subject: response.user.subject,
+          Rating: response.user.rating 
+        }),
+      };
+      
+      setUser(loggedInUser);
+      localStorage.setItem('user', JSON.stringify(loggedInUser));
+      return true;
+    } catch (error: any) {
+      toast({
+        title: "Login Failed",
+        description: error.message || "Invalid credentials. Please try again.",
+        variant: "destructive",
+      });
+      return false;
+    }
   };
 
   const signup = async (
@@ -74,22 +83,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     email: string,
     password: string
   ): Promise<boolean> => {
-    // TODO: Connect to MySQL backend
-    // For now, mock signup
-    const newUser: User = {
-      StudentID: Date.now().toString(),
-      FirstName: firstName,
-      LastName: lastName,
-      Email: email,
-      Points: 0,
-      Role: 'student',
-    };
-    setUser(newUser);
-    localStorage.setItem('user', JSON.stringify(newUser));
-    return true;
+    try {
+      const response = await authService.signup({ firstName, lastName, email, password });
+      
+      const newUser: User = {
+        StudentID: response.user.studentID || response.user.id,
+        FirstName: response.user.firstName,
+        LastName: response.user.lastName,
+        Email: response.user.email,
+        Points: response.user.points || 0,
+        Role: 'student', // Signup is always for students
+      };
+      
+      setUser(newUser);
+      localStorage.setItem('user', JSON.stringify(newUser));
+      return true;
+    } catch (error: any) {
+      toast({
+        title: "Signup Failed",
+        description: error.message || "Could not create account. Please try again.",
+        variant: "destructive",
+      });
+      return false;
+    }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await authService.logout();
     setUser(null);
     localStorage.removeItem('user');
   };
