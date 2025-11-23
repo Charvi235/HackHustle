@@ -17,8 +17,8 @@ export interface AuthResponse {
   token: string;
   user: {
     id: string;
-    studentID?: string;
-    facultyID?: string;
+    studentId?: string;
+    facultyId?: string;
     firstName: string;
     lastName: string;
     email: string;

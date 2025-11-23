@@ -77,13 +77,13 @@ const FacultyDashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2">
-            <span className="text-3xl font-bold">{user?.Rating || 4.5}</span>
+            <span className="text-3xl font-bold">{user?.rating || 4.5}</span>
             <div className="flex">
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star
                   key={star}
                   className={`h-6 w-6 ${
-                    star <= (user?.Rating || 4.5)
+                    star <= (user?.rating || 4.5)
                       ? 'fill-yellow-400 text-yellow-400'
                       : 'text-gray-300'
                   }`}

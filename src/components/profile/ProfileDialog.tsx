@@ -14,9 +14,9 @@ interface ProfileDialogProps {
 export const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [firstName, setFirstName] = useState(user?.FirstName || '');
-  const [lastName, setLastName] = useState(user?.LastName || '');
-  const [email, setEmail] = useState(user?.Email || '');
+  const [firstName, setFirstName] = useState(user?.firstName || '');
+  const [lastName, setLastName] = useState(user?.lastName || '');
+  const [email, setEmail] = useState(user?.email || '');
 
   const handleSave = () => {
     // TODO: Connect to MySQL backend to update user profile
@@ -56,21 +56,21 @@ export const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          {user?.Role === 'student' && (
+          {user?.role === 'student' && (
             <div className="space-y-2">
               <Label>Points</Label>
-              <div className="text-2xl font-bold text-primary">{user?.Points || 0}</div>
+              <div className="text-2xl font-bold text-primary">{user?.points || 0}</div>
             </div>
           )}
-          {user?.Role === 'faculty' && (
+          {user?.role === 'faculty' && (
             <>
               <div className="space-y-2">
                 <Label>Subject</Label>
-                <div className="text-lg">{user?.Subject}</div>
+                <div className="text-lg">{user?.subject}</div>
               </div>
               <div className="space-y-2">
                 <Label>Rating</Label>
-                <div className="text-lg">{user?.Rating} ⭐</div>
+                <div className="text-lg">{user?.rating} ⭐</div>
               </div>
             </>
           )}

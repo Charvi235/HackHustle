@@ -81,7 +81,7 @@ const QuestionDetail = () => {
             <Badge variant="outline" className="ml-2 mb-2">{topicName}</Badge>
             <h1 className="text-2xl font-bold mt-2">Question {questionIndex + 1}</h1>
           </div>
-          {user?.Role === 'student' && (
+          {user?.role === 'student' && (
             <Button onClick={() => setShowDoubtPanel(true)} variant="outline">
               <HelpCircle className="w-4 h-4 mr-2" />
               Ask Doubt
