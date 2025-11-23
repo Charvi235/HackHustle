@@ -1,32 +1,30 @@
 import { API_CONFIG, apiClient } from '@/config/api';
 
+// Match exact Spring Boot DTO structure
 export interface LoginRequest {
   email: string;
   password: string;
-  role: 'student' | 'faculty';
+  role: string; // 'STUDENT' or 'FACULTY' in backend
 }
 
 export interface SignupRequest {
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   email: string;
   password: string;
 }
 
 export interface AuthResponse {
   token: string;
-  user: {
-    id: string;
-    studentId?: string;
-    facultyId?: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    points?: number;
-    role: 'student' | 'faculty';
-    subject?: string;
-    rating?: number;
-  };
+  student_id?: string;
+  faculty_id?: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  points?: number;
+  role: string;
+  subject?: string;
+  rating?: number;
 }
 
 export const authService = {

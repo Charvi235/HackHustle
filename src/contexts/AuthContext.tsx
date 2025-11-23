@@ -3,13 +3,13 @@ import { authService } from '@/services/authService';
 import { toast } from '@/hooks/use-toast';
 
 interface User {
-  studentId?: string;
-  facultyId?: string;
-  firstName: string;
-  lastName: string;
+  student_id?: string;
+  faculty_id?: string;
+  first_name: string;
+  last_name: string;
   email: string;
   points?: number;
-  role: 'student' | 'faculty';
+  role: string;
   subject?: string;
   rating?: number;
 }
@@ -46,22 +46,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string, role: 'student' | 'faculty'): Promise<boolean> => {
     try {
-      const response = await authService.login({ email, password, role });
+      const roleUpper = role.toUpperCase(); // Convert to STUDENT or FACULTY
+      const response = await authService.login({ email, password, role: roleUpper });
       
       const loggedInUser: User = {
-        ...(role === 'faculty' 
-          ? { facultyId: response.user.facultyId || response.user.id }
-          : { studentId: response.user.studentId || response.user.id }
-        ),
-        firstName: response.user.firstName,
-        lastName: response.user.lastName,
-        email: response.user.email,
-        role: role,
-        ...(role === 'student' && { points: response.user.points || 0 }),
-        ...(role === 'faculty' && { 
-          subject: response.user.subject,
-          rating: response.user.rating 
-        }),
+        student_id: response.student_id,
+        faculty_id: response.faculty_id,
+        first_name: response.first_name,
+        last_name: response.last_name,
+        email: response.email,
+        role: response.role,
+        points: response.points || 0,
+        subject: response.subject,
+        rating: response.rating,
       };
       
       setUser(loggedInUser);
@@ -84,15 +81,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     password: string
   ): Promise<boolean> => {
     try {
-      const response = await authService.signup({ firstName, lastName, email, password });
+      const response = await authService.signup({ 
+        first_name: firstName, 
+        last_name: lastName, 
+        email, 
+        password 
+      });
       
       const newUser: User = {
-        studentId: response.user.studentId || response.user.id,
-        firstName: response.user.firstName,
-        lastName: response.user.lastName,
-        email: response.user.email,
-        points: response.user.points || 0,
-        role: 'student', // Signup is always for students
+        student_id: response.student_id,
+        first_name: response.first_name,
+        last_name: response.last_name,
+        email: response.email,
+        points: response.points || 0,
+        role: response.role,
       };
       
       setUser(newUser);
@@ -122,7 +124,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         signup,
         logout,
         isAuthenticated: !!user,
-        isFaculty: user?.role === 'faculty',
+        isFaculty: user?.role?.toLowerCase() === 'faculty',
       }}
     >
       {children}
