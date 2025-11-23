@@ -3,15 +3,15 @@ import { authService } from '@/services/authService';
 import { toast } from '@/hooks/use-toast';
 
 interface User {
-  StudentID?: string;
-  FacultyID?: string;
-  FirstName: string;
-  LastName: string;
-  Email: string;
-  Points?: number;
-  Role: 'student' | 'faculty';
-  Subject?: string;
-  Rating?: number;
+  studentId?: string;
+  facultyId?: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  points?: number;
+  role: 'student' | 'faculty';
+  subject?: string;
+  rating?: number;
 }
 
 interface AuthContextType {
@@ -50,17 +50,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       const loggedInUser: User = {
         ...(role === 'faculty' 
-          ? { FacultyID: response.user.facultyID || response.user.id }
-          : { StudentID: response.user.studentID || response.user.id }
+          ? { facultyId: response.user.facultyId || response.user.id }
+          : { studentId: response.user.studentId || response.user.id }
         ),
-        FirstName: response.user.firstName,
-        LastName: response.user.lastName,
-        Email: response.user.email,
-        Role: role,
-        ...(role === 'student' && { Points: response.user.points || 0 }),
+        firstName: response.user.firstName,
+        lastName: response.user.lastName,
+        email: response.user.email,
+        role: role,
+        ...(role === 'student' && { points: response.user.points || 0 }),
         ...(role === 'faculty' && { 
-          Subject: response.user.subject,
-          Rating: response.user.rating 
+          subject: response.user.subject,
+          rating: response.user.rating 
         }),
       };
       
@@ -87,12 +87,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const response = await authService.signup({ firstName, lastName, email, password });
       
       const newUser: User = {
-        StudentID: response.user.studentID || response.user.id,
-        FirstName: response.user.firstName,
-        LastName: response.user.lastName,
-        Email: response.user.email,
-        Points: response.user.points || 0,
-        Role: 'student', // Signup is always for students
+        studentId: response.user.studentId || response.user.id,
+        firstName: response.user.firstName,
+        lastName: response.user.lastName,
+        email: response.user.email,
+        points: response.user.points || 0,
+        role: 'student', // Signup is always for students
       };
       
       setUser(newUser);
@@ -122,7 +122,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         signup,
         logout,
         isAuthenticated: !!user,
-        isFaculty: user?.Role === 'faculty',
+        isFaculty: user?.role === 'faculty',
       }}
     >
       {children}
