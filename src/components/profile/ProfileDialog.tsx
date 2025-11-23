@@ -14,8 +14,8 @@ interface ProfileDialogProps {
 export const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [firstName, setFirstName] = useState(user?.firstName || '');
-  const [lastName, setLastName] = useState(user?.lastName || '');
+  const [firstName, setFirstName] = useState(user?.first_name || '');
+  const [lastName, setLastName] = useState(user?.last_name || '');
   const [email, setEmail] = useState(user?.email || '');
 
   const handleSave = () => {
@@ -56,13 +56,13 @@ export const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          {user?.role === 'student' && (
+          {user?.role?.toLowerCase() === 'student' && (
             <div className="space-y-2">
               <Label>Points</Label>
               <div className="text-2xl font-bold text-primary">{user?.points || 0}</div>
             </div>
           )}
-          {user?.role === 'faculty' && (
+          {user?.role?.toLowerCase() === 'faculty' && (
             <>
               <div className="space-y-2">
                 <Label>Subject</Label>

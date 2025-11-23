@@ -54,7 +54,7 @@ export const Header = () => {
 
   const getUserInitials = () => {
     if (!user) return 'U';
-    return `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase();
+    return `${user.first_name?.[0] || ''}${user.last_name?.[0] || ''}`.toUpperCase();
   };
 
   return (
@@ -117,7 +117,7 @@ export const Header = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
                     <div className="flex flex-col space-y-1 p-2">
-                      <p className="text-sm font-medium">{user?.firstName} {user?.lastName}</p>
+                      <p className="text-sm font-medium">{user?.first_name} {user?.last_name}</p>
                       <p className="text-xs text-muted-foreground">{user?.email}</p>
                       <p className="text-xs text-muted-foreground">{user?.points} pts</p>
                     </div>
@@ -183,7 +183,7 @@ export const Header = () => {
                   ))}
                   <div className="flex flex-col space-y-2 pt-4 border-t border-border">
                     <div className="px-2 text-sm text-muted-foreground">
-                      {user?.firstName} {user?.lastName} ({user?.points} pts)
+                      {user?.first_name} {user?.last_name} ({user?.points} pts)
                     </div>
                     <Button variant="ghost" className="justify-start" onClick={handleLogout}>
                       <LogOut className="h-4 w-4 mr-2" />
