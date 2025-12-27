@@ -135,6 +135,9 @@ export const API_CONFIG = {
     AUTH: {
   LOGIN: '/api/students/login',
   SIGNUP: '/api/students',
+  FACULTY_LOGIN: '/api/teachers/login',
+  FACULTY_SIGNUP:'/api/teachers'
+
 },
     STUDENTS: {
       PROFILE: '/api/students/profile',
@@ -142,7 +145,7 @@ export const API_CONFIG = {
       POINTS: '/api/students/points',
     },
     FACULTY: {
-      PROFILE: '/api/faculty/profile',
+      PROFILE: '/api/teachers/profile',
       UPDATE_PROFILE: '/api/faculty/profile/update',
     },
   },
