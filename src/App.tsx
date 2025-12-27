@@ -4,9 +4,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import { SidebarProvider } from "./components/ui/sidebar";
 import { Header } from "./components/layout/Header";
 import { Footer } from "./components/layout/Footer";
+import { AppSidebar } from "./components/layout/AppSidebar";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import Index from "./pages/Index";
+import Dashboard from "./pages/Dashboard";
 import Practice from "./pages/Practice";
 import Interview from "./pages/Interview";
 import Battle from "./pages/Battle";
@@ -25,24 +29,60 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <div className="min-h-screen flex flex-col">
-            <Header />
-            <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/practice" element={<Practice />} />
-                <Route path="/interview" element={<Interview />} />
-                <Route path="/battle" element={<Battle />} />
-                <Route path="/question-detail" element={<QuestionDetail />} />
-                <Route path="/assessment" element={<Assessment />} />
-                <Route path="/faculty-dashboard" element={<FacultyDashboard />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
+          <SidebarProvider>
+            <div className="min-h-screen flex w-full">
+              <AppSidebar />
+              <div className="flex-1 flex flex-col">
+                <Header />
+                <main className="flex-1">
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/dashboard" element={
+                      <ProtectedRoute allowFaculty={true} allowStudent={true}>
+                        <Dashboard />
+                      </ProtectedRoute>
+                    } />
+                    {/* Student-only routes - Faculty cannot access */}
+                    <Route path="/practice" element={
+                      <ProtectedRoute allowFaculty={false} allowStudent={true}>
+                        <Practice />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/interview" element={
+                      <ProtectedRoute allowFaculty={false} allowStudent={true}>
+                        <Interview />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/battle" element={
+                      <ProtectedRoute allowFaculty={false} allowStudent={true}>
+                        <Battle />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/question-detail" element={
+                      <ProtectedRoute allowFaculty={false} allowStudent={true}>
+                        <QuestionDetail />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/assessment" element={
+                      <ProtectedRoute allowFaculty={false} allowStudent={true}>
+                        <Assessment />
+                      </ProtectedRoute>
+                    } />
+                    {/* Faculty-only route */}
+                    <Route path="/faculty-dashboard" element={
+                      <ProtectedRoute allowFaculty={true} allowStudent={false}>
+                        <FacultyDashboard />
+                      </ProtectedRoute>
+                    } />
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </main>
+                <Footer />
+              </div>
+            </div>
+          </SidebarProvider>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>

@@ -29,10 +29,31 @@ const mockTeachers: Teacher[] = [
 ];
 
 export const AskDoubtPanel = ({ open, onOpenChange, question, subject }: AskDoubtPanelProps) => {
-  const { user } = useAuth();
+  const { user, isFaculty } = useAuth();
   const { toast } = useToast();
   const [selectedTeacher, setSelectedTeacher] = useState<string>('');
   const [doubtQuery, setDoubtQuery] = useState('');
+
+  // Faculty cannot send doubts
+  if (isFaculty) {
+    return (
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Faculty Access Restricted</SheetTitle>
+            <SheetDescription>
+              As a faculty member, you can only respond to student doubts, not send them.
+            </SheetDescription>
+          </SheetHeader>
+          <div className="mt-6">
+            <Button onClick={() => onOpenChange(false)} className="w-full">
+              Close
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
 
   const handleSendDoubt = () => {
     if (!selectedTeacher) {
