@@ -133,9 +133,9 @@ export const API_CONFIG = {
   BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080', // no /api here
   ENDPOINTS: {
     AUTH: {
-      LOGIN: '/api/students/login',   // matches backend
-      SIGNUP: '/api/students', // implement later
-    },
+  LOGIN: '/api/students/login',
+  SIGNUP: '/api/students',
+},
     STUDENTS: {
       PROFILE: '/api/students/profile',
       UPDATE_PROFILE: '/api/students/profile/update',
