@@ -17,7 +17,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string, role: 'student' | 'faculty') => Promise<boolean>;
-  signup: (firstName: string, lastName: string, email: string, password: string) => Promise<boolean>;
+  signup: (firstName: string, lastName: string, email: string, password: string, role?: 'student' | 'faculty', subjectAssociated?: string, institute?: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
   isFaculty: boolean;
@@ -78,23 +78,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     firstName: string,
     lastName: string,
     email: string,
-    password: string
+    password: string,
+    role: 'student' | 'faculty' = 'student',
+    subjectAssociated?: string,
+    institute?: string
   ): Promise<boolean> => {
     try {
+      const roleUpper = role.toUpperCase(); // Convert to STUDENT or FACULTY
       const response = await authService.signup({ 
         first_name: firstName, 
         last_name: lastName, 
         email, 
-        password 
+        password,
+        role: roleUpper,
+        subject_associated: subjectAssociated,
+        institute: institute,
       });
       
       const newUser: User = {
         student_id: response.student_id,
+        faculty_id: response.faculty_id,
         first_name: response.first_name,
         last_name: response.last_name,
         email: response.email,
         points: response.points || 0,
         role: response.role,
+        subject: response.subject,
+        rating: response.rating,
       };
       
       setUser(newUser);

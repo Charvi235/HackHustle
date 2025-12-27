@@ -21,7 +21,16 @@ const Auth = () => {
     email: '',
     password: '',
   });
+  const [teacherSignupData, setTeacherSignupData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    subjectAssociated: '',
+    institute: '',
+  });
   const [isLoading, setIsLoading] = useState(false);
+  const [signupRole, setSignupRole] = useState<'student' | 'teacher'>('student');
 
   const handleLogin = async (role: 'student' | 'faculty') => {
     setIsLoading(true);
@@ -29,7 +38,6 @@ const Auth = () => {
       const success = await login(loginData.email, loginData.password, role);
       if (success) {
         toast({ title: 'Login successful!' });
-        // Redirect based on role
         navigate(role === 'faculty' ? '/faculty-dashboard' : '/dashboard');
       }
     } finally {
@@ -37,19 +45,42 @@ const Auth = () => {
     }
   };
 
-  const handleSignup = async () => {
+  const handleStudentSignup = async () => {
     setIsLoading(true);
     try {
       const success = await signup(
         signupData.firstName,
         signupData.lastName,
         signupData.email,
-        signupData.password
+        signupData.password,
+        'student'
       );
 
       if (success) {
         toast({ title: 'Signup successful!' });
         navigate('/dashboard');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleTeacherSignup = async () => {
+    setIsLoading(true);
+    try {
+      const success = await signup(
+        teacherSignupData.firstName,
+        teacherSignupData.lastName,
+        teacherSignupData.email,
+        teacherSignupData.password,
+        'faculty',
+        teacherSignupData.subjectAssociated,
+        teacherSignupData.institute
+      );
+
+      if (success) {
+        toast({ title: 'Signup successful!' });
+        navigate('/faculty-dashboard');
       }
     } finally {
       setIsLoading(false);
@@ -135,59 +166,144 @@ const Auth = () => {
                 <CardDescription>Sign up to get started</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name</Label>
-                      <Input
-                        id="firstName"
-                        placeholder="John"
-                        value={signupData.firstName}
-                        onChange={(e) => setSignupData({ ...signupData, firstName: e.target.value })}
-                        required
-                      />
+                <Tabs value={signupRole} onValueChange={(v) => setSignupRole(v as 'student' | 'teacher')} className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 mb-4">
+                    <TabsTrigger value="student">Student</TabsTrigger>
+                    <TabsTrigger value="teacher">Teacher</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="student" className="mt-0">
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="student-firstName">First Name</Label>
+                          <Input
+                            id="student-firstName"
+                            placeholder="John"
+                            value={signupData.firstName}
+                            onChange={(e) => setSignupData({ ...signupData, firstName: e.target.value })}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="student-lastName">Last Name</Label>
+                          <Input
+                            id="student-lastName"
+                            placeholder="Doe"
+                            value={signupData.lastName}
+                            onChange={(e) => setSignupData({ ...signupData, lastName: e.target.value })}
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="student-email">Email</Label>
+                        <Input
+                          id="student-email"
+                          type="email"
+                          placeholder="your.email@example.com"
+                          value={signupData.email}
+                          onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="student-password">Password</Label>
+                        <Input
+                          id="student-password"
+                          type="password"
+                          placeholder="••••••••"
+                          value={signupData.password}
+                          onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <Button 
+                        className="w-full" 
+                        onClick={handleStudentSignup}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? 'Signing up...' : 'Sign Up as Student'}
+                      </Button>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name</Label>
-                      <Input
-                        id="lastName"
-                        placeholder="Doe"
-                        value={signupData.lastName}
-                        onChange={(e) => setSignupData({ ...signupData, lastName: e.target.value })}
-                        required
-                      />
+                  </TabsContent>
+
+                  <TabsContent value="teacher" className="mt-0">
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="teacher-firstName">First Name</Label>
+                          <Input
+                            id="teacher-firstName"
+                            placeholder="John"
+                            value={teacherSignupData.firstName}
+                            onChange={(e) => setTeacherSignupData({ ...teacherSignupData, firstName: e.target.value })}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="teacher-lastName">Last Name</Label>
+                          <Input
+                            id="teacher-lastName"
+                            placeholder="Doe"
+                            value={teacherSignupData.lastName}
+                            onChange={(e) => setTeacherSignupData({ ...teacherSignupData, lastName: e.target.value })}
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="teacher-email">Email</Label>
+                        <Input
+                          id="teacher-email"
+                          type="email"
+                          placeholder="your.email@example.com"
+                          value={teacherSignupData.email}
+                          onChange={(e) => setTeacherSignupData({ ...teacherSignupData, email: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="teacher-password">Password</Label>
+                        <Input
+                          id="teacher-password"
+                          type="password"
+                          placeholder="••••••••"
+                          value={teacherSignupData.password}
+                          onChange={(e) => setTeacherSignupData({ ...teacherSignupData, password: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="teacher-subject">Subject Associated</Label>
+                        <Input
+                          id="teacher-subject"
+                          placeholder="e.g., Mathematics, Physics"
+                          value={teacherSignupData.subjectAssociated}
+                          onChange={(e) => setTeacherSignupData({ ...teacherSignupData, subjectAssociated: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="teacher-institute">Institute</Label>
+                        <Input
+                          id="teacher-institute"
+                          placeholder="e.g., ABC University"
+                          value={teacherSignupData.institute}
+                          onChange={(e) => setTeacherSignupData({ ...teacherSignupData, institute: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <Button 
+                        className="w-full" 
+                        onClick={handleTeacherSignup}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? 'Signing up...' : 'Sign Up as Teacher'}
+                      </Button>
                     </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
-                    <Input
-                      id="signup-email"
-                      type="email"
-                      placeholder="your.email@example.com"
-                      value={signupData.email}
-                      onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password</Label>
-                    <Input
-                      id="signup-password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={signupData.password}
-                      onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <Button 
-                    className="w-full" 
-                    onClick={handleSignup}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Signing up...' : 'Sign Up'}
-                  </Button>
-                </div>
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
           </TabsContent>
