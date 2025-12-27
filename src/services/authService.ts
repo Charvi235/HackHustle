@@ -25,6 +25,9 @@ export interface SignupRequest {
   last_name: string;
   email: string;
   password: string;
+  role?: string;
+  subject_associated?: string;
+  institute?: string;
 }
 
 export const authService = {
@@ -51,14 +54,27 @@ export const authService = {
   },
 
   signup: async (userData: SignupRequest): Promise<AuthResponse> => {
-    const payload = { 
+    const isFaculty = userData.role === 'FACULTY';
+    
+    const payload: any = { 
       firstName: userData.first_name, 
       lastName: userData.last_name, 
       emailId: userData.email, 
       password: userData.password 
     };
     
-    const response = await apiClient.post(API_CONFIG.ENDPOINTS.AUTH.SIGNUP, payload);
+    // Add faculty-specific fields
+    if (isFaculty) {
+      payload.subjectAssociated = userData.subject_associated;
+      payload.institute = userData.institute;
+    }
+    
+    // Use different endpoints for student vs faculty signup
+    const endpoint = isFaculty 
+      ? '/api/faculty' 
+      : API_CONFIG.ENDPOINTS.AUTH.SIGNUP;
+    
+    const response = await apiClient.post(endpoint, payload);
     
     // Store token if returned
     if (response.token) {
