@@ -344,6 +344,7 @@ interface AuthContextType {
   logout: () => void;
   isAuthenticated: boolean;
   isTeacher: boolean;
+  isFaculty: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -446,6 +447,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('user');
   };
 
+  const isTeacher = user?.role === 'TEACHER';
+  
   return (
     <AuthContext.Provider
       value={{
@@ -454,7 +457,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         signup,
         logout,
         isAuthenticated: !!user,
-        isTeacher: user?.role === 'TEACHER',
+        isTeacher,
+        isFaculty: isTeacher, // alias for backward compatibility
       }}
     >
       {children}

@@ -16,7 +16,7 @@ export const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
   const { toast } = useToast();
   const [firstName, setFirstName] = useState(user?.first_name || '');
   const [lastName, setLastName] = useState(user?.last_name || '');
-  const [email, setEmail] = useState(user?.email || '');
+  const [email, setEmail] = useState(user?.emailId || '');
 
   const handleSave = () => {
     // TODO: Connect to MySQL backend to update user profile
