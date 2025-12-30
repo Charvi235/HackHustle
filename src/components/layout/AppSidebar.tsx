@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   Sidebar,
@@ -23,14 +23,32 @@ import {
   Users,
   Home
 } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 export function AppSidebar() {
   const { isAuthenticated, isFaculty } = useAuth();
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleAboutClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (location.pathname !== '/') {
+      navigate('/');
+      setTimeout(() => {
+        document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   // Student navigation items
   const studentItems = [
@@ -48,11 +66,9 @@ export function AppSidebar() {
     { title: 'Students', url: '/faculty-dashboard', icon: Users },
   ];
 
-  // Public navigation items
+  // Public navigation items (Home only - About/Contact handled specially)
   const publicItems = [
     { title: 'Home', url: '/', icon: Home },
-    { title: 'About Us', url: '/#features', icon: Info },
-    { title: 'Contact Us', url: '/#contact', icon: Mail },
   ];
 
   const navItems = isAuthenticated 
@@ -86,6 +102,33 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              
+              {/* About Us - smooth scroll (only for public) */}
+              {!isAuthenticated && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton onClick={handleAboutClick}>
+                    <Info className="h-4 w-4" />
+                    {!collapsed && <span>About Us</span>}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+              
+              {/* Contact Us - tooltip (only for public) */}
+              {!isAuthenticated && (
+                <SidebarMenuItem>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SidebarMenuButton className="cursor-default">
+                        <Mail className="h-4 w-4" />
+                        {!collapsed && <span>Contact Us</span>}
+                      </SidebarMenuButton>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      <p>Need help? Reach us at contact@hackhustle.org</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -97,20 +140,23 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <Link to="/#features">
-                      <Info className="h-4 w-4" />
-                      {!collapsed && <span>About Us</span>}
-                    </Link>
+                  <SidebarMenuButton onClick={handleAboutClick}>
+                    <Info className="h-4 w-4" />
+                    {!collapsed && <span>About Us</span>}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <Link to="/#contact">
-                      <Mail className="h-4 w-4" />
-                      {!collapsed && <span>Contact Us</span>}
-                    </Link>
-                  </SidebarMenuButton>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SidebarMenuButton className="cursor-default">
+                        <Mail className="h-4 w-4" />
+                        {!collapsed && <span>Contact Us</span>}
+                      </SidebarMenuButton>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      <p>Need help? Reach us at contact@hackhustle.org</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
