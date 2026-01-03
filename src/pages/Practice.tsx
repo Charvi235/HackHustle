@@ -434,7 +434,7 @@ import {
   ChevronLeft
 } from 'lucide-react';
 
-import { questionService, QuestionDto } from '@/services/questionService';
+import { questionService, QuestionDto } from '@/services/questionsServices';
 
 /* ---------------- SUBJECT & TOPIC UI CONFIG (NO QUESTIONS HERE) ---------------- */
 
@@ -464,8 +464,10 @@ const subjects: SubjectConfig[] = [
     id: 1002,
     name: 'OOPS',
     topics: [
-      { id: 1001, name: 'Proc' },
-      { id: 2, name: 'CPU Scheduling' }
+      { id: 1005, name: 'Concepts of OOPS' },
+      { id: 1006, name: 'Inheritance' },
+      { id: 1007, name: 'Abstraction' },
+      { id: 1008, name: 'Polymorphism' }
     ]
   }
 ];
@@ -473,21 +475,21 @@ const subjects: SubjectConfig[] = [
 /* ---------------- ICONS & COLORS ---------------- */
 
 const subjectIcons: { [key: string]: any } = {
-  'Database Management System': Database,
-  'Operating System': Target,
-  'Computer Network': Globe,
-  'Object Oriented Programming': Code,
-  'Data Structure and Algorithms': Brain,
-  'Java Programming': Code
+  'DBMS': Database,
+  // 'Operating System': Target,
+  // 'Computer Network': Globe,
+  'OOPS': Code,
+  // 'Data Structure and Algorithms': Brain,
+  // 'Java Programming': Code
 };
 
 const subjectColors: { [key: string]: string } = {
-  'Database Management System': 'bg-green-500',
-  'Operating System': 'bg-purple-500',
-  'Computer Network': 'bg-orange-500',
-  'Object Oriented Programming': 'bg-red-500',
-  'Data Structure and Algorithms': 'bg-blue-500',
-  'Java Programming': 'bg-indigo-500'
+  'DBMS': 'bg-green-500',
+  //'Operating System': 'bg-purple-500',
+  //'Computer Network': 'bg-orange-500',
+  'OOPS': 'bg-red-500',
+  //'Data Structure and Algorithms': 'bg-blue-500',
+ // 'Java Programming': 'bg-indigo-500'
 };
 
 /* ---------------- COMPONENT ---------------- */

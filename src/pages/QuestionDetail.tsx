@@ -1,32 +1,66 @@
+// 
+
+
+
+
+
+
+
+
+
+
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, CheckCircle2, XCircle, ChevronRight, HelpCircle } from 'lucide-react';
-import { Question } from '@/data/questions';
+import {
+  ChevronLeft,
+  CheckCircle2,
+  XCircle,
+  ChevronRight,
+  HelpCircle
+} from 'lucide-react';
 import { AskDoubtPanel } from '@/components/practice/AskDoubtPanel';
 import { useAuth } from '@/contexts/AuthContext';
+import { QuestionDto } from '@/services/questionsServices';
+import { getOptionsArray } from '@/data/questions';
+
+//const options = getOptionsArray(question); // replace old manual array
 
 const QuestionDetail = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { question, questionIndex, topicName, subjectName, questions, setNumber } = location.state as {
-    question: Question;
+
+  const {
+    question,
+    questionIndex,
+    topicName,
+    subjectName,
+    questions
+  } = location.state as {
+    question: QuestionDto;
     questionIndex: number;
     topicName: string;
     subjectName: string;
-    questions: Question[];
-    setNumber: number;
+    questions: QuestionDto[];
   };
 
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [showDoubtPanel, setShowDoubtPanel] = useState(false);
 
-  const handleAnswer = (answerIndex: number) => {
-    setSelectedAnswer(answerIndex);
+  /* ✅ Convert option1–4 into iterable array */
+  const options = [
+    question.option1,
+    question.option2,
+    question.option3,
+    question.option4
+  ];
+
+  const handleAnswer = (option: string) => {
+    setSelectedAnswer(option);
     setShowResult(true);
   };
 
@@ -38,8 +72,7 @@ const QuestionDetail = () => {
           questionIndex: questionIndex + 1,
           topicName,
           subjectName,
-          questions,
-          setNumber
+          questions
         }
       });
       setSelectedAnswer(null);
@@ -55,8 +88,7 @@ const QuestionDetail = () => {
           questionIndex: questionIndex - 1,
           topicName,
           subjectName,
-          questions,
-          setNumber
+          questions
         }
       });
       setSelectedAnswer(null);
@@ -77,10 +109,17 @@ const QuestionDetail = () => {
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <Badge variant="secondary" className="mb-2">{subjectName}</Badge>
-            <Badge variant="outline" className="ml-2 mb-2">{topicName}</Badge>
-            <h1 className="text-2xl font-bold mt-2">Question {questionIndex + 1}</h1>
+            <Badge variant="secondary" className="mb-2">
+              {subjectName}
+            </Badge>
+            <Badge variant="outline" className="ml-2 mb-2">
+              {topicName}
+            </Badge>
+            <h1 className="text-2xl font-bold mt-2">
+              Question {questionIndex + 1}
+            </h1>
           </div>
+
           {user?.role?.toLowerCase() === 'student' && (
             <Button onClick={() => setShowDoubtPanel(true)} variant="outline">
               <HelpCircle className="w-4 h-4 mr-2" />
@@ -93,69 +132,72 @@ const QuestionDetail = () => {
         <Card className="p-8 bg-gradient-card">
           <div className="flex items-start gap-4 mb-6">
             <div className="flex-1">
-              <h2 className="text-2xl font-semibold mb-6">{question.questionText}</h2>
+              <h2 className="text-2xl font-semibold mb-6">
+                {question.questionText}
+              </h2>
             </div>
-            {showResult && (
-              isCorrect ? (
-                <CheckCircle2 className="w-10 h-10 text-green-500 flex-shrink-0" />
+
+            {showResult &&
+              (isCorrect ? (
+                <CheckCircle2 className="w-10 h-10 text-green-500" />
               ) : (
-                <XCircle className="w-10 h-10 text-red-500 flex-shrink-0" />
-              )
-            )}
+                <XCircle className="w-10 h-10 text-red-500" />
+              ))}
           </div>
 
+          {/* Options */}
           <div className="space-y-4">
-            {question.options.map((option, optionIndex) => {
-              const isSelected = selectedAnswer === optionIndex;
-              const isCorrectOption = optionIndex === question.correctAnswer;
-              
-              let buttonClass = "justify-start text-left h-auto py-5 px-6 text-base ";
+            {options.map((option, index) => {
+              const isSelected = selectedAnswer === option;
+              const isCorrectOption = option === question.correctAnswer;
+
+              let buttonClass =
+                'justify-start text-left h-auto py-5 px-6 text-base ';
+
               if (showResult) {
                 if (isCorrectOption) {
-                  buttonClass += "border-green-500 bg-green-500/10";
+                  buttonClass += 'border-green-500 bg-green-500/10';
                 } else if (isSelected && !isCorrect) {
-                  buttonClass += "border-red-500 bg-red-500/10";
+                  buttonClass += 'border-red-500 bg-red-500/10';
                 }
               } else if (isSelected) {
-                buttonClass += "border-primary bg-primary/10";
+                buttonClass += 'border-primary bg-primary/10';
               }
 
               return (
                 <Button
-                  key={optionIndex}
+                  key={index}
                   variant="outline"
                   className={buttonClass}
-                  onClick={() => !showResult && handleAnswer(optionIndex)}
+                  onClick={() => !showResult && handleAnswer(option)}
                   disabled={showResult}
                 >
-                  <span className="font-bold mr-4 text-xl">{String.fromCharCode(65 + optionIndex)}.</span>
+                  <span className="font-bold mr-4 text-xl">
+                    {String.fromCharCode(65 + index)}.
+                  </span>
                   <span>{option}</span>
                 </Button>
               );
             })}
           </div>
 
-          {/* {showResult && question.explanation && (
-            <div className="mt-8 p-6 bg-muted/50 rounded-lg">
-              <h3 className="font-semibold mb-3 text-lg">Explanation</h3>
-              <p className="text-muted-foreground">{question.explanation}</p>
-            </div>
-          )} */}
-
+          {/* Navigation */}
           {showResult && (
             <div className="mt-6 flex gap-4 justify-center">
-              <Button 
-                onClick={handlePreviousQuestion} 
+              <Button
+                onClick={handlePreviousQuestion}
                 disabled={questionIndex === 0}
                 variant="outline"
               >
                 <ChevronLeft className="w-4 h-4 mr-2" />
                 Previous
               </Button>
+
               <Button onClick={() => navigate(-1)} variant="outline">
                 Back to Questions
               </Button>
-              <Button 
+
+              <Button
                 onClick={handleNextQuestion}
                 disabled={questionIndex === questions.length - 1}
               >
