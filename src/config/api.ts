@@ -423,10 +423,15 @@ export const API_CONFIG = {
   BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
   ENDPOINTS: {
     AUTH: {
+//<<<<<<< Updated upstream
       STUDENT_LOGIN: '/api/students/login',
       STUDENT_SIGNUP: '/api/students',
       TEACHER_LOGIN: '/api/teachers/login',
       TEACHER_SIGNUP: '/api/teachers',
+//=======
+      LOGIN: '/api/students/login',   // matches backend
+      SIGNUP: '/api/students', // implement later
+//>>>>>>> Stashed changes
     },
     STUDENTS: {
       PROFILE: '/api/students/profile',

@@ -93,7 +93,7 @@ const QuestionDetail = () => {
         <Card className="p-8 bg-gradient-card">
           <div className="flex items-start gap-4 mb-6">
             <div className="flex-1">
-              <h2 className="text-2xl font-semibold mb-6">{question.question}</h2>
+              <h2 className="text-2xl font-semibold mb-6">{question.questionText}</h2>
             </div>
             {showResult && (
               isCorrect ? (
@@ -135,12 +135,12 @@ const QuestionDetail = () => {
             })}
           </div>
 
-          {showResult && question.explanation && (
+          {/* {showResult && question.explanation && (
             <div className="mt-8 p-6 bg-muted/50 rounded-lg">
               <h3 className="font-semibold mb-3 text-lg">Explanation</h3>
               <p className="text-muted-foreground">{question.explanation}</p>
             </div>
-          )}
+          )} */}
 
           {showResult && (
             <div className="mt-6 flex gap-4 justify-center">
@@ -170,7 +170,7 @@ const QuestionDetail = () => {
         <AskDoubtPanel
           open={showDoubtPanel}
           onOpenChange={setShowDoubtPanel}
-          question={question.question}
+          question={question.questionText}
           subject={subjectName}
         />
       </div>

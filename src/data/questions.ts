@@ -1,10 +1,20 @@
+// export interface Question {
+//   questionID: number;
+//   questionText: string;
+//   options: string[];
+//   correctAnswer: number;
+// }
 export interface Question {
-  id: number;
-  question: string;
-  options: string[];
-  correctAnswer: number;
-  explanation?: string;
+  questionID: number;
+  questionText: string;
+  option1: string;
+  option2: string;
+  option3: string;
+  option4: string;
+  correctAnswer: string;
+  topicName: string;
 }
+
 
 export interface Topic {
   id: number;
@@ -20,107 +30,107 @@ export interface Subject {
 
 // Dummy questions for different subjects
 const dummyQuestions: Question[] = [
-  {
-    id: 1,
-    question: "What is normalization in databases?",
-    options: [
-      "Process of organizing data to reduce redundancy",
-      "Process of creating backups",
-      "Process of indexing tables",
-      "Process of deleting data"
-    ],
-    correctAnswer: 0,
-    explanation: "Normalization is the process of organizing data in a database to reduce redundancy and improve data integrity."
-  },
-  {
-    id: 2,
-    question: "Which SQL command is used to retrieve data?",
-    options: ["INSERT", "UPDATE", "SELECT", "DELETE"],
-    correctAnswer: 2
-  },
-  {
-    id: 3,
-    question: "What does ACID stand for in databases?",
-    options: [
-      "Atomicity, Consistency, Isolation, Durability",
-      "Addition, Computation, Integration, Distribution",
-      "Array, Class, Interface, Data",
-      "None of the above"
-    ],
-    correctAnswer: 0
-  },
-  {
-    id: 4,
-    question: "What is a primary key?",
-    options: [
-      "A key that opens the database",
-      "A unique identifier for a record",
-      "A foreign key reference",
-      "An index key"
-    ],
-    correctAnswer: 1
-  },
-  {
-    id: 5,
-    question: "Which process scheduling algorithm is non-preemptive?",
-    options: ["Round Robin", "FCFS", "Priority Scheduling", "Shortest Job First"],
-    correctAnswer: 1
-  },
-  {
-    id: 6,
-    question: "What is thrashing in OS?",
-    options: [
-      "High paging activity",
-      "CPU scheduling",
-      "Memory allocation",
-      "Disk formatting"
-    ],
-    correctAnswer: 0
-  },
-  {
-    id: 7,
-    question: "What is the OSI model?",
-    options: [
-      "A 7-layer networking framework",
-      "An operating system",
-      "A programming language",
-      "A database model"
-    ],
-    correctAnswer: 0
-  },
-  {
-    id: 8,
-    question: "What does TCP stand for?",
-    options: [
-      "Transfer Control Protocol",
-      "Transmission Control Protocol",
-      "Transport Connection Protocol",
-      "Terminal Control Protocol"
-    ],
-    correctAnswer: 1
-  },
-  {
-    id: 9,
-    question: "What is encapsulation in OOP?",
-    options: [
-      "Hiding implementation details",
-      "Creating multiple classes",
-      "Inheriting properties",
-      "Overloading methods"
-    ],
-    correctAnswer: 0
-  },
-  {
-    id: 10,
-    question: "What is polymorphism?",
-    options: [
-      "Multiple inheritance",
-      "Ability to take multiple forms",
-      "Data hiding",
-      "Object creation"
-    ],
-    correctAnswer: 1
-  }
+  
+  //   id: 1,
+  //   question: "What is normalization in databases?",
+  //   options: [
+  //     "Process of organizing data to reduce redundancy",
+  //     "Process of creating backups",
+  //     "Process of indexing tables",
+  //     "Process of deleting data"
+  //   ],
+  //   correctAnswer: 0,
+  //   explanation: "Normalization is the process of organizing data in a database to reduce redundancy and improve data integrity."
+  // },
+  // {
+  //   id: 2,
+  //   question: "Which SQL command is used to retrieve data?",
+  //   options: ["INSERT", "UPDATE", "SELECT", "DELETE"],
+  //   correctAnswer: 2
+  // },
+  // {
+  //   id: 3,
+  //   question: "What does ACID stand for in databases?",
+  //   options: [
+  //     "Atomicity, Consistency, Isolation, Durability",
+  //     "Addition, Computation, Integration, Distribution",
+  //     "Array, Class, Interface, Data",
+  //     "None of the above"
+  //   ],
+  //   correctAnswer: 0
+  // },
+  // {
+  //   id: 4,
+  //   question: "What is a primary key?",
+  //   options: [
+  //     "A key that opens the database",
+  //     "A unique identifier for a record",
+  //     "A foreign key reference",
+  //     "An index key"
+  //   ],
+  //   correctAnswer: 1
+  // },
+  // {
+  //   id: 5,
+  //   question: "Which process scheduling algorithm is non-preemptive?",
+  //   options: ["Round Robin", "FCFS", "Priority Scheduling", "Shortest Job First"],
+  //   correctAnswer: 1
+  // },
+  // {
+  //   id: 6,
+  //   question: "What is thrashing in OS?",
+  //   options: [
+  //     "High paging activity",
+  //     "CPU scheduling",
+  //     "Memory allocation",
+  //     "Disk formatting"
+  //   ],
+  //   correctAnswer: 0
+  // },
+  // {
+  //   id: 7,
+  //   question: "What is the OSI model?",
+  //   options: [
+  //     "A 7-layer networking framework",
+  //     "An operating system",
+  //     "A programming language",
+  //     "A database model"
+  //   ],
+  //   correctAnswer: 0
+  // },
+  // {
+  //   id: 8,
+  //   question: "What does TCP stand for?",
+  //   options: [
+  //     "Transfer Control Protocol",
+  //     "Transmission Control Protocol",
+  //     "Transport Connection Protocol",
+  //     "Terminal Control Protocol"
+  //   ],
+  //   correctAnswer: 1
+  // },
+  // {
+  //   id: 9,
+  //   question: "What is encapsulation in OOP?",
+  //   options: [
+  //     "Hiding implementation details",
+  //     "Creating multiple classes",
+  //     "Inheriting properties",
+  //     "Overloading methods"
+  //   ],
+  //   correctAnswer: 0
+  // },
+  // {
+  //   id: 10,
+  //   question: "What is polymorphism?",
+  //   options: [
+  //     "Multiple inheritance",
+  //     "Ability to take multiple forms",
+  //     "Data hiding",
+  //     "Object creation"
+  //   ],
+  //   correctAnswer: 1
+  // }
 ];
 
 // Generate multiple sets of questions
