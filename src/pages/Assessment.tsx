@@ -7,6 +7,11 @@ import { Progress } from '@/components/ui/progress';
 import { ChevronLeft, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { Question } from '@/data/questions';
 
+// Helper to get options as array
+const getOptionsArray = (q: Question): string[] => {
+  return [q.option1, q.option2, q.option3, q.option4];
+};
+
 const Assessment = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -35,7 +40,7 @@ const Assessment = () => {
   }, [isActive, timeLeft, showResults]);
 
   const handleAnswer = (answerIndex: number) => {
-    const questionId = questions[currentQuestion].id;
+    const questionId = questions[currentQuestion].questionID;
     setSelectedAnswers({ ...selectedAnswers, [questionId]: answerIndex });
   };
 
@@ -63,9 +68,13 @@ const Assessment = () => {
   };
 
   if (showResults) {
-    const correctCount = Object.keys(selectedAnswers).filter(
-      (qId) => selectedAnswers[parseInt(qId)] === questions.find(q => q.id === parseInt(qId))?.correctAnswer
-    ).length;
+    const correctCount = Object.keys(selectedAnswers).filter((qId) => {
+      const question = questions.find(q => q.questionID === parseInt(qId));
+      if (!question) return false;
+      const options = getOptionsArray(question);
+      const selectedOption = options[selectedAnswers[parseInt(qId)]];
+      return selectedOption === question.correctAnswer;
+    }).length;
     const percentage = Math.round((correctCount / questions.length) * 100);
 
     return (
@@ -111,7 +120,8 @@ const Assessment = () => {
   }
 
   const question = questions[currentQuestion];
-  const selectedAnswer = selectedAnswers[question.id];
+  const options = getOptionsArray(question);
+  const selectedAnswer = selectedAnswers[question.questionID];
 
   return (
     <div className="min-h-screen bg-background pt-20 pb-16">
@@ -145,11 +155,11 @@ const Assessment = () => {
             <Badge variant="outline" className="mb-4 text-lg px-3 py-1">
               {currentQuestion + 1}
             </Badge>
-            <h2 className="text-2xl font-semibold">{question.question}</h2>
+            <h2 className="text-2xl font-semibold">{question.questionText}</h2>
           </div>
 
           <div className="space-y-3">
-            {question.options.map((option, optionIndex) => {
+            {options.map((option, optionIndex) => {
               const isSelected = selectedAnswer === optionIndex;
               
               return (

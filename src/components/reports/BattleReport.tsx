@@ -9,11 +9,15 @@ import {
   Clock,
   Target,
   Medal,
-  TrendingUp,
   ChevronLeft,
   Zap
 } from 'lucide-react';
 import { Question } from '@/data/questions';
+
+// Helper to get options as array
+const getOptionsArray = (q: Question): string[] => {
+  return [q.option1, q.option2, q.option3, q.option4];
+};
 
 interface BattleReportProps {
   questions: Question[];
@@ -30,9 +34,13 @@ export const BattleReport = ({
   totalQuestions,
   onBack 
 }: BattleReportProps) => {
-  const correctCount = Object.keys(selectedAnswers).filter(
-    (qId) => selectedAnswers[parseInt(qId)] === questions.find(q => q.id === parseInt(qId))?.correctAnswer
-  ).length;
+  const correctCount = Object.keys(selectedAnswers).filter((qId) => {
+    const question = questions.find(q => q.questionID === parseInt(qId));
+    if (!question) return false;
+    const options = getOptionsArray(question);
+    const selectedOption = options[selectedAnswers[parseInt(qId)]];
+    return selectedOption === question.correctAnswer;
+  }).length;
   
   const answeredCount = Object.keys(selectedAnswers).length;
   const percentage = Math.round((correctCount / totalQuestions) * 100);
@@ -91,7 +99,7 @@ export const BattleReport = ({
             </div>
             <div className="text-center p-4 bg-muted/50 rounded-lg">
               <Target className="w-6 h-6 mx-auto mb-2 text-purple-500" />
-              <div className="text-2xl font-bold">{Math.round((correctCount / answeredCount) * 100)}%</div>
+              <div className="text-2xl font-bold">{answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0}%</div>
               <div className="text-sm text-muted-foreground">Accuracy</div>
             </div>
           </div>
@@ -101,29 +109,31 @@ export const BattleReport = ({
         <h2 className="text-2xl font-bold mb-4">Question Review</h2>
         <div className="space-y-4">
           {questions.map((question, index) => {
-            const userAnswer = selectedAnswers[question.id];
+            const options = getOptionsArray(question);
+            const userAnswerIndex = selectedAnswers[question.questionID];
+            const userAnswer = userAnswerIndex !== undefined ? options[userAnswerIndex] : undefined;
             const isCorrect = userAnswer === question.correctAnswer;
             const wasAnswered = userAnswer !== undefined;
 
             return (
-              <Card key={question.id} className="p-6 bg-gradient-card">
+              <Card key={question.questionID} className="p-6 bg-gradient-card">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-start gap-3 flex-1">
                     <Badge variant="outline" className="mt-1">
                       {index + 1}
                     </Badge>
                     <div className="flex-1">
-                      <p className="font-medium mb-3">{question.question}</p>
+                      <p className="font-medium mb-3">{question.questionText}</p>
                       {wasAnswered && (
                         <div className="space-y-2">
                           <div className={`p-3 rounded-lg ${isCorrect ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20'}`}>
                             <div className="text-sm font-medium mb-1">Your Answer:</div>
-                            <div className="text-sm">{question.options[userAnswer]}</div>
+                            <div className="text-sm">{userAnswer}</div>
                           </div>
                           {!isCorrect && (
                             <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
                               <div className="text-sm font-medium mb-1">Correct Answer:</div>
-                              <div className="text-sm">{question.options[question.correctAnswer]}</div>
+                              <div className="text-sm">{question.correctAnswer}</div>
                             </div>
                           )}
                         </div>
