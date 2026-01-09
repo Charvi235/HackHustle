@@ -18,6 +18,7 @@ import QuestionDetail from "@/pages/QuestionDetail";
 import Assessment from "@/pages/Assessment";
 import Auth from "@/pages/Auth";
 import FacultyDashboard from "@/pages/FacultyDashboard";
+import Profile from "@/pages/Profile";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,8 +32,8 @@ const AppContent = () => {
       <div className="min-h-screen flex w-full">
         {!isAuthPage && <AppSidebar />}
         <div className="flex-1 flex flex-col">
-          {!isAuthPage && <Header />}
-          <main className="flex-1">
+          <Header />
+          <main className="flex-1 pt-16">
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
@@ -71,6 +72,12 @@ const AppContent = () => {
             <Route path="/faculty-dashboard" element={
               <ProtectedRoute allowFaculty={true} allowStudent={false}>
                 <FacultyDashboard />
+              </ProtectedRoute>
+            } />
+            {/* Profile page - accessible to all authenticated users */}
+            <Route path="/profile" element={
+              <ProtectedRoute allowFaculty={true} allowStudent={true}>
+                <Profile />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
