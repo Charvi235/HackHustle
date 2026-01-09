@@ -40,13 +40,19 @@ interface AuthContextType {
   isFaculty: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within AuthProvider');
-  return context;
+const defaultAuthContext: AuthContextType = {
+  user: null,
+  login: async () => false,
+  signup: async () => false,
+  logout: () => {},
+  isAuthenticated: false,
+  isTeacher: false,
+  isFaculty: false,
 };
+
+const AuthContext = createContext<AuthContextType>(defaultAuthContext);
+
+export const useAuth = () => useContext(AuthContext);
 
 // Utility to convert lowercase role to uppercase literal
 const mapRole = (role: 'student' | 'teacher'): RoleType => {
