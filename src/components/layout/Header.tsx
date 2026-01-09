@@ -1,21 +1,10 @@
-import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Zap, LogOut, User, Info, Mail } from 'lucide-react';
+import { Zap, Info, Mail } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { ProfileDialog } from '@/components/profile/ProfileDialog';
-import { DoubtsDialog } from '@/components/profile/DoubtsDialog';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { BookOpen } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -23,13 +12,10 @@ import {
 } from '@/components/ui/tooltip';
 
 export const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [unreadDoubtsCount, setUnreadDoubtsCount] = useState(3);
-  const [showProfileDialog, setShowProfileDialog] = useState(false);
-  const [showDoubtsDialog, setShowDoubtsDialog] = useState(false);
-  const { isAuthenticated, user, logout, isFaculty } = useAuth();
+  const { isAuthenticated, user, isFaculty } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const unreadDoubtsCount = 3; // Mock count
 
   const handleAboutClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -43,24 +29,18 @@ export const Header = () => {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-    setIsMenuOpen(false);
-  };
-
   const getUserInitials = () => {
     if (!user) return 'U';
     return `${user.first_name?.[0] || ''}${user.last_name?.[0] || ''}`.toUpperCase();
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Left side - Sidebar trigger and Logo */}
+          {/* Left Side - Logo */}
           <div className="flex items-center space-x-4">
-            <SidebarTrigger />
+            {isAuthenticated && <SidebarTrigger />}
             <Link to={isAuthenticated ? '/dashboard' : '/'} className="flex items-center space-x-2 font-bold text-xl">
               <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
                 <Zap className="h-5 w-5 text-white" />
@@ -71,77 +51,49 @@ export const Header = () => {
             </Link>
           </div>
 
-          {/* Right side - User actions */}
+          {/* Center - About Us & Contact Us (always visible) */}
+          <div className="hidden md:flex items-center space-x-6">
+            <Button variant="ghost" onClick={handleAboutClick}>
+              <Info className="h-4 w-4 mr-2" />
+              About Us
+            </Button>
+            
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" className="cursor-default">
+                  <Mail className="h-4 w-4 mr-2" />
+                  Contact Us
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Need help? Reach us at contact@hackhustle.org</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+
+          {/* Right Side - User Profile or Auth buttons */}
           <div className="flex items-center space-x-4">
             {isAuthenticated ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback>{getUserInitials()}</AvatarFallback>
-                    </Avatar>
-                    {!isFaculty && unreadDoubtsCount > 0 && (
-                      <Badge 
-                        variant="destructive" 
-                        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                      >
-                        {unreadDoubtsCount}
-                      </Badge>
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <div className="flex flex-col space-y-1 p-2">
-                    <p className="text-sm font-medium">{user?.first_name} {user?.last_name}</p>
-                    <p className="text-xs text-muted-foreground">{user?.emailId}</p>
-                    {!isFaculty && <p className="text-xs text-muted-foreground">{user?.points} pts</p>}
-                    {isFaculty && <p className="text-xs text-muted-foreground">Faculty - {user?.subject}</p>}
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setShowProfileDialog(true)}>
-                    <User className="mr-2 h-4 w-4" />
-                    My Profile
-                  </DropdownMenuItem>
-                  {/* Only students can see their doubts */}
-                  {!isFaculty && (
-                    <DropdownMenuItem onClick={() => setShowDoubtsDialog(true)}>
-                      <BookOpen className="mr-2 h-4 w-4" />
-                      My Doubts
-                      {unreadDoubtsCount > 0 && (
-                        <Badge variant="destructive" className="ml-auto">
-                          {unreadDoubtsCount}
-                        </Badge>
-                      )}
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="relative"
+                onClick={() => navigate('/profile')}
+              >
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                </Avatar>
+                {!isFaculty && unreadDoubtsCount > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                  >
+                    {unreadDoubtsCount}
+                  </Badge>
+                )}
+              </Button>
             ) : (
               <>
-                {/* About Us - scroll to section */}
-                <Button variant="ghost" onClick={handleAboutClick} className="hidden md:inline-flex">
-                  <Info className="h-4 w-4 mr-2" />
-                  About Us
-                </Button>
-                
-                {/* Contact Us - hover tooltip */}
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" className="hidden md:inline-flex cursor-default">
-                      <Mail className="h-4 w-4 mr-2" />
-                      Contact Us
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Need help? Reach us at contact@hackhustle.org</p>
-                  </TooltipContent>
-                </Tooltip>
-
                 <Button variant="ghost" onClick={() => navigate('/auth')}>
                   Sign In
                 </Button>
@@ -151,22 +103,6 @@ export const Header = () => {
           </div>
         </div>
       </div>
-
-      {/* Dialogs */}
-      <ProfileDialog 
-        open={showProfileDialog} 
-        onOpenChange={setShowProfileDialog}
-      />
-      {!isFaculty && (
-        <DoubtsDialog 
-          open={showDoubtsDialog} 
-          onOpenChange={setShowDoubtsDialog}
-          onMarkAsRead={(doubtId) => setUnreadDoubtsCount(prev => Math.max(0, prev - 1))}
-          onRateTeacher={(doubtId, rating) => {
-            console.log(`Rated doubt ${doubtId} with ${rating} stars`);
-          }}
-        />
-      )}
     </header>
   );
 };
