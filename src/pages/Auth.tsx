@@ -538,7 +538,7 @@ const Auth = () => {
       const success = await login(loginData.emailId, loginData.password, role.toLowerCase() as 'student' | 'teacher');
       if (success) {
         toast({ title: 'Login successful!' });
-        navigate(role === 'TEACHER' ? '/faculty-dashboard' : '/dashboard');
+        navigate(role === 'TEACHER' ? '/faculty-dashboard' : '/practice');
       }
     } catch (err: any) {
       toast({ title: 'Login failed', description: err.message || 'Something went wrong' });
@@ -560,7 +560,7 @@ const Auth = () => {
       );
       if (success) {
         toast({ title: 'Signup successful!' });
-        navigate('/dashboard');
+        navigate('/practice');
       }
     } catch (err: any) {
       toast({ title: 'Signup failed', description: err.message || 'Something went wrong' });
@@ -594,7 +594,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-20 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex justify-center mb-8">

@@ -28,6 +28,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 
 export function AppSidebar() {
   const { isAuthenticated, isFaculty } = useAuth();
@@ -77,38 +78,50 @@ export function AppSidebar() {
 
   return (
     <Sidebar 
-      className={collapsed ? "w-14" : "w-60"}
+      className={collapsed ? "w-14" : "w-64"}
       collapsible="icon"
     >
       <SidebarContent className="pt-16">
         <SidebarGroup>
-          <SidebarGroupLabel>
+          <SidebarGroupLabel className="text-sm font-semibold text-muted-foreground mb-2">
             {isAuthenticated 
               ? (isFaculty ? 'Faculty Menu' : 'Student Menu') 
               : 'Navigation'}
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild
-                    isActive={isActive(item.url)}
-                  >
-                    <Link to={item.url}>
-                      <item.icon className="h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+            <SidebarMenu className="space-y-1">
+              {navItems.map((item) => {
+                const active = isActive(item.url);
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton 
+                      asChild
+                      isActive={active}
+                      className={cn(
+                        "transition-all duration-200 ease-in-out text-base py-3",
+                        active 
+                          ? "bg-primary/20 text-primary font-bold border-l-4 border-primary" 
+                          : "hover:bg-muted/60 hover:text-foreground"
+                      )}
+                    >
+                      <Link to={item.url} className="flex items-center gap-3">
+                        <item.icon className={cn("h-5 w-5", active && "text-primary")} />
+                        {!collapsed && <span className="text-base">{item.title}</span>}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
               
               {/* About Us - smooth scroll (only for public) */}
               {!isAuthenticated && (
                 <SidebarMenuItem>
-                  <SidebarMenuButton onClick={handleAboutClick}>
-                    <Info className="h-4 w-4" />
-                    {!collapsed && <span>About Us</span>}
+                  <SidebarMenuButton 
+                    onClick={handleAboutClick}
+                    className="transition-all duration-200 ease-in-out text-base py-3 hover:bg-muted/60 hover:text-foreground"
+                  >
+                    <Info className="h-5 w-5" />
+                    {!collapsed && <span className="text-base">About Us</span>}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )}
@@ -118,9 +131,9 @@ export function AppSidebar() {
                 <SidebarMenuItem>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <SidebarMenuButton className="cursor-default">
-                        <Mail className="h-4 w-4" />
-                        {!collapsed && <span>Contact Us</span>}
+                      <SidebarMenuButton className="cursor-default transition-all duration-200 ease-in-out text-base py-3 hover:bg-muted/60">
+                        <Mail className="h-5 w-5" />
+                        {!collapsed && <span className="text-base">Contact Us</span>}
                       </SidebarMenuButton>
                     </TooltipTrigger>
                     <TooltipContent side="right">
@@ -136,21 +149,24 @@ export function AppSidebar() {
         {/* About/Contact for authenticated users */}
         {isAuthenticated && (
           <SidebarGroup>
-            <SidebarGroupLabel>Info</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-sm font-semibold text-muted-foreground mb-2">Info</SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className="space-y-1">
                 <SidebarMenuItem>
-                  <SidebarMenuButton onClick={handleAboutClick}>
-                    <Info className="h-4 w-4" />
-                    {!collapsed && <span>About Us</span>}
+                  <SidebarMenuButton 
+                    onClick={handleAboutClick}
+                    className="transition-all duration-200 ease-in-out text-base py-3 hover:bg-muted/60 hover:text-foreground"
+                  >
+                    <Info className="h-5 w-5" />
+                    {!collapsed && <span className="text-base">About Us</span>}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <SidebarMenuButton className="cursor-default">
-                        <Mail className="h-4 w-4" />
-                        {!collapsed && <span>Contact Us</span>}
+                      <SidebarMenuButton className="cursor-default transition-all duration-200 ease-in-out text-base py-3 hover:bg-muted/60">
+                        <Mail className="h-5 w-5" />
+                        {!collapsed && <span className="text-base">Contact Us</span>}
                       </SidebarMenuButton>
                     </TooltipTrigger>
                     <TooltipContent side="right">
