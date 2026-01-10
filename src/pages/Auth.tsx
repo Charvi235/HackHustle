@@ -17,9 +17,11 @@ const isValidGmail = (email: string) => {
 };
 
 const isValidPassword = (password: string) => {
-  const passwordRegex = /^(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z@$!%*?&]{8}$/;
-  return passwordRegex.test(password);
+  const regex =
+    /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+  return regex.test(password);
 };
+
 
 const isEmptyField = (data: Record<string, string>) => {
   return Object.values(data).some((value) => value.trim() === '');
@@ -73,7 +75,7 @@ const Auth = () => {
     toast({
       title: 'Invalid Password',
       description:
-        'Password must be exactly 8 characters, include 1 uppercase letter and 1 special character',
+        'Password must be of 8 characters or more, include atleast one uppercase letter and one special character',
       variant: 'destructive',
     });
     return;
@@ -141,11 +143,13 @@ const handleStudentSignup = async () => {
     toast({
       title: 'Invalid Password',
       description:
-        'Password must be exactly 8 characters, include 1 uppercase letter and 1 special character',
+        'Password must be of 8 characters or more, include atleast one uppercase letter and one special character',
       variant: 'destructive',
     });
     return;
   }
+  console.log('Signup payload (STUDENT):', signupData);
+
 
   setIsLoading(true);
   try {
@@ -219,11 +223,12 @@ const handleTeacherSignup = async () => {
     toast({
       title: 'Invalid Password',
       description:
-        'Password must be exactly 8 characters, include 1 uppercase letter and 1 special character',
+        'Password must be of 8 characters or more, include atleast one uppercase letter and one special character',
       variant: 'destructive',
     });
     return;
   }
+console.log('Signup payload (TEACHER):', teacherSignupData);
 
   setIsLoading(true);
   try {
