@@ -5,7 +5,7 @@ import { toast } from '@/hooks/use-toast';
 // ==================== MOCK MODE TOGGLE ====================
 // Set to `true` for mock login (no backend needed)
 // Set to `false` to use the real backend
-const USE_MOCK_AUTH = true;
+const USE_MOCK_AUTH = false;
 // ==========================================================
 
 type RoleType = 'STUDENT' | 'TEACHER';
