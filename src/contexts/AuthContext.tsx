@@ -3,6 +3,12 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { authService } from '@/services/authService';
 import { toast } from '@/hooks/use-toast';
 
+// ==================== MOCK MODE TOGGLE ====================
+// Set to `true` for mock login (no backend needed)
+// Set to `false` to use the real backend
+const USE_MOCK_AUTH = true;
+// ==========================================================
+
 type RoleType = 'STUDENT' | 'TEACHER';
 
 interface User {
@@ -35,13 +41,19 @@ interface AuthContextType {
   isFaculty: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within AuthProvider');
-  return context;
+const defaultAuthContext: AuthContextType = {
+  user: null,
+  login: async () => false,
+  signup: async () => false,
+  logout: () => {},
+  isAuthenticated: false,
+  isTeacher: false,
+  isFaculty: false,
 };
+
+const AuthContext = createContext<AuthContextType>(defaultAuthContext);
+
+export const useAuth = () => useContext(AuthContext);
 
 // Utility to convert lowercase role to uppercase literal
 const mapRole = (role: 'student' | 'teacher'): RoleType => {
@@ -63,9 +75,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     password: string,
     role: 'student' | 'teacher'
   ): Promise<boolean> => {
+    // ==================== MOCK LOGIN ====================
+    if (USE_MOCK_AUTH) {
+      const roleUpper = mapRole(role);
+      const mockUser: User = {
+        student_id: 'mock-student-001',
+        first_name: 'Charvi',
+        last_name: 'Student',
+        emailId: emailId || 'charvi@example.com',
+        role: roleUpper,
+        points: 150,
+      };
+      setUser(mockUser);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+      toast({ title: 'Mock login successful!' });
+      return true;
+    }
+    // ==================== REAL LOGIN ====================
     try {
       const roleUpper = mapRole(role);
-      const success = await authService.login({ emailId, password, role: roleUpper }); // <-- pass object
+      const success = await authService.login({ emailId, password, role: roleUpper });
       if (success) {
         const loggedInUser: User = {
           
@@ -97,6 +126,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     subjectAssociated?: string,
     institute?: string
   ): Promise<boolean> => {
+    // ==================== MOCK SIGNUP ====================
+    if (USE_MOCK_AUTH) {
+      const roleUpper = mapRole(role);
+      const mockUser: User = {
+        student_id: 'mock-student-001',
+        first_name: firstName || 'Charvi',
+        last_name: lastName || 'Student',
+        emailId: emailId || 'charvi@example.com',
+        role: roleUpper,
+        points: 0,
+      };
+      setUser(mockUser);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+      toast({ title: 'Mock signup successful!' });
+      return true;
+    }
+    // ==================== REAL SIGNUP ====================
     try {
       const roleUpper = mapRole(role);
       const success = await authService.signup({
@@ -107,7 +153,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         role: roleUpper,
         subject_associated: subjectAssociated,
         institute,
-      }); // <-- pass object
+      });
 
       if (success) {
         const newUser: User = {
@@ -131,7 +177,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
-    await authService.logout();
+    if (!USE_MOCK_AUTH) {
+      await authService.logout();
+    }
     setUser(null);
     localStorage.removeItem('user');
   };
@@ -147,15 +195,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         logout,
         isAuthenticated: !!user,
         isTeacher,
-        isFaculty: isTeacher, // alias for backward compatibility
+        isFaculty: isTeacher,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
-
-
-
 
 

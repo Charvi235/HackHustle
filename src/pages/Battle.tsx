@@ -19,6 +19,11 @@ import { battleQuestions, Question } from '@/data/questions';
 import { BattleReport } from '@/components/reports/BattleReport';
 import { BattleLobby, JoinBattleLobby } from './BattleLobby';
 
+// Helper to get options as array
+const getOptionsArray = (q: Question): string[] => {
+  return [q.option1, q.option2, q.option3, q.option4];
+};
+
 const battleModes = [
   {
     id: 1,
@@ -111,7 +116,7 @@ const Battle = () => {
   };
 
   const handleAnswer = (answerIndex: number) => {
-    const questionId = battleQuestions[currentQuestion].id;
+    const questionId = battleQuestions[currentQuestion].questionID;
     setSelectedAnswers({ ...selectedAnswers, [questionId]: answerIndex });
     setShowResults({ ...showResults, [questionId]: true });
 
@@ -171,10 +176,13 @@ const Battle = () => {
 
   if (gameMode === 'game') {
     const question = battleQuestions[currentQuestion];
-    const questionId = question.id;
+    const questionId = question.questionID;
+    const options = getOptionsArray(question);
     const isAnswered = showResults[questionId];
     const selectedAnswer = selectedAnswers[questionId];
-    const isCorrect = selectedAnswer === question.correctAnswer;
+    // Check if selected option text matches correctAnswer
+    const selectedOptionText = selectedAnswer !== undefined ? options[selectedAnswer] : null;
+    const isCorrect = selectedOptionText === question.correctAnswer;
 
     return (
       <div className="min-h-screen bg-background pt-20 pb-16">
@@ -205,7 +213,7 @@ const Battle = () => {
               <Badge variant="outline" className="text-lg px-3 py-1">
                 {currentQuestion + 1}
               </Badge>
-              <h2 className="text-2xl font-semibold flex-1">{question.question}</h2>
+              <h2 className="text-2xl font-semibold flex-1">{question.questionText}</h2>
               {isAnswered && (
                 isCorrect ? (
                   <CheckCircle2 className="w-8 h-8 text-green-500" />
@@ -216,9 +224,9 @@ const Battle = () => {
             </div>
 
             <div className="space-y-3">
-              {question.options.map((option, optionIndex) => {
+              {options.map((option, optionIndex) => {
                 const isSelected = selectedAnswer === optionIndex;
-                const isCorrectOption = optionIndex === question.correctAnswer;
+                const isCorrectOption = option === question.correctAnswer;
                 
                 let buttonClass = "justify-start text-left h-auto py-4 px-4 ";
                 if (isAnswered) {
@@ -253,9 +261,13 @@ const Battle = () => {
               <div>
                 <div className="text-sm text-muted-foreground">Your Score</div>
                 <div className="text-2xl font-bold">
-                  {Object.keys(showResults).filter(
-                    (qId) => selectedAnswers[parseInt(qId)] === battleQuestions.find(q => q.id === parseInt(qId))?.correctAnswer
-                  ).length} / {Object.keys(showResults).length}
+                  {Object.keys(showResults).filter((qId) => {
+                    const q = battleQuestions.find(bq => bq.questionID === parseInt(qId));
+                    if (!q) return false;
+                    const opts = getOptionsArray(q);
+                    const selOpt = opts[selectedAnswers[parseInt(qId)]];
+                    return selOpt === q.correctAnswer;
+                  }).length} / {Object.keys(showResults).length}
                 </div>
               </div>
               <Button onClick={handleFinishGame} variant="outline">

@@ -1,5 +1,4 @@
 
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,6 +11,21 @@ import { Zap } from 'lucide-react';
 
 type RoleType = 'STUDENT' | 'TEACHER';
 
+//-----------------
+const isValidGmail = (email: string) => {
+  return email.endsWith('@gmail.com');
+};
+
+const isValidPassword = (password: string) => {
+  const passwordRegex = /^(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z@$!%*?&]{8}$/;
+  return passwordRegex.test(password);
+};
+
+const isEmptyField = (data: Record<string, string>) => {
+  return Object.values(data).some((value) => value.trim() === '');
+};
+
+//------------------
 const Auth = () => {
   const navigate = useNavigate();
   const { login, signup } = useAuth();
@@ -31,70 +45,240 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [signupRole, setSignupRole] = useState<RoleType>('STUDENT');
 
-  // ===== LOGIN =====
+
+  //--------------------------------
   const handleLogin = async (role: RoleType) => {
-    setIsLoading(true);
-    try {
-      const success = await login(loginData.emailId, loginData.password, role.toLowerCase() as 'student' | 'teacher');
-      if (success) {
-        toast({ title: 'Login successful!' });
-        navigate(role === 'TEACHER' ? '/faculty-dashboard' : '/dashboard');
-      }
-    } catch (err: any) {
-      toast({ title: 'Login failed', description: err.message || 'Something went wrong' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Mandatory check
+  if (isEmptyField(loginData)) {
+    toast({
+      title: 'Validation Error',
+      description: 'All fields are mandatory',
+      variant: 'destructive',
+    });
+    return;
+  }
 
+  // Email validation
+  if (!isValidGmail(loginData.emailId)) {
+    toast({
+      title: 'Invalid Email',
+      description: 'Email must end with @gmail.com',
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  // Password validation
+  if (!isValidPassword(loginData.password)) {
+    toast({
+      title: 'Invalid Password',
+      description:
+        'Password must be exactly 8 characters, include 1 uppercase letter and 1 special character',
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  setIsLoading(true);
+  try {
+    const success = await login(
+      loginData.emailId,
+      loginData.password,
+      role.toLowerCase() as 'student' | 'teacher'
+    );
+
+    if (success) {
+      toast({ title: 'Login successful!' });
+      navigate(role === 'TEACHER' ? '/faculty-dashboard' : '/practice');
+    }
+  } catch (err: any) {
+    toast({
+      title: 'Login failed',
+      description: err.message || 'Something went wrong',
+      variant: 'destructive',
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+  // ===== LOGIN =====
+  // const handleLogin = async (role: RoleType) => {
+  //   setIsLoading(true);
+  //   try {
+  //     const success = await login(loginData.emailId, loginData.password, role.toLowerCase() as 'student' | 'teacher');
+  //     if (success) {
+  //       toast({ title: 'Login successful!' });
+  //       navigate(role === 'TEACHER' ? '/faculty-dashboard' : '/practice');
+  //     }
+  //   } catch (err: any) {
+  //     toast({ title: 'Login failed', description: err.message || 'Something went wrong' });
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+//------------------------------------------------------------------------------
+const handleStudentSignup = async () => {
+  if (isEmptyField(signupData)) {
+    toast({
+      title: 'Validation Error',
+      description: 'All fields are mandatory',
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  if (!isValidGmail(signupData.emailId)) {
+    toast({
+      title: 'Invalid Email',
+      description: 'Email must end with @gmail.com',
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  if (!isValidPassword(signupData.password)) {
+    toast({
+      title: 'Invalid Password',
+      description:
+        'Password must be exactly 8 characters, include 1 uppercase letter and 1 special character',
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  setIsLoading(true);
+  try {
+    const success = await signup(
+      signupData.firstName,
+      signupData.lastName,
+      signupData.emailId,
+      signupData.password,
+      'student'
+    );
+
+    if (success) {
+      toast({ title: 'Signup successful!' });
+      navigate('/practice');
+    }
+  } catch (err: any) {
+    toast({
+      title: 'Signup failed',
+      description: err.message || 'Something went wrong',
+      variant: 'destructive',
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+//-----------------------------------------------------------------------------
   // ===== STUDENT SIGNUP =====
-  const handleStudentSignup = async () => {
-    setIsLoading(true);
-    try {
-      const success = await signup(
-        signupData.firstName,
-        signupData.lastName,
-        signupData.emailId,
-        signupData.password,
-        'student'
-      );
-      if (success) {
-        toast({ title: 'Signup successful!' });
-        navigate('/dashboard');
-      }
-    } catch (err: any) {
-      toast({ title: 'Signup failed', description: err.message || 'Something went wrong' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // const handleStudentSignup = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     const success = await signup(
+  //       signupData.firstName,
+  //       signupData.lastName,
+  //       signupData.emailId,
+  //       signupData.password,
+  //       'student'
+  //     );
+  //     if (success) {
+  //       toast({ title: 'Signup successful!' });
+  //       navigate('/practice');
+  //     }
+  //   } catch (err: any) {
+  //     toast({ title: 'Signup failed', description: err.message || 'Something went wrong' });
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
-  // ===== TEACHER SIGNUP =====
-  const handleTeacherSignup = async () => {
-    setIsLoading(true);
-    try {
-      const success = await signup(
-        teacherSignupData.firstName,
-        teacherSignupData.lastName,
-        teacherSignupData.emailId,
-        teacherSignupData.password,
-        'teacher',
-        teacherSignupData.subjectAssociated,
-        teacherSignupData.institute
-      );
-      if (success) {
-        toast({ title: 'Signup successful!' });
-        navigate('/faculty-dashboard');
-      }
-    } catch (err: any) {
-      toast({ title: 'Signup failed', description: err.message || 'Something went wrong' });
-    } finally {
-      setIsLoading(false);
+  //---------------------------------------------------------
+const handleTeacherSignup = async () => {
+  if (isEmptyField(teacherSignupData)) {
+    toast({
+      title: 'Validation Error',
+      description: 'All fields are mandatory',
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  if (!isValidGmail(teacherSignupData.emailId)) {
+    toast({
+      title: 'Invalid Email',
+      description: 'Email must end with @gmail.com',
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  if (!isValidPassword(teacherSignupData.password)) {
+    toast({
+      title: 'Invalid Password',
+      description:
+        'Password must be exactly 8 characters, include 1 uppercase letter and 1 special character',
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  setIsLoading(true);
+  try {
+    const success = await signup(
+      teacherSignupData.firstName,
+      teacherSignupData.lastName,
+      teacherSignupData.emailId,
+      teacherSignupData.password,
+      'teacher',
+      teacherSignupData.subjectAssociated,
+      teacherSignupData.institute
+    );
+
+    if (success) {
+      toast({ title: 'Signup successful!' });
+      navigate('/faculty-dashboard');
     }
-  };
+  } catch (err: any) {
+    toast({
+      title: 'Signup failed',
+      description: err.message || 'Something went wrong',
+      variant: 'destructive',
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+  //-----------------------------------------------------------
+  // ===== TEACHER SIGNUP =====
+  // const handleTeacherSignup = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     const success = await signup(
+  //       teacherSignupData.firstName,
+  //       teacherSignupData.lastName,
+  //       teacherSignupData.emailId,
+  //       teacherSignupData.password,
+  //       'teacher',
+  //       teacherSignupData.subjectAssociated,
+  //       teacherSignupData.institute
+  //     );
+  //     if (success) {
+  //       toast({ title: 'Signup successful!' });
+  //       navigate('/faculty-dashboard');
+  //     }
+  //   } catch (err: any) {
+  //     toast({ title: 'Signup failed', description: err.message || 'Something went wrong' });
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-20 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex justify-center mb-8">

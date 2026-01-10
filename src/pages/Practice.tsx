@@ -120,6 +120,7 @@ const Practice = () => {
         topicName={selectedTopic.name}
         subjectName={selectedSubject.name}
         onBack={() => setStartQuiz(false)}
+        totalQuestionsInTopic={questionSets.flat().length}
       />
     );
   }
