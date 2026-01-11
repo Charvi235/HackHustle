@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Pencil, Save, X, LogOut, BookOpen } from 'lucide-react';
+import { Pencil, Save, X, LogOut, BookOpen, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 
@@ -173,7 +173,18 @@ const Profile = () => {
             <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {!isFaculty && (
+            {isFaculty ? (
+              // Faculty-specific quick actions
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => navigate('/faculty-doubts')}
+              >
+                <MessageSquare className="mr-2 h-4 w-4" />
+                View Doubts
+              </Button>
+            ) : (
+              // Student-specific quick actions
               <Button 
                 variant="outline" 
                 className="w-full justify-start"

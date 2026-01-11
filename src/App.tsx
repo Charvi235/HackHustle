@@ -18,6 +18,8 @@ import QuestionDetail from "@/pages/QuestionDetail";
 import Assessment from "@/pages/Assessment";
 import Auth from "@/pages/Auth";
 import FacultyDashboard from "@/pages/FacultyDashboard";
+import FacultyDoubts from "@/pages/FacultyDoubts";
+import FacultyStudents from "@/pages/FacultyStudents";
 import Profile from "@/pages/Profile";
 import NotFound from "@/pages/NotFound";
 
@@ -68,10 +70,20 @@ const AppContent = () => {
                 <Assessment />
               </ProtectedRoute>
             } />
-            {/* Faculty-only route */}
+            {/* Faculty-only routes */}
             <Route path="/faculty-dashboard" element={
               <ProtectedRoute allowFaculty={true} allowStudent={false}>
                 <FacultyDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/faculty-doubts" element={
+              <ProtectedRoute allowFaculty={true} allowStudent={false}>
+                <FacultyDoubts />
+              </ProtectedRoute>
+            } />
+            <Route path="/faculty-students" element={
+              <ProtectedRoute allowFaculty={true} allowStudent={false}>
+                <FacultyStudents />
               </ProtectedRoute>
             } />
             {/* Profile page - accessible to all authenticated users */}
