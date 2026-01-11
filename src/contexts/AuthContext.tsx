@@ -35,7 +35,7 @@ const MOCK_TEACHER: User = {
   teacher_id: 'mock-teacher-001',
   first_name: 'Amit',
   last_name: 'Verma',
-  emailId: 'teacher@hackhustle.com',
+  emailId: 'teacher@gmail.com',
   role: 'TEACHER',
   subject: 'DSA',
   institute: 'IIT Delhi',
