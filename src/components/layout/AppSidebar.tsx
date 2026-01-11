@@ -59,12 +59,11 @@ export function AppSidebar() {
     { title: 'Quiz Battle', url: '/battle', icon: Trophy },
   ];
 
-  // Faculty navigation items - no interview, battle, practice
+  // Faculty navigation items - only 3 items: Dashboard, Student Doubts, Students
   const facultyItems = [
     { title: 'Dashboard', url: '/faculty-dashboard', icon: LayoutDashboard },
-    { title: 'Student Doubts', url: '/faculty-dashboard', icon: MessageSquare },
-    { title: 'Manage Questions', url: '/faculty-dashboard', icon: BookOpen },
-    { title: 'Students', url: '/faculty-dashboard', icon: Users },
+    { title: 'Student Doubts', url: '/faculty-doubts', icon: MessageSquare },
+    { title: 'Students', url: '/faculty-students', icon: Users },
   ];
 
   // Public navigation items (Home only - About/Contact handled specially)
@@ -146,38 +145,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* About/Contact for authenticated users */}
-        {isAuthenticated && (
-          <SidebarGroup>
-            <SidebarGroupLabel className="text-sm font-semibold text-muted-foreground mb-2">Info</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu className="space-y-1">
-                <SidebarMenuItem>
-                  <SidebarMenuButton 
-                    onClick={handleAboutClick}
-                    className="transition-all duration-200 ease-in-out text-base py-3 hover:bg-muted/60 hover:text-foreground"
-                  >
-                    <Info className="h-5 w-5" />
-                    {!collapsed && <span className="text-base">About Us</span>}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <SidebarMenuButton className="cursor-default transition-all duration-200 ease-in-out text-base py-3 hover:bg-muted/60">
-                        <Mail className="h-5 w-5" />
-                        {!collapsed && <span className="text-base">Contact Us</span>}
-                      </SidebarMenuButton>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">
-                      <p>Need help? Reach us at contact@hackhustle.org</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
+        {/* Info section removed for authenticated faculty users */}
       </SidebarContent>
 
       {/* Sidebar trigger inside for collapsed state */}
