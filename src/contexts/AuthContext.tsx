@@ -4,20 +4,6 @@ import { toast } from '@/hooks/use-toast';
 
 type RoleType = 'STUDENT' | 'TEACHER';
 
-// ─────────── TOGGLE MOCK AUTH ───────────
-const USE_MOCK_AUTH = true;
-
-interface UserSocials {
-  linkedin?: string;
-  github?: string;
-  website?: string;
-}
-
-interface UserStats {
-  studentsMentored?: number;
-  doubtsSolved?: number;
-}
-
 interface User {
   student_id?: string;
   teacher_id?: string;
@@ -27,54 +13,8 @@ interface User {
   points?: number;
   role: RoleType;
   subject?: string;
-  institute?: string;
   rating?: number;
-  // Extended teacher profile fields
-  designation?: string;
-  department?: string;
-  experience?: number;
-  bio?: string;
-  officeHours?: string;
-  socials?: UserSocials;
-  stats?: UserStats;
 }
-
-export type { User, UserSocials, UserStats };
-
-// ─────────── MOCK DATA ───────────
-const MOCK_STUDENT: User = {
-  student_id: 'mock-student-001',
-  first_name: 'Charvi',
-  last_name: 'Student',
-  emailId: 'charvi@example.com',
-  points: 1200,
-  role: 'STUDENT',
-  rating: 4.5,
-};
-
-const MOCK_TEACHER: User = {
-  teacher_id: 'mock-teacher-001',
-  first_name: 'Amit',
-  last_name: 'Verma',
-  emailId: 'teacher@gmail.com',
-  role: 'TEACHER',
-  subject: 'DSA',
-  institute: 'IIT Delhi',
-  designation: 'Associate Professor',
-  department: 'Computer Science',
-  experience: 8,
-  bio: 'Passionate educator with expertise in Data Structures and Algorithms. Love helping students crack technical interviews.',
-  officeHours: 'Mon-Fri, 5 PM - 7 PM',
-  socials: {
-    linkedin: 'https://linkedin.com/in/amitverma',
-    github: 'https://github.com/amitverma',
-    website: 'https://amitverma.dev',
-  },
-  stats: {
-    studentsMentored: 156,
-    doubtsSolved: 342,
-  },
-};
 
 interface AuthContextType {
   user: User | null;
@@ -124,21 +64,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   ): Promise<boolean> => {
     try {
       const roleUpper = mapRole(role);
-
-      // ─────────── MOCK LOGIN ───────────
-      if (USE_MOCK_AUTH) {
-        const mockUser = roleUpper === 'TEACHER' ? MOCK_TEACHER : MOCK_STUDENT;
-        setUser(mockUser);
-        localStorage.setItem('user', JSON.stringify(mockUser));
-        toast({
-          title: 'Mock Login Successful',
-          description: `Welcome, ${mockUser.first_name}! (Mock Mode)`,
-        });
-        return true;
-      }
-
-      // ─────────── REAL LOGIN ───────────
-      const success = await authService.login({ emailId, password, role: roleUpper });
+      const success = await authService.login({ emailId, password, role: roleUpper }); // <-- pass object
       if (success) {
         const loggedInUser: User = {
           emailId,
@@ -171,22 +97,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   ): Promise<boolean> => {
     try {
       const roleUpper = mapRole(role);
-
-      // ─────────── MOCK SIGNUP ───────────
-      if (USE_MOCK_AUTH) {
-        const mockUser: User = roleUpper === 'TEACHER' 
-          ? { ...MOCK_TEACHER, first_name: firstName, last_name: lastName, emailId }
-          : { ...MOCK_STUDENT, first_name: firstName, last_name: lastName, emailId };
-        setUser(mockUser);
-        localStorage.setItem('user', JSON.stringify(mockUser));
-        toast({
-          title: 'Mock Signup Successful',
-          description: `Account created for ${firstName}! (Mock Mode)`,
-        });
-        return true;
-      }
-
-      // ─────────── REAL SIGNUP ───────────
       const success = await authService.signup({
         first_name: firstName,
         last_name: lastName,
@@ -195,7 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         role: roleUpper,
         subject_associated: subjectAssociated,
         institute,
-      });
+      }); // <-- pass object
 
       if (success) {
         const newUser: User = {
@@ -225,7 +135,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const isTeacher = user?.role === 'TEACHER';
-  
+ 
   return (
     <AuthContext.Provider
       value={{
@@ -235,7 +145,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         logout,
         isAuthenticated: !!user,
         isTeacher,
-        isFaculty: isTeacher,
+        isFaculty: isTeacher, // alias for backward compatibility
       }}
     >
       {children}
