@@ -7,6 +7,17 @@ type RoleType = 'STUDENT' | 'TEACHER';
 // ─────────── TOGGLE MOCK AUTH ───────────
 const USE_MOCK_AUTH = true;
 
+interface UserSocials {
+  linkedin?: string;
+  github?: string;
+  website?: string;
+}
+
+interface UserStats {
+  studentsMentored?: number;
+  doubtsSolved?: number;
+}
+
 interface User {
   student_id?: string;
   teacher_id?: string;
@@ -18,7 +29,17 @@ interface User {
   subject?: string;
   institute?: string;
   rating?: number;
+  // Extended teacher profile fields
+  designation?: string;
+  department?: string;
+  experience?: number;
+  bio?: string;
+  officeHours?: string;
+  socials?: UserSocials;
+  stats?: UserStats;
 }
+
+export type { User, UserSocials, UserStats };
 
 // ─────────── MOCK DATA ───────────
 const MOCK_STUDENT: User = {
@@ -39,6 +60,20 @@ const MOCK_TEACHER: User = {
   role: 'TEACHER',
   subject: 'DSA',
   institute: 'IIT Delhi',
+  designation: 'Associate Professor',
+  department: 'Computer Science',
+  experience: 8,
+  bio: 'Passionate educator with expertise in Data Structures and Algorithms. Love helping students crack technical interviews.',
+  officeHours: 'Mon-Fri, 5 PM - 7 PM',
+  socials: {
+    linkedin: 'https://linkedin.com/in/amitverma',
+    github: 'https://github.com/amitverma',
+    website: 'https://amitverma.dev',
+  },
+  stats: {
+    studentsMentored: 156,
+    doubtsSolved: 342,
+  },
 };
 
 interface AuthContextType {
