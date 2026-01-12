@@ -8,7 +8,6 @@ import {
   LogOut, 
   BookOpen, 
   MessageSquare, 
-  Edit, 
   Clock
 } from 'lucide-react';
 import { FaLinkedin, FaGithub, FaGlobe } from 'react-icons/fa';
@@ -76,18 +75,10 @@ const Profile = () => {
           </CardHeader>
         </Card>
 
-        {/* Profile Details - Read Only (no pencil icon) */}
+        {/* Profile Details - Read Only */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader>
             <CardTitle>Profile Information</CardTitle>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setIsEditModalOpen(true)}
-            >
-              <Edit className="h-4 w-4 mr-2" />
-              Edit Profile
-            </Button>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -154,6 +145,31 @@ const Profile = () => {
           </CardContent>
         </Card>
 
+        {/* Stats Card (Faculty only) */}
+        {isFaculty && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Teaching Stats</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  <p className="text-3xl font-bold text-primary">
+                    {localUser.stats?.studentsMentored || 0}
+                  </p>
+                  <p className="text-muted-foreground text-sm">Students Mentored</p>
+                </div>
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  <p className="text-3xl font-bold text-primary">
+                    {localUser.stats?.doubtsSolved || 0}
+                  </p>
+                  <p className="text-muted-foreground text-sm">Doubts Solved</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Contact & Availability (Faculty only) */}
         {isFaculty && (
           <Card>
@@ -174,18 +190,19 @@ const Profile = () => {
 
               <Separator />
 
-              {/* Social Links */}
+              {/* Social Links with Labels */}
               <div>
                 <Label className="text-muted-foreground mb-3 block">Social Links</Label>
-                <div className="flex gap-3">
+                <div className="flex flex-col gap-3">
                   {localUser.socials?.linkedin && (
                     <a
                       href={localUser.socials.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 rounded-lg bg-muted hover:bg-[#0077B5] hover:text-white transition-colors"
+                      className="flex items-center gap-3 p-3 rounded-lg bg-muted hover:bg-[#0077B5] hover:text-white transition-colors"
                     >
                       <FaLinkedin className="h-5 w-5" />
+                      <span>LinkedIn URL</span>
                     </a>
                   )}
                   {localUser.socials?.github && (
@@ -193,9 +210,10 @@ const Profile = () => {
                       href={localUser.socials.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 rounded-lg bg-muted hover:bg-foreground hover:text-background transition-colors"
+                      className="flex items-center gap-3 p-3 rounded-lg bg-muted hover:bg-foreground hover:text-background transition-colors"
                     >
                       <FaGithub className="h-5 w-5" />
+                      <span>GitHub URL</span>
                     </a>
                   )}
                   {localUser.socials?.website && (
@@ -203,9 +221,10 @@ const Profile = () => {
                       href={localUser.socials.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 rounded-lg bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
+                      className="flex items-center gap-3 p-3 rounded-lg bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
                     >
                       <FaGlobe className="h-5 w-5" />
+                      <span>Personal Website URL</span>
                     </a>
                   )}
                   {!localUser.socials?.linkedin && !localUser.socials?.github && !localUser.socials?.website && (
