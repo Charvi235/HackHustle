@@ -22,6 +22,11 @@ const isValidPassword = (password: string) => {
   return regex.test(password);
 };
 
+const isValidName = (name: string) => {
+  const regex = /^[A-Za-z][A-Za-z]*$/;
+  return regex.test(name.trim());
+};
+
 
 const isEmptyField = (data: Record<string, string>) => {
   return Object.values(data).some((value) => value.trim() === '');
@@ -130,6 +135,24 @@ const handleStudentSignup = async () => {
     return;
   }
 
+  if(!isValidName(signupData.firstName)) {
+    toast({
+      title: 'Invalid first name',
+      description: 'First Name must start with character',
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  if(!isValidName(signupData.lastName)) {
+    toast({
+      title: 'Invalid last name',
+      description: 'Last Name must start with character',
+      variant: 'destructive',
+    });
+    return;
+  }
+
   if (!isValidGmail(signupData.emailId)) {
     toast({
       title: 'Invalid Email',
@@ -205,6 +228,42 @@ const handleTeacherSignup = async () => {
     toast({
       title: 'Validation Error',
       description: 'All fields are mandatory',
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  if(!isValidName(teacherSignupData.firstName)) {
+    toast({
+      title: 'Invalid first name',
+      description: 'First Name must start with character',
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  if(!isValidName(teacherSignupData.lastName)) {
+    toast({
+      title: 'Invalid last name',
+      description: 'Last Name must start with character',
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  if(!isValidName(teacherSignupData.subjectAssociated)) {
+    toast({
+      title: 'Invalid subject name',
+      description: 'Subject Name must start with character',
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  if(!isValidName(teacherSignupData.institute)) {
+    toast({
+      title: 'Invalid institute name',
+      description: 'Institute Name must start with character',
       variant: 'destructive',
     });
     return;
