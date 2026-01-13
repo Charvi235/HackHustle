@@ -7,32 +7,32 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Zap } from 'lucide-react';
+import { Zap, Eye, EyeOff } from 'lucide-react';
 
 type RoleType = 'STUDENT' | 'TEACHER';
 
-//-----------------
 const isValidGmail = (email: string) => {
   return email.endsWith('@gmail.com');
 };
 
 const isValidPassword = (password: string) => {
-  const regex =
-    /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+  const regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
   return regex.test(password);
 };
 
+<<<<<<< HEAD
 const isValidName = (name: string) => {
   const regex = /^[A-Za-z][A-Za-z]*$/;
   return regex.test(name.trim());
 };
 
 
+=======
+>>>>>>> 3f5e1fedbaeeccf9e7d9dab9a6ab5f645945cc53
 const isEmptyField = (data: Record<string, string>) => {
   return Object.values(data).some((value) => value.trim() === '');
 };
 
-//------------------
 const Auth = () => {
   const navigate = useNavigate();
   const { login, signup } = useAuth();
@@ -52,63 +52,29 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [signupRole, setSignupRole] = useState<RoleType>('STUDENT');
 
+  // Password visibility states
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showStudentSignupPassword, setShowStudentSignupPassword] = useState(false);
+  const [showTeacherSignupPassword, setShowTeacherSignupPassword] = useState(false);
 
-  //--------------------------------
+  const handleForgotPassword = () => {
+    toast({
+      title: 'Coming Soon',
+      description: 'Password reset feature is under development.',
+    });
+  };
+
   const handleLogin = async (role: RoleType) => {
-  // Mandatory check
-  if (isEmptyField(loginData)) {
-    toast({
-      title: 'Validation Error',
-      description: 'All fields are mandatory',
-      variant: 'destructive',
-    });
-    return;
-  }
-
-  // Email validation
-  if (!isValidGmail(loginData.emailId)) {
-    toast({
-      title: 'Invalid Email',
-      description: 'Email must end with @gmail.com',
-      variant: 'destructive',
-    });
-    return;
-  }
-
-  // Password validation
-  if (!isValidPassword(loginData.password)) {
-    toast({
-      title: 'Invalid Password',
-      description:
-        'Password must be of 8 characters or more, include atleast one uppercase letter and one special character',
-      variant: 'destructive',
-    });
-    return;
-  }
-
-  setIsLoading(true);
-  try {
-    const success = await login(
-      loginData.emailId,
-      loginData.password,
-      role.toLowerCase() as 'student' | 'teacher'
-    );
-
-    if (success) {
-      toast({ title: 'Login successful!' });
-      navigate(role === 'TEACHER' ? '/faculty-dashboard' : '/practice');
+    if (isEmptyField(loginData)) {
+      toast({
+        title: 'Validation Error',
+        description: 'All fields are mandatory',
+        variant: 'destructive',
+      });
+      return;
     }
-  } catch (err: any) {
-    toast({
-      title: 'Login failed',
-      description: err.message || 'Something went wrong',
-      variant: 'destructive',
-    });
-  } finally {
-    setIsLoading(false);
-  }
-};
 
+<<<<<<< HEAD
   // ===== LOGIN =====
   // const handleLogin = async (role: RoleType) => {
   //   setIsLoading(true);
@@ -187,18 +153,18 @@ const handleStudentSignup = async () => {
     if (success) {
       toast({ title: 'Signup successful!' });
       navigate('/practice');
+=======
+    if (!isValidGmail(loginData.emailId)) {
+      toast({
+        title: 'Invalid Email',
+        description: 'Email must end with @gmail.com',
+        variant: 'destructive',
+      });
+      return;
+>>>>>>> 3f5e1fedbaeeccf9e7d9dab9a6ab5f645945cc53
     }
-  } catch (err: any) {
-    toast({
-      title: 'Signup failed',
-      description: err.message || 'Something went wrong',
-      variant: 'destructive',
-    });
-  } finally {
-    setIsLoading(false);
-  }
-};
 
+<<<<<<< HEAD
 //-----------------------------------------------------------------------------
   // ===== STUDENT SIGNUP =====
   // const handleStudentSignup = async () => {
@@ -304,42 +270,150 @@ console.log('Signup payload (TEACHER):', teacherSignupData);
     if (success) {
       toast({ title: 'Signup successful!' });
       navigate('/faculty-dashboard');
+=======
+    if (!isValidPassword(loginData.password)) {
+      toast({
+        title: 'Invalid Password',
+        description:
+          'Password must be of 8 characters or more, include atleast one uppercase letter and one special character',
+        variant: 'destructive',
+      });
+      return;
+>>>>>>> 3f5e1fedbaeeccf9e7d9dab9a6ab5f645945cc53
     }
-  } catch (err: any) {
-    toast({
-      title: 'Signup failed',
-      description: err.message || 'Something went wrong',
-      variant: 'destructive',
-    });
-  } finally {
-    setIsLoading(false);
-  }
-};
 
-  //-----------------------------------------------------------
-  // ===== TEACHER SIGNUP =====
-  // const handleTeacherSignup = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const success = await signup(
-  //       teacherSignupData.firstName,
-  //       teacherSignupData.lastName,
-  //       teacherSignupData.emailId,
-  //       teacherSignupData.password,
-  //       'teacher',
-  //       teacherSignupData.subjectAssociated,
-  //       teacherSignupData.institute
-  //     );
-  //     if (success) {
-  //       toast({ title: 'Signup successful!' });
-  //       navigate('/faculty-dashboard');
-  //     }
-  //   } catch (err: any) {
-  //     toast({ title: 'Signup failed', description: err.message || 'Something went wrong' });
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
+    setIsLoading(true);
+    try {
+      const success = await login(
+        loginData.emailId,
+        loginData.password,
+        role.toLowerCase() as 'student' | 'teacher'
+      );
+
+      if (success) {
+        toast({ title: 'Login successful!' });
+        navigate(role === 'TEACHER' ? '/faculty-dashboard' : '/practice');
+      }
+    } catch (err: any) {
+      toast({
+        title: 'Login failed',
+        description: err.message || 'Something went wrong',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleStudentSignup = async () => {
+    if (isEmptyField(signupData)) {
+      toast({
+        title: 'Validation Error',
+        description: 'All fields are mandatory',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!isValidGmail(signupData.emailId)) {
+      toast({
+        title: 'Invalid Email',
+        description: 'Email must end with @gmail.com',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!isValidPassword(signupData.password)) {
+      toast({
+        title: 'Invalid Password',
+        description:
+          'Password must be of 8 characters or more, include atleast one uppercase letter and one special character',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const success = await signup(
+        signupData.firstName,
+        signupData.lastName,
+        signupData.emailId,
+        signupData.password,
+        'student'
+      );
+
+      if (success) {
+        toast({ title: 'Signup successful!' });
+        navigate('/practice');
+      }
+    } catch (err: any) {
+      toast({
+        title: 'Signup failed',
+        description: err.message || 'Something went wrong',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleTeacherSignup = async () => {
+    if (isEmptyField(teacherSignupData)) {
+      toast({
+        title: 'Validation Error',
+        description: 'All fields are mandatory',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!isValidGmail(teacherSignupData.emailId)) {
+      toast({
+        title: 'Invalid Email',
+        description: 'Email must end with @gmail.com',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!isValidPassword(teacherSignupData.password)) {
+      toast({
+        title: 'Invalid Password',
+        description:
+          'Password must be of 8 characters or more, include atleast one uppercase letter and one special character',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const success = await signup(
+        teacherSignupData.firstName,
+        teacherSignupData.lastName,
+        teacherSignupData.emailId,
+        teacherSignupData.password,
+        'teacher',
+        teacherSignupData.subjectAssociated,
+        teacherSignupData.institute
+      );
+
+      if (success) {
+        toast({ title: 'Signup successful!' });
+        navigate('/faculty-dashboard');
+      }
+    } catch (err: any) {
+      toast({
+        title: 'Signup failed',
+        description: err.message || 'Something went wrong',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
@@ -376,12 +450,33 @@ console.log('Signup payload (TEACHER):', teacherSignupData);
                   value={loginData.emailId}
                   onChange={(e) => setLoginData({ ...loginData, emailId: e.target.value })}
                 />
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  value={loginData.password}
-                  onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                />
+                <div className="space-y-1">
+                  <div className="relative">
+                    <Input
+                      type={showLoginPassword ? 'text' : 'password'}
+                      placeholder="Password"
+                      value={loginData.password}
+                      onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowLoginPassword(!showLoginPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showLoginPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={handleForgotPassword}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
+                </div>
 
                 <Button className="w-full" onClick={() => handleLogin('STUDENT')} disabled={isLoading}>
                   {isLoading ? 'Logging in...' : 'Login as Student'}
@@ -424,12 +519,22 @@ console.log('Signup payload (TEACHER):', teacherSignupData);
                       value={signupData.emailId}
                       onChange={(e) => setSignupData({ ...signupData, emailId: e.target.value })}
                     />
-                    <Input
-                      type="password"
-                      placeholder="Password"
-                      value={signupData.password}
-                      onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
-                    />
+                    <div className="relative">
+                      <Input
+                        type={showStudentSignupPassword ? 'text' : 'password'}
+                        placeholder="Password"
+                        value={signupData.password}
+                        onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowStudentSignupPassword(!showStudentSignupPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showStudentSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
                     <Button className="w-full" onClick={handleStudentSignup} disabled={isLoading}>
                       {isLoading ? 'Signing up...' : 'Sign Up as Student'}
                     </Button>
@@ -452,12 +557,22 @@ console.log('Signup payload (TEACHER):', teacherSignupData);
                       value={teacherSignupData.emailId}
                       onChange={(e) => setTeacherSignupData({ ...teacherSignupData, emailId: e.target.value })}
                     />
-                    <Input
-                      type="password"
-                      placeholder="Password"
-                      value={teacherSignupData.password}
-                      onChange={(e) => setTeacherSignupData({ ...teacherSignupData, password: e.target.value })}
-                    />
+                    <div className="relative">
+                      <Input
+                        type={showTeacherSignupPassword ? 'text' : 'password'}
+                        placeholder="Password"
+                        value={teacherSignupData.password}
+                        onChange={(e) => setTeacherSignupData({ ...teacherSignupData, password: e.target.value })}
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowTeacherSignupPassword(!showTeacherSignupPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showTeacherSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
                     <Input
                       placeholder="Subject Associated"
                       value={teacherSignupData.subjectAssociated}

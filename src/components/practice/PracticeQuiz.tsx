@@ -9,10 +9,11 @@ import { QuestionDto } from '@/services/questionsServices';
 
 interface PracticeQuizProps {
   questions: QuestionDto[];
-  topicName: string;
+  topicName?: string;
   subjectName: string;
   onBack: () => void;
   totalQuestionsInTopic: number;
+  visitedQuestionIds?: number[];
 }
 
 const getOptionsArray = (q: QuestionDto): string[] => [
@@ -27,7 +28,8 @@ const PracticeQuiz = ({
   topicName,
   subjectName,
   onBack,
-  totalQuestionsInTopic
+  totalQuestionsInTopic,
+  visitedQuestionIds
 }: PracticeQuizProps) => {
 
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>({});

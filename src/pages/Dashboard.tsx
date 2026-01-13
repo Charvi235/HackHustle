@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Brain, Trophy, MessageSquare, Users, Star } from 'lucide-react';
+import { BookOpen, Brain, Trophy, MessageSquare, Star } from 'lucide-react';
 
 const Dashboard = () => {
   const { user, isAuthenticated, isFaculty } = useAuth();
@@ -44,30 +44,8 @@ const Dashboard = () => {
     },
   ];
 
-  // Faculty features
-  const facultyFeatures = [
-    {
-      title: 'View Student Doubts',
-      description: 'Review and respond to student doubts',
-      icon: MessageSquare,
-      href: '/faculty-dashboard',
-      color: 'bg-green-500',
-    },
-    {
-      title: 'Manage Questions',
-      description: 'Add, edit, or remove practice questions',
-      icon: BookOpen,
-      href: '/faculty-dashboard',
-      color: 'bg-blue-500',
-    },
-    {
-      title: 'Student Performance',
-      description: 'Track student progress and performance',
-      icon: Users,
-      href: '/faculty-dashboard',
-      color: 'bg-purple-500',
-    },
-  ];
+  // Faculty features - no quick actions, just an empty array
+  const facultyFeatures: typeof studentFeatures = [];
 
   const features = isFaculty ? facultyFeatures : studentFeatures;
 
@@ -142,40 +120,44 @@ const Dashboard = () => {
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pending Doubts</CardTitle>
+                <CardTitle className="text-sm font-medium">Doubts Solved</CardTitle>
                 <MessageSquare className="h-4 w-4 text-green-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">0</div>
+                <div className="text-2xl font-bold">{user.stats?.doubtsSolved || 0}</div>
               </CardContent>
             </Card>
           </div>
         )}
 
-        {/* Features Grid */}
-        <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {features.map((feature) => (
-            <Card 
-              key={feature.title} 
-              className="cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => navigate(feature.href)}
-            >
-              <CardHeader>
-                <div className={`w-12 h-12 rounded-lg ${feature.color} flex items-center justify-center mb-4`}>
-                  <feature.icon className="h-6 w-6 text-white" />
-                </div>
-                <CardTitle>{feature.title}</CardTitle>
-                <CardDescription>{feature.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full">
-                  {isFaculty ? 'Open' : 'Start'}
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {/* Features Grid - Only for students */}
+        {!isFaculty && (
+          <>
+            <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {features.map((feature) => (
+                <Card 
+                  key={feature.title} 
+                  className="cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() => navigate(feature.href)}
+                >
+                  <CardHeader>
+                    <div className={`w-12 h-12 rounded-lg ${feature.color} flex items-center justify-center mb-4`}>
+                      <feature.icon className="h-6 w-6 text-white" />
+                    </div>
+                    <CardTitle>{feature.title}</CardTitle>
+                    <CardDescription>{feature.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button variant="outline" className="w-full">
+                      Start
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

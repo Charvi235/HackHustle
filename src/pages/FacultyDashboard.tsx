@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Star, Eye } from 'lucide-react';
+import { Star, Eye, CheckCircle, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Doubt {
@@ -70,29 +70,58 @@ const FacultyDashboard = () => {
     <div className="container mx-auto py-12 px-4">
       <h1 className="text-4xl font-bold mb-8">Faculty Dashboard</h1>
 
-      {/* Rating Section */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>My Rating</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-2">
-            <span className="text-3xl font-bold">{user?.rating || 4.5}</span>
-            <div className="flex">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  className={`h-6 w-6 ${
-                    star <= (user?.rating || 4.5)
-                      ? 'fill-yellow-400 text-yellow-400'
-                      : 'text-gray-300'
-                  }`}
-                />
-              ))}
+      {/* Stats Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        {/* Rating Card */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">My Rating</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              <span className="text-3xl font-bold">{user?.rating || 4.5}</span>
+              <div className="flex">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className={`h-5 w-5 ${
+                      star <= (user?.rating || 4.5)
+                        ? 'fill-yellow-400 text-yellow-400'
+                        : 'text-muted-foreground'
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+
+        {/* Doubts Solved Card */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Doubts Solved</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-8 w-8 text-green-500" />
+              <span className="text-3xl font-bold">{user?.stats?.doubtsSolved || 450}</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Students Mentored Card */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Students Mentored</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-3">
+              <Users className="h-8 w-8 text-primary" />
+              <span className="text-3xl font-bold">{user?.stats?.studentsMentored || 120}</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Pending Doubts Section */}
       <Card>

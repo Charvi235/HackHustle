@@ -4,7 +4,7 @@ import { toast } from '@/hooks/use-toast';
 
 type RoleType = 'STUDENT' | 'TEACHER';
 
-interface User {
+export interface User {
   student_id?: string;
   teacher_id?: string;
   first_name: string;
@@ -14,6 +14,21 @@ interface User {
   role: RoleType;
   subject?: string;
   rating?: number;
+  institute?: string;
+  designation?: string;
+  department?: string;
+  experience?: string;
+  bio?: string;
+  officeHours?: string;
+  socials?: {
+    linkedin?: string;
+    github?: string;
+    website?: string;
+  };
+  stats?: {
+    studentsMentored?: number;
+    doubtsSolved?: number;
+  };
 }
 
 interface AuthContextType {
@@ -135,7 +150,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const isTeacher = user?.role === 'TEACHER';
-  
+ 
   return (
     <AuthContext.Provider
       value={{
@@ -152,5 +167,3 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     </AuthContext.Provider>
   );
 };
-
-

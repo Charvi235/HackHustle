@@ -1,53 +1,63 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useAuth, User } from '@/contexts/AuthContext';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Pencil, Save, X, LogOut, BookOpen } from 'lucide-react';
+import { 
+  LogOut, 
+  BookOpen, 
+  MessageSquare, 
+  Clock
+} from 'lucide-react';
+import { FaLinkedin, FaGithub, FaGlobe } from 'react-icons/fa';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { EditProfileModal } from '@/components/profile/EditProfileModal';
 
 const Profile = () => {
   const { user, isAuthenticated, logout, isFaculty } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
   
-  const [isEditing, setIsEditing] = useState(false);
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [localUser, setLocalUser] = useState<User | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/auth');
       return;
     }
-    // Initialize form with user data
-    setFirstName(user?.first_name || '');
-    setLastName(user?.last_name || '');
-    setEmail(user?.emailId || '');
+    setLocalUser(user);
   }, [isAuthenticated, user, navigate]);
 
+  // Check for edit query param to auto-open modal
+  useEffect(() => {
+    if (searchParams.get('edit') === 'true' && localUser) {
+      setIsEditModalOpen(true);
+      // Clear the query param after opening
+      setSearchParams({});
+    }
+  }, [searchParams, localUser, setSearchParams]);
+
   const getUserInitials = () => {
-    if (!user) return 'U';
-    return `${user.first_name?.[0] || ''}${user.last_name?.[0] || ''}`.toUpperCase();
+    if (!localUser) return 'U';
+    return `${localUser.first_name?.[0] || ''}${localUser.last_name?.[0] || ''}`.toUpperCase();
   };
 
-  const handleSave = () => {
-    // TODO: Connect to backend to update user profile
-    toast({ title: 'Profile updated successfully!' });
-    setIsEditing(false);
+  const handleProfileUpdate = (updatedData: Partial<User>) => {
+    if (localUser) {
+      const updated = { ...localUser, ...updatedData };
+      setLocalUser(updated);
+      localStorage.setItem('user', JSON.stringify(updated));
+    }
   };
 
-  const handleCancel = () => {
-    // Reset to original values
-    setFirstName(user?.first_name || '');
-    setLastName(user?.last_name || '');
-    setEmail(user?.emailId || '');
-    setIsEditing(false);
+  const handleOpenEditModal = () => {
+    setIsEditModalOpen(true);
   };
 
   const handleLogout = () => {
@@ -55,7 +65,7 @@ const Profile = () => {
     navigate('/');
   };
 
-  if (!isAuthenticated || !user) {
+  if (!isAuthenticated || !localUser) {
     return null;
   }
 
@@ -71,101 +81,174 @@ const Profile = () => {
               </Avatar>
             </div>
             <CardTitle className="text-2xl">
-              {user.first_name} {user.last_name}
+              {localUser.first_name} {localUser.last_name}
             </CardTitle>
             <Badge variant="secondary" className="w-fit mx-auto mt-2">
-              {user.role}
+              {localUser.role}
             </Badge>
           </CardHeader>
         </Card>
 
-        {/* Profile Details */}
+        {/* Profile Details - Read Only */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader>
             <CardTitle>Profile Information</CardTitle>
-            {!isEditing ? (
-              <Button variant="ghost" size="icon" onClick={() => setIsEditing(true)}>
-                <Pencil className="h-4 w-4" />
-              </Button>
-            ) : (
-              <div className="flex gap-2">
-                <Button variant="ghost" size="icon" onClick={handleCancel}>
-                  <X className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={handleSave}>
-                  <Save className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
-                {isEditing ? (
-                  <Input
-                    id="firstName"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                  />
-                ) : (
-                  <p className="text-lg">{user.first_name}</p>
-                )}
+                <Label className="text-muted-foreground">First Name</Label>
+                <p className="text-lg">{localUser.first_name || 'Not set'}</p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
-                {isEditing ? (
-                  <Input
-                    id="lastName"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                  />
-                ) : (
-                  <p className="text-lg">{user.last_name}</p>
-                )}
+                <Label className="text-muted-foreground">Last Name</Label>
+                <p className="text-lg">{localUser.last_name || 'Not set'}</p>
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              {isEditing ? (
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              ) : (
-                <p className="text-lg">{user.emailId}</p>
-              )}
+              <Label className="text-muted-foreground">Email</Label>
+              <p className="text-lg">{localUser.emailId}</p>
             </div>
 
             {/* Role-specific info */}
-            {user.role?.toLowerCase() === 'student' && (
+            {localUser.role?.toLowerCase() === 'student' && (
               <div className="space-y-2">
-                <Label>Points</Label>
-                <p className="text-2xl font-bold text-primary">{user.points || 0}</p>
+                <Label className="text-muted-foreground">Points</Label>
+                <p className="text-2xl font-bold text-primary">{localUser.points || 0}</p>
               </div>
             )}
+
             {isFaculty && (
               <>
                 <div className="space-y-2">
-                  <Label>Subject</Label>
-                  <p className="text-lg">{user.subject}</p>
+                  <Label className="text-muted-foreground">Subject</Label>
+                  <p className="text-lg">{localUser.subject || 'Add Subject'}</p>
                 </div>
                 <div className="space-y-2">
-                  <Label>Rating</Label>
-                  <p className="text-lg">{user.rating} ⭐</p>
+                  <Label className="text-muted-foreground">Institute</Label>
+                  <p className="text-lg">{localUser.institute || 'Add Institute'}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground">Designation</Label>
+                    <p className="text-lg">{localUser.designation || 'Add Designation'}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground">Department</Label>
+                    <p className="text-lg">{localUser.department || 'Add Department'}</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-muted-foreground">Experience</Label>
+                  <p className="text-lg">
+                    {localUser.experience ? `${localUser.experience} years` : 'Add Experience'}
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-muted-foreground">Rating</Label>
+                  <p className="text-lg">{localUser.rating ? `${localUser.rating} ⭐` : 'No rating yet'}</p>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-muted-foreground">Bio</Label>
+                  <p className="text-muted-foreground">
+                    {localUser.bio || 'No bio added yet'}
+                  </p>
                 </div>
               </>
             )}
-
-            {isEditing && (
-              <Button onClick={handleSave} className="w-full mt-4">
-                Save Changes
-              </Button>
-            )}
           </CardContent>
         </Card>
+
+        {/* Stats Card (Faculty only) */}
+        {isFaculty && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Teaching Stats</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  <p className="text-3xl font-bold text-primary">
+                    {localUser.stats?.studentsMentored || 0}
+                  </p>
+                  <p className="text-muted-foreground text-sm">Students Mentored</p>
+                </div>
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  <p className="text-3xl font-bold text-primary">
+                    {localUser.stats?.doubtsSolved || 0}
+                  </p>
+                  <p className="text-muted-foreground text-sm">Doubts Solved</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Contact & Availability (Faculty only) */}
+        {isFaculty && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Contact & Availability</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Office Hours */}
+              <div className="flex items-center gap-3">
+                <Clock className="h-5 w-5 text-primary" />
+                <div>
+                  <Label className="text-muted-foreground">Office Hours</Label>
+                  <p className="text-lg">
+                    {localUser.officeHours || 'Not specified'}
+                  </p>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Social Links with Labels */}
+              <div>
+                <Label className="text-muted-foreground mb-3 block">Social Links</Label>
+                <div className="flex flex-col gap-3">
+                  {localUser.socials?.linkedin && (
+                    <a
+                      href={localUser.socials.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-3 rounded-lg bg-muted hover:bg-[#0077B5] hover:text-white transition-colors"
+                    >
+                      <FaLinkedin className="h-5 w-5" />
+                      <span>LinkedIn URL</span>
+                    </a>
+                  )}
+                  {localUser.socials?.github && (
+                    <a
+                      href={localUser.socials.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-3 rounded-lg bg-muted hover:bg-foreground hover:text-background transition-colors"
+                    >
+                      <FaGithub className="h-5 w-5" />
+                      <span>GitHub URL</span>
+                    </a>
+                  )}
+                  {localUser.socials?.website && (
+                    <a
+                      href={localUser.socials.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-3 rounded-lg bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
+                    >
+                      <FaGlobe className="h-5 w-5" />
+                      <span>Personal Website URL</span>
+                    </a>
+                  )}
+                  {!localUser.socials?.linkedin && !localUser.socials?.github && !localUser.socials?.website && (
+                    <p className="text-muted-foreground text-sm">No social links added yet.</p>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Quick Actions */}
         <Card>
@@ -173,7 +256,16 @@ const Profile = () => {
             <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {!isFaculty && (
+            {isFaculty ? (
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => navigate('/faculty-doubts')}
+              >
+                <MessageSquare className="mr-2 h-4 w-4" />
+                View Doubts
+              </Button>
+            ) : (
               <Button 
                 variant="outline" 
                 className="w-full justify-start"
@@ -194,6 +286,16 @@ const Profile = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Edit Profile Modal */}
+      {localUser && (
+        <EditProfileModal
+          open={isEditModalOpen}
+          onOpenChange={setIsEditModalOpen}
+          user={localUser}
+          onSave={handleProfileUpdate}
+        />
+      )}
     </div>
   );
 };
