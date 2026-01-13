@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -20,15 +19,12 @@ const isValidPassword = (password: string) => {
   return regex.test(password);
 };
 
-<<<<<<< HEAD
 const isValidName = (name: string) => {
   const regex = /^[A-Za-z][A-Za-z]*$/;
   return regex.test(name.trim());
 };
 
 
-=======
->>>>>>> 3f5e1fedbaeeccf9e7d9dab9a6ab5f645945cc53
 const isEmptyField = (data: Record<string, string>) => {
   return Object.values(data).some((value) => value.trim() === '');
 };
@@ -74,86 +70,6 @@ const Auth = () => {
       return;
     }
 
-<<<<<<< HEAD
-  // ===== LOGIN =====
-  // const handleLogin = async (role: RoleType) => {
-  //   setIsLoading(true);
-  //   try {
-  //     const success = await login(loginData.emailId, loginData.password, role.toLowerCase() as 'student' | 'teacher');
-  //     if (success) {
-  //       toast({ title: 'Login successful!' });
-  //       navigate(role === 'TEACHER' ? '/faculty-dashboard' : '/practice');
-  //     }
-  //   } catch (err: any) {
-  //     toast({ title: 'Login failed', description: err.message || 'Something went wrong' });
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-//------------------------------------------------------------------------------
-const handleStudentSignup = async () => {
-  if (isEmptyField(signupData)) {
-    toast({
-      title: 'Validation Error',
-      description: 'All fields are mandatory',
-      variant: 'destructive',
-    });
-    return;
-  }
-
-  if(!isValidName(signupData.firstName)) {
-    toast({
-      title: 'Invalid first name',
-      description: 'First Name must start with character',
-      variant: 'destructive',
-    });
-    return;
-  }
-
-  if(!isValidName(signupData.lastName)) {
-    toast({
-      title: 'Invalid last name',
-      description: 'Last Name must start with character',
-      variant: 'destructive',
-    });
-    return;
-  }
-
-  if (!isValidGmail(signupData.emailId)) {
-    toast({
-      title: 'Invalid Email',
-      description: 'Email must end with @gmail.com',
-      variant: 'destructive',
-    });
-    return;
-  }
-
-  if (!isValidPassword(signupData.password)) {
-    toast({
-      title: 'Invalid Password',
-      description:
-        'Password must be of 8 characters or more, include atleast one uppercase letter and one special character',
-      variant: 'destructive',
-    });
-    return;
-  }
-  console.log('Signup payload (STUDENT):', signupData);
-
-
-  setIsLoading(true);
-  try {
-    const success = await signup(
-      signupData.firstName,
-      signupData.lastName,
-      signupData.emailId,
-      signupData.password,
-      'student'
-    );
-
-    if (success) {
-      toast({ title: 'Signup successful!' });
-      navigate('/practice');
-=======
     if (!isValidGmail(loginData.emailId)) {
       toast({
         title: 'Invalid Email',
@@ -161,116 +77,8 @@ const handleStudentSignup = async () => {
         variant: 'destructive',
       });
       return;
->>>>>>> 3f5e1fedbaeeccf9e7d9dab9a6ab5f645945cc53
     }
 
-<<<<<<< HEAD
-//-----------------------------------------------------------------------------
-  // ===== STUDENT SIGNUP =====
-  // const handleStudentSignup = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const success = await signup(
-  //       signupData.firstName,
-  //       signupData.lastName,
-  //       signupData.emailId,
-  //       signupData.password,
-  //       'student'
-  //     );
-  //     if (success) {
-  //       toast({ title: 'Signup successful!' });
-  //       navigate('/practice');
-  //     }
-  //   } catch (err: any) {
-  //     toast({ title: 'Signup failed', description: err.message || 'Something went wrong' });
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
-  //---------------------------------------------------------
-const handleTeacherSignup = async () => {
-  if (isEmptyField(teacherSignupData)) {
-    toast({
-      title: 'Validation Error',
-      description: 'All fields are mandatory',
-      variant: 'destructive',
-    });
-    return;
-  }
-
-  if(!isValidName(teacherSignupData.firstName)) {
-    toast({
-      title: 'Invalid first name',
-      description: 'First Name must start with character',
-      variant: 'destructive',
-    });
-    return;
-  }
-
-  if(!isValidName(teacherSignupData.lastName)) {
-    toast({
-      title: 'Invalid last name',
-      description: 'Last Name must start with character',
-      variant: 'destructive',
-    });
-    return;
-  }
-
-  if(!isValidName(teacherSignupData.subjectAssociated)) {
-    toast({
-      title: 'Invalid subject name',
-      description: 'Subject Name must start with character',
-      variant: 'destructive',
-    });
-    return;
-  }
-
-  if(!isValidName(teacherSignupData.institute)) {
-    toast({
-      title: 'Invalid institute name',
-      description: 'Institute Name must start with character',
-      variant: 'destructive',
-    });
-    return;
-  }
-
-  if (!isValidGmail(teacherSignupData.emailId)) {
-    toast({
-      title: 'Invalid Email',
-      description: 'Email must end with @gmail.com',
-      variant: 'destructive',
-    });
-    return;
-  }
-
-  if (!isValidPassword(teacherSignupData.password)) {
-    toast({
-      title: 'Invalid Password',
-      description:
-        'Password must be of 8 characters or more, include atleast one uppercase letter and one special character',
-      variant: 'destructive',
-    });
-    return;
-  }
-console.log('Signup payload (TEACHER):', teacherSignupData);
-
-  setIsLoading(true);
-  try {
-    const success = await signup(
-      teacherSignupData.firstName,
-      teacherSignupData.lastName,
-      teacherSignupData.emailId,
-      teacherSignupData.password,
-      'teacher',
-      teacherSignupData.subjectAssociated,
-      teacherSignupData.institute
-    );
-
-    if (success) {
-      toast({ title: 'Signup successful!' });
-      navigate('/faculty-dashboard');
-=======
     if (!isValidPassword(loginData.password)) {
       toast({
         title: 'Invalid Password',
@@ -279,7 +87,6 @@ console.log('Signup payload (TEACHER):', teacherSignupData);
         variant: 'destructive',
       });
       return;
->>>>>>> 3f5e1fedbaeeccf9e7d9dab9a6ab5f645945cc53
     }
 
     setIsLoading(true);
@@ -330,6 +137,24 @@ console.log('Signup payload (TEACHER):', teacherSignupData);
         description:
           'Password must be of 8 characters or more, include atleast one uppercase letter and one special character',
         variant: 'destructive',
+      });
+      return;
+    }
+
+    if(!isValidName(signupData.firstName)) {
+      toast({
+        title: 'Invalid first name',
+        description: 'First Name must start with character',
+        variant: 'destructive',
+        });
+      return;
+    }
+
+    if(!isValidName(signupData.lastName)) {
+    toast({
+      title: 'Invalid last name',
+      description: 'Last Name must start with character',
+      variant: 'destructive',
       });
       return;
     }
@@ -387,6 +212,43 @@ console.log('Signup payload (TEACHER):', teacherSignupData);
       });
       return;
     }
+
+    if(!isValidName(teacherSignupData.firstName)) {
+    toast({
+      title: 'Invalid first name',
+      description: 'First Name must start with character',
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  if(!isValidName(teacherSignupData.lastName)) {
+    toast({
+      title: 'Invalid last name',
+      description: 'Last Name must start with character',
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  if(!isValidName(teacherSignupData.subjectAssociated)) {
+    toast({
+      title: 'Invalid subject name',
+      description: 'Subject Name must start with character',
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  if(!isValidName(teacherSignupData.institute)) {
+    toast({
+      title: 'Invalid institute name',
+      description: 'Institute Name must start with character',
+      variant: 'destructive',
+    });
+    return;
+  }
+
 
     setIsLoading(true);
     try {
