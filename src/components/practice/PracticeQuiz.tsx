@@ -9,11 +9,11 @@ import { QuestionDto } from '@/services/questionsServices';
 
 interface PracticeQuizProps {
   questions: QuestionDto[];
-  topicName: string;
+  topicName?: string;
   subjectName: string;
   onBack: () => void;
   totalQuestionsInTopic: number;
-  visitedQuestionIds: number[];
+  visitedQuestionIds?: number[];
 }
 
 const getOptionsArray = (q: QuestionDto): string[] => [
