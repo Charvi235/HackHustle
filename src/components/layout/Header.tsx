@@ -111,7 +111,7 @@ export const Header = () => {
                     <User className="mr-2 h-4 w-4" />
                     View Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
+                  <DropdownMenuItem onClick={() => navigate('/profile?edit=true')} className="cursor-pointer">
                     <Pencil className="mr-2 h-4 w-4" />
                     Edit Profile
                   </DropdownMenuItem>
