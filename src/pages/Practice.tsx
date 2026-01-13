@@ -153,7 +153,7 @@ const handleSubjectAssessment = async () => {
     return (
       <PracticeQuiz
         questions={questionSets[selectedSet]}
-       
+        topicName={selectedTopic?.name}
         subjectName={selectedSubject.name}
         onBack={() => setStartQuiz(false)}
         totalQuestionsInTopic={questionSets.flat().length}

@@ -59,11 +59,10 @@ export function AppSidebar() {
     { title: 'Quiz Battle', url: '/battle', icon: Trophy },
   ];
 
-  // Faculty navigation items - only 3 items: Dashboard, Student Doubts, Students
+  // Faculty navigation items - only 2 items: Dashboard, Student Doubts
   const facultyItems = [
     { title: 'Dashboard', url: '/faculty-dashboard', icon: LayoutDashboard },
     { title: 'Student Doubts', url: '/faculty-doubts', icon: MessageSquare },
-    { title: 'Students', url: '/faculty-students', icon: Users },
   ];
 
   // Public navigation items (Home only - About/Contact handled specially)

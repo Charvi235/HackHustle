@@ -25,7 +25,7 @@ export const EditProfileModal = ({ open, onOpenChange, user, onSave }: EditProfi
     institute: '',
     designation: '',
     department: '',
-    experience: 0,
+    experience: '',
     bio: '',
     subject: '',
     officeHours: '',
@@ -43,7 +43,7 @@ export const EditProfileModal = ({ open, onOpenChange, user, onSave }: EditProfi
         institute: user.institute || '',
         designation: user.designation || '',
         department: user.department || '',
-        experience: user.experience || 0,
+        experience: user.experience || '',
         bio: user.bio || '',
         subject: user.subject || '',
         officeHours: user.officeHours || '',
@@ -54,7 +54,7 @@ export const EditProfileModal = ({ open, onOpenChange, user, onSave }: EditProfi
     }
   }, [user, open]);
 
-  const handleChange = (field: string, value: string | number) => {
+  const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -66,7 +66,7 @@ export const EditProfileModal = ({ open, onOpenChange, user, onSave }: EditProfi
       institute: formData.institute,
       designation: formData.designation,
       department: formData.department,
-      experience: Number(formData.experience),
+      experience: formData.experience,
       bio: formData.bio,
       subject: formData.subject,
       officeHours: formData.officeHours,
@@ -172,10 +172,9 @@ export const EditProfileModal = ({ open, onOpenChange, user, onSave }: EditProfi
               <Label htmlFor="experience">Years of Experience</Label>
               <Input
                 id="experience"
-                type="number"
-                min="0"
                 value={formData.experience}
-                onChange={(e) => handleChange('experience', parseInt(e.target.value) || 0)}
+                onChange={(e) => handleChange('experience', e.target.value)}
+                placeholder="e.g., 10"
               />
             </div>
             <div className="space-y-2 mt-4">
