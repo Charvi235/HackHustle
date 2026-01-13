@@ -49,6 +49,18 @@ const subjects: SubjectConfig[] = [
       { id: 1007, name: 'Abstraction' },
       { id: 1008, name: 'Polymorphism' }
     ]
+  },
+  {
+    id: 1003,
+    name: 'Data Structures',
+    topics: [
+      { id: 1009, name: 'Stack' },
+      { id: 1010, name: 'Linked List' },
+      { id: 1011, name: 'Queue' },
+      { id: 1012, name: 'Tree' },
+      { id: 1013, name: 'Heap' },
+      { id: 1014, name: 'Graphs' }
+    ]
   }
 ];
 
@@ -87,7 +99,7 @@ const handleTopicAssessment = async () => {
 
   setLoading(true);
   try {
-    const data = await questionService.getQuestionsByTopic(
+    const data = await questionService. getTopicAssessmentQuestions(
       selectedTopic.name
     );
 

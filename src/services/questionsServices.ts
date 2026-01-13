@@ -32,5 +32,13 @@ export const questionService = {
     return apiClient.get(
       `/api/questionstatus/visited/${encodeURIComponent(emailId)}`
     );
+  },
+   // New API for topic-wise assessment
+  getTopicAssessmentQuestions: async (
+    topicName: string
+  ): Promise<QuestionDto[]> => {
+    return apiClient.get(
+      `/api/question/topicassesment/${encodeURIComponent(topicName)}`
+    );
   }
 };
