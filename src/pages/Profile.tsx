@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth, User } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -21,6 +21,7 @@ const Profile = () => {
   const { user, isAuthenticated, logout, isFaculty } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
   
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [localUser, setLocalUser] = useState<User | null>(null);
@@ -33,6 +34,15 @@ const Profile = () => {
     setLocalUser(user);
   }, [isAuthenticated, user, navigate]);
 
+  // Check for edit query param to auto-open modal
+  useEffect(() => {
+    if (searchParams.get('edit') === 'true' && localUser) {
+      setIsEditModalOpen(true);
+      // Clear the query param after opening
+      setSearchParams({});
+    }
+  }, [searchParams, localUser, setSearchParams]);
+
   const getUserInitials = () => {
     if (!localUser) return 'U';
     return `${localUser.first_name?.[0] || ''}${localUser.last_name?.[0] || ''}`.toUpperCase();
@@ -44,6 +54,10 @@ const Profile = () => {
       setLocalUser(updated);
       localStorage.setItem('user', JSON.stringify(updated));
     }
+  };
+
+  const handleOpenEditModal = () => {
+    setIsEditModalOpen(true);
   };
 
   const handleLogout = () => {
