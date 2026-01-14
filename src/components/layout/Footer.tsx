@@ -8,34 +8,15 @@ const footerSections = [
       { label: 'Practice MCQs', href: '/practice' },
       { label: 'Mock Interviews', href: '/interview' },
       { label: 'Quiz Battles', href: '/battle' },
-      { label: 'Progress Tracking', href: '/progress' },
-    ],
-  },
-  {
-    title: 'Resources',
-    links: [
-      { label: 'Documentation', href: '/docs' },
-      { label: 'API Reference', href: '/api' },
-      { label: 'Tutorials', href: '/tutorials' },
-      { label: 'Blog', href: '/blog' },
     ],
   },
   {
     title: 'Support',
     links: [
-      { label: 'Help Center', href: '/help' },
-      { label: 'Contact Us', href: '/contact' },
-      { label: 'Community', href: '/community' },
-      { label: 'Status', href: '/status' },
-    ],
-  },
-  {
-    title: 'Company',
-    links: [
       { label: 'About Us', href: '/about' },
-      { label: 'Careers', href: '/careers' },
-      { label: 'Privacy Policy', href: '/privacy' },
-      { label: 'Terms of Service', href: '/terms' },
+      { label: 'Contact Us', href: '/contact' },
+      { label: 'Help Center', href: '/help' },
+      { label: 'Community', href: '/community' },
     ],
   },
 ];
@@ -51,7 +32,7 @@ export const Footer = () => {
   return (
     <footer id="contact" className="bg-card border-t border-border">
       <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center space-x-2 font-bold text-xl mb-4">
@@ -100,12 +81,9 @@ export const Footer = () => {
           ))}
         </div>
 
-        {/* Bottom Section */}
-        <div className="border-t border-border mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+        {/* Bottom Section - just social text, no copyright */}
+        <div className="border-t border-border mt-12 pt-8 flex justify-center items-center">
           <div className="text-muted-foreground text-sm">
-            © 2024 HackHustle. All rights reserved.
-          </div>
-          <div className="text-muted-foreground text-sm mt-4 md:mt-0">
             Built with ❤️ for students worldwide
           </div>
         </div>

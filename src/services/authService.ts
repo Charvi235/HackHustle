@@ -21,22 +21,43 @@ export interface SignupRequest {
 
 /* ===================== SERVICE ===================== */
 
+// Mock student credentials
+const MOCK_STUDENT_EMAIL = 'student@gmail.com';
+const MOCK_STUDENT_PASSWORD = 'Student@123';
+
 export const authService = {
   /**
    * LOGIN
    * Backend returns ResponseEntity<Void>
-   * So DO NOT expect any response body
+   * Includes mock student login bypass
    */
-  login: async ({ emailId, password, role }: LoginRequest): Promise<boolean> => {
+  login: async ({ emailId, password, role }: LoginRequest): Promise<{ success: boolean; user?: any }> => {
+    // Mock Student Login bypass
+    if (role === 'STUDENT' && emailId === MOCK_STUDENT_EMAIL && password === MOCK_STUDENT_PASSWORD) {
+      const mockUser = {
+        student_id: 'mock-student-001',
+        first_name: 'Charvi',
+        last_name: 'Singh',
+        emailId: MOCK_STUDENT_EMAIL,
+        role: 'STUDENT' as const,
+        points: 1250,
+        stats: {
+          battleWins: 12,
+          questionsSolved: 150,
+        },
+      };
+      return { success: true, user: mockUser };
+    }
+
     const payload = { emailId, password };
 
     const endpoint =
       role === 'TEACHER'
-        ? API_CONFIG.ENDPOINTS.AUTH.TEACHER_LOGIN // /api/teachers/login
-        : API_CONFIG.ENDPOINTS.AUTH.STUDENT_LOGIN;        // /api/students/login
+        ? API_CONFIG.ENDPOINTS.AUTH.TEACHER_LOGIN
+        : API_CONFIG.ENDPOINTS.AUTH.STUDENT_LOGIN;
 
-    await apiClient.post(endpoint, payload); // ✅ no response parsing
-    return true;
+    await apiClient.post(endpoint, payload);
+    return { success: true };
   },
 
   /**

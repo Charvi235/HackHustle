@@ -28,6 +28,8 @@ export interface User {
   stats?: {
     studentsMentored?: number;
     doubtsSolved?: number;
+    battleWins?: number;
+    questionsSolved?: number;
   };
 }
 
@@ -79,9 +81,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   ): Promise<boolean> => {
     try {
       const roleUpper = mapRole(role);
-      const success = await authService.login({ emailId, password, role: roleUpper }); // <-- pass object
-      if (success) {
-        const loggedInUser: User = {
+      const result = await authService.login({ emailId, password, role: roleUpper });
+      if (result.success) {
+        // Use mock user data if provided, otherwise create basic user
+        const loggedInUser: User = result.user || {
           emailId,
           first_name: '',
           last_name: '',
@@ -90,7 +93,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(loggedInUser);
         localStorage.setItem('user', JSON.stringify(loggedInUser));
       }
-      return success;
+      return result.success;
     } catch (error: any) {
       toast({
         title: 'Login Failed',

@@ -8,7 +8,9 @@ import {
   LogOut, 
   BookOpen, 
   MessageSquare, 
-  Clock
+  Clock,
+  Trophy,
+  CheckCircle
 } from 'lucide-react';
 import { FaLinkedin, FaGithub, FaGlobe } from 'react-icons/fa';
 import { useToast } from '@/hooks/use-toast';
@@ -112,10 +114,12 @@ const Profile = () => {
 
             {/* Role-specific info */}
             {localUser.role?.toLowerCase() === 'student' && (
-              <div className="space-y-2">
-                <Label className="text-muted-foreground">Points</Label>
-                <p className="text-2xl font-bold text-primary">{localUser.points || 0}</p>
-              </div>
+              <>
+                <div className="space-y-2">
+                  <Label className="text-muted-foreground">Points</Label>
+                  <p className="text-2xl font-bold text-primary">{localUser.points || 0}</p>
+                </div>
+              </>
             )}
 
             {isFaculty && (
@@ -178,6 +182,33 @@ const Profile = () => {
                     {localUser.stats?.doubtsSolved || 0}
                   </p>
                   <p className="text-muted-foreground text-sm">Doubts Solved</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Stats Card (Student only) */}
+        {!isFaculty && localUser.role?.toLowerCase() === 'student' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Your Stats</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  <Trophy className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
+                  <p className="text-3xl font-bold text-primary">
+                    {localUser.stats?.battleWins || 0}
+                  </p>
+                  <p className="text-muted-foreground text-sm">Battle Wins</p>
+                </div>
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                  <p className="text-3xl font-bold text-primary">
+                    {localUser.stats?.questionsSolved || 0}
+                  </p>
+                  <p className="text-muted-foreground text-sm">Questions Solved</p>
                 </div>
               </div>
             </CardContent>
