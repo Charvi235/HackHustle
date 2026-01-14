@@ -6,8 +6,7 @@ import {
   Trophy, 
   BookOpen, 
   Users, 
-  Zap, 
-  Target,
+  Zap,
   ArrowRight,
   Star
 } from 'lucide-react';
@@ -41,13 +40,6 @@ const features = [
     description: 'Get help from verified faculty members for complex doubts and concepts.',
     badge: 'Expert Help',
     color: 'bg-purple-500',
-  },
-  {
-    icon: Target,
-    title: 'Progress Tracking',
-    description: 'Monitor your learning journey with detailed analytics and performance insights.',
-    badge: 'Analytics',
-    color: 'bg-red-500',
   },
   {
     icon: Zap,
@@ -110,14 +102,6 @@ export const FeaturesSection = () => {
           ))}
         </div>
 
-        <div className="text-center mt-16">
-          <Button asChild variant="hero" size="lg">
-            <Link to="/practice">
-              Explore All Features
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Link>
-          </Button>
-        </div>
       </div>
     </section>
   );
