@@ -17,6 +17,7 @@ interface EditProfileModalProps {
 
 export const EditProfileModal = ({ open, onOpenChange, user, onSave }: EditProfileModalProps) => {
   const { toast } = useToast();
+  const isFaculty = user?.role?.toLowerCase() === 'faculty' || user?.role?.toLowerCase() === 'teacher';
   
   const [formData, setFormData] = useState({
     first_name: '',
@@ -59,25 +60,36 @@ export const EditProfileModal = ({ open, onOpenChange, user, onSave }: EditProfi
   };
 
   const handleSave = () => {
-    const updatedUser: Partial<User> = {
-      first_name: formData.first_name,
-      last_name: formData.last_name,
-      emailId: formData.emailId,
-      institute: formData.institute,
-      designation: formData.designation,
-      department: formData.department,
-      experience: formData.experience,
-      bio: formData.bio,
-      subject: formData.subject,
-      officeHours: formData.officeHours,
-      socials: {
-        linkedin: formData.linkedin || undefined,
-        github: formData.github || undefined,
-        website: formData.website || undefined,
-      },
-    };
+    // For students, only save basic fields
+    if (!isFaculty) {
+      const updatedUser: Partial<User> = {
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        emailId: formData.emailId,
+      };
+      onSave(updatedUser);
+    } else {
+      // For faculty, save all fields
+      const updatedUser: Partial<User> = {
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        emailId: formData.emailId,
+        institute: formData.institute,
+        designation: formData.designation,
+        department: formData.department,
+        experience: formData.experience,
+        bio: formData.bio,
+        subject: formData.subject,
+        officeHours: formData.officeHours,
+        socials: {
+          linkedin: formData.linkedin || undefined,
+          github: formData.github || undefined,
+          website: formData.website || undefined,
+        },
+      };
+      onSave(updatedUser);
+    }
     
-    onSave(updatedUser);
     toast({ title: 'Profile updated successfully!' });
     onOpenChange(false);
   };
@@ -123,114 +135,119 @@ export const EditProfileModal = ({ open, onOpenChange, user, onSave }: EditProfi
             </div>
           </div>
 
-          <Separator />
+          {/* Faculty-only sections */}
+          {isFaculty && (
+            <>
+              <Separator />
 
-          {/* Professional Info Section */}
-          <div>
-            <h3 className="text-sm font-semibold text-muted-foreground mb-3">Professional Details</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="institute">Institute</Label>
-                <Input
-                  id="institute"
-                  value={formData.institute}
-                  onChange={(e) => handleChange('institute', e.target.value)}
-                  placeholder="e.g., IIT Delhi"
-                />
+              {/* Professional Info Section */}
+              <div>
+                <h3 className="text-sm font-semibold text-muted-foreground mb-3">Professional Details</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="institute">Institute</Label>
+                    <Input
+                      id="institute"
+                      value={formData.institute}
+                      onChange={(e) => handleChange('institute', e.target.value)}
+                      placeholder="e.g., IIT Delhi"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="subject">Subject</Label>
+                    <Input
+                      id="subject"
+                      value={formData.subject}
+                      onChange={(e) => handleChange('subject', e.target.value)}
+                      placeholder="e.g., DSA"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="designation">Designation</Label>
+                    <Input
+                      id="designation"
+                      value={formData.designation}
+                      onChange={(e) => handleChange('designation', e.target.value)}
+                      placeholder="e.g., Associate Professor"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="department">Department</Label>
+                    <Input
+                      id="department"
+                      value={formData.department}
+                      onChange={(e) => handleChange('department', e.target.value)}
+                      placeholder="e.g., Computer Science"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2 mt-4">
+                  <Label htmlFor="experience">Years of Experience</Label>
+                  <Input
+                    id="experience"
+                    value={formData.experience}
+                    onChange={(e) => handleChange('experience', e.target.value)}
+                    placeholder="e.g., 10"
+                  />
+                </div>
+                <div className="space-y-2 mt-4">
+                  <Label htmlFor="bio">Bio / About Me</Label>
+                  <Textarea
+                    id="bio"
+                    value={formData.bio}
+                    onChange={(e) => handleChange('bio', e.target.value)}
+                    placeholder="Tell students about yourself..."
+                    rows={3}
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="subject">Subject</Label>
-                <Input
-                  id="subject"
-                  value={formData.subject}
-                  onChange={(e) => handleChange('subject', e.target.value)}
-                  placeholder="e.g., DSA"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="designation">Designation</Label>
-                <Input
-                  id="designation"
-                  value={formData.designation}
-                  onChange={(e) => handleChange('designation', e.target.value)}
-                  placeholder="e.g., Associate Professor"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="department">Department</Label>
-                <Input
-                  id="department"
-                  value={formData.department}
-                  onChange={(e) => handleChange('department', e.target.value)}
-                  placeholder="e.g., Computer Science"
-                />
-              </div>
-            </div>
-            <div className="space-y-2 mt-4">
-              <Label htmlFor="experience">Years of Experience</Label>
-              <Input
-                id="experience"
-                value={formData.experience}
-                onChange={(e) => handleChange('experience', e.target.value)}
-                placeholder="e.g., 10"
-              />
-            </div>
-            <div className="space-y-2 mt-4">
-              <Label htmlFor="bio">Bio / About Me</Label>
-              <Textarea
-                id="bio"
-                value={formData.bio}
-                onChange={(e) => handleChange('bio', e.target.value)}
-                placeholder="Tell students about yourself..."
-                rows={3}
-              />
-            </div>
-          </div>
 
-          <Separator />
+              <Separator />
 
-          {/* Socials & Availability Section */}
-          <div>
-            <h3 className="text-sm font-semibold text-muted-foreground mb-3">Socials & Availability</h3>
-            <div className="space-y-2">
-              <Label htmlFor="officeHours">Office Hours</Label>
-              <Input
-                id="officeHours"
-                value={formData.officeHours}
-                onChange={(e) => handleChange('officeHours', e.target.value)}
-                placeholder="e.g., Mon-Fri, 5 PM - 7 PM"
-              />
-            </div>
-            <div className="space-y-2 mt-4">
-              <Label htmlFor="linkedin">LinkedIn URL</Label>
-              <Input
-                id="linkedin"
-                value={formData.linkedin}
-                onChange={(e) => handleChange('linkedin', e.target.value)}
-                placeholder="https://linkedin.com/in/yourprofile"
-              />
-            </div>
-            <div className="space-y-2 mt-4">
-              <Label htmlFor="github">GitHub URL</Label>
-              <Input
-                id="github"
-                value={formData.github}
-                onChange={(e) => handleChange('github', e.target.value)}
-                placeholder="https://github.com/yourusername"
-              />
-            </div>
-            <div className="space-y-2 mt-4">
-              <Label htmlFor="website">Personal Website</Label>
-              <Input
-                id="website"
-                value={formData.website}
-                onChange={(e) => handleChange('website', e.target.value)}
-                placeholder="https://yourwebsite.com"
-              />
-            </div>
-          </div>
+              {/* Socials & Availability Section */}
+              <div>
+                <h3 className="text-sm font-semibold text-muted-foreground mb-3">Socials & Availability</h3>
+                <div className="space-y-2">
+                  <Label htmlFor="officeHours">Office Hours</Label>
+                  <Input
+                    id="officeHours"
+                    value={formData.officeHours}
+                    onChange={(e) => handleChange('officeHours', e.target.value)}
+                    placeholder="e.g., Mon-Fri, 5 PM - 7 PM"
+                  />
+                </div>
+                <div className="space-y-2 mt-4">
+                  <Label htmlFor="linkedin">LinkedIn URL</Label>
+                  <Input
+                    id="linkedin"
+                    value={formData.linkedin}
+                    onChange={(e) => handleChange('linkedin', e.target.value)}
+                    placeholder="https://linkedin.com/in/yourprofile"
+                  />
+                </div>
+                <div className="space-y-2 mt-4">
+                  <Label htmlFor="github">GitHub URL</Label>
+                  <Input
+                    id="github"
+                    value={formData.github}
+                    onChange={(e) => handleChange('github', e.target.value)}
+                    placeholder="https://github.com/yourusername"
+                  />
+                </div>
+                <div className="space-y-2 mt-4">
+                  <Label htmlFor="website">Personal Website</Label>
+                  <Input
+                    id="website"
+                    value={formData.website}
+                    onChange={(e) => handleChange('website', e.target.value)}
+                    placeholder="https://yourwebsite.com"
+                  />
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="flex gap-3 pt-4">

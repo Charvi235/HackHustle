@@ -112,15 +112,7 @@ const Profile = () => {
               <p className="text-lg">{localUser.emailId}</p>
             </div>
 
-            {/* Role-specific info */}
-            {localUser.role?.toLowerCase() === 'student' && (
-              <>
-                <div className="space-y-2">
-                  <Label className="text-muted-foreground">Points</Label>
-                  <p className="text-2xl font-bold text-primary">{localUser.points || 0}</p>
-                </div>
-              </>
-            )}
+            {/* Student stats shown inline */}
 
             {isFaculty && (
               <>
