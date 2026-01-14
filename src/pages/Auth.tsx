@@ -98,6 +98,7 @@ const Auth = () => {
       );
 
       if (success) {
+        localStorage.setItem('emailId', loginData.emailId);
         toast({ title: 'Login successful!' });
         navigate(role === 'TEACHER' ? '/faculty-dashboard' : '/practice');
       }
@@ -170,6 +171,7 @@ const Auth = () => {
       );
 
       if (success) {
+        localStorage.setItem('emailId', signupData.emailId);
         toast({ title: 'Signup successful!' });
         navigate('/practice');
       }
@@ -263,6 +265,7 @@ const Auth = () => {
       );
 
       if (success) {
+        localStorage.setItem('emailId', teacherSignupData.emailId);
         toast({ title: 'Signup successful!' });
         navigate('/faculty-dashboard');
       }

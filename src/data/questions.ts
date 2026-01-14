@@ -26,88 +26,88 @@ export interface Subject {
 const dummyQuestions: Question[] = [];
 
 // Generate multiple sets of questions
-function generateQuestionSets(count: number): Question[][] {
-  const sets: Question[][] = [];
-  for (let i = 0; i < count; i++) {
-    sets.push(dummyQuestions.map((q, idx) => ({
-      ...q,
-      id: i * 10 + idx + 1
-    })));
-  }
-  return sets;
-}
+// function generateQuestionSets(count: number): Question[][] {
+//   const sets: Question[][] = [];
+//   for (let i = 0; i < count; i++) {
+//     sets.push(dummyQuestions.map((q, idx) => ({
+//       ...q,
+//       id: i * 10 + idx + 1
+//     })));
+//   }
+//   return sets;
+// }
 
-export const subjects: Subject[] = [
-  {
-    id: 1,
-    name: "Database Management System",
-    topics: [
-      { id: 1, name: "Introduction to DBMS", questions: generateQuestionSets(5) },
-      { id: 2, name: "Relational Model", questions: generateQuestionSets(5) },
-      { id: 3, name: "SQL Queries", questions: generateQuestionSets(5) },
-      { id: 4, name: "Normalization", questions: generateQuestionSets(5) },
-      { id: 5, name: "Transactions", questions: generateQuestionSets(5) },
-      { id: 6, name: "Indexing", questions: generateQuestionSets(5) },
-    ]
-  },
-  {
-    id: 2,
-    name: "Operating System",
-    topics: [
-      { id: 1, name: "Process Management", questions: generateQuestionSets(5) },
-      { id: 2, name: "CPU Scheduling", questions: generateQuestionSets(5) },
-      { id: 3, name: "Memory Management", questions: generateQuestionSets(5) },
-      { id: 4, name: "Deadlocks", questions: generateQuestionSets(5) },
-      { id: 5, name: "File Systems", questions: generateQuestionSets(5) },
-    ]
-  },
-  {
-    id: 3,
-    name: "Computer Network",
-    topics: [
-      { id: 1, name: "Network Fundamentals", questions: generateQuestionSets(5) },
-      { id: 2, name: "OSI Model", questions: generateQuestionSets(5) },
-      { id: 3, name: "TCP/IP Protocol", questions: generateQuestionSets(5) },
-      { id: 4, name: "Network Security", questions: generateQuestionSets(5) },
-      { id: 5, name: "Routing Algorithms", questions: generateQuestionSets(5) },
-    ]
-  },
-  {
-    id: 4,
-    name: "Object Oriented Programming",
-    topics: [
-      { id: 1, name: "OOP Concepts", questions: generateQuestionSets(5) },
-      { id: 2, name: "Inheritance", questions: generateQuestionSets(5) },
-      { id: 3, name: "Polymorphism", questions: generateQuestionSets(5) },
-      { id: 4, name: "Encapsulation", questions: generateQuestionSets(5) },
-      { id: 5, name: "Abstraction", questions: generateQuestionSets(5) },
-    ]
-  },
-  {
-    id: 5,
-    name: "Data Structure and Algorithms",
-    topics: [
-      { id: 1, name: "Arrays and Strings", questions: generateQuestionSets(5) },
-      { id: 2, name: "Linked Lists", questions: generateQuestionSets(5) },
-      { id: 3, name: "Stacks and Queues", questions: generateQuestionSets(5) },
-      { id: 4, name: "Trees", questions: generateQuestionSets(5) },
-      { id: 5, name: "Graphs", questions: generateQuestionSets(5) },
-      { id: 6, name: "Sorting Algorithms", questions: generateQuestionSets(5) },
-      { id: 7, name: "Searching Algorithms", questions: generateQuestionSets(5) },
-    ]
-  },
-  {
-    id: 6,
-    name: "Java Programming",
-    topics: [
-      { id: 1, name: "Java Basics", questions: generateQuestionSets(5) },
-      { id: 2, name: "Collections Framework", questions: generateQuestionSets(5) },
-      { id: 3, name: "Multithreading", questions: generateQuestionSets(5) },
-      { id: 4, name: "Exception Handling", questions: generateQuestionSets(5) },
-      { id: 5, name: "Java 8 Features", questions: generateQuestionSets(5) },
-    ]
-  }
-];
+// export const subjects: Subject[] = [
+//   {
+//     id: 1,
+//     name: "Database Management System",
+//     topics: [
+//       { id: 1, name: "Introduction to DBMS", questions: generateQuestionSets(5) },
+//       { id: 2, name: "Relational Model", questions: generateQuestionSets(5) },
+//       { id: 3, name: "SQL Queries", questions: generateQuestionSets(5) },
+//       { id: 4, name: "Normalization", questions: generateQuestionSets(5) },
+//       { id: 5, name: "Transactions", questions: generateQuestionSets(5) },
+//       { id: 6, name: "Indexing", questions: generateQuestionSets(5) },
+//     ]
+//   },
+//   {
+//     id: 2,
+//     name: "Operating System",
+//     topics: [
+//       { id: 1, name: "Process Management", questions: generateQuestionSets(5) },
+//       { id: 2, name: "CPU Scheduling", questions: generateQuestionSets(5) },
+//       { id: 3, name: "Memory Management", questions: generateQuestionSets(5) },
+//       { id: 4, name: "Deadlocks", questions: generateQuestionSets(5) },
+//       { id: 5, name: "File Systems", questions: generateQuestionSets(5) },
+//     ]
+//   },
+//   {
+//     id: 3,
+//     name: "Computer Network",
+//     topics: [
+//       { id: 1, name: "Network Fundamentals", questions: generateQuestionSets(5) },
+//       { id: 2, name: "OSI Model", questions: generateQuestionSets(5) },
+//       { id: 3, name: "TCP/IP Protocol", questions: generateQuestionSets(5) },
+//       { id: 4, name: "Network Security", questions: generateQuestionSets(5) },
+//       { id: 5, name: "Routing Algorithms", questions: generateQuestionSets(5) },
+//     ]
+//   },
+//   {
+//     id: 4,
+//     name: "Object Oriented Programming",
+//     topics: [
+//       { id: 1, name: "OOP Concepts", questions: generateQuestionSets(5) },
+//       { id: 2, name: "Inheritance", questions: generateQuestionSets(5) },
+//       { id: 3, name: "Polymorphism", questions: generateQuestionSets(5) },
+//       { id: 4, name: "Encapsulation", questions: generateQuestionSets(5) },
+//       { id: 5, name: "Abstraction", questions: generateQuestionSets(5) },
+//     ]
+//   },
+//   {
+//     id: 5,
+//     name: "Data Structure and Algorithms",
+//     topics: [
+//       { id: 1, name: "Arrays and Strings", questions: generateQuestionSets(5) },
+//       { id: 2, name: "Linked Lists", questions: generateQuestionSets(5) },
+//       { id: 3, name: "Stacks and Queues", questions: generateQuestionSets(5) },
+//       { id: 4, name: "Trees", questions: generateQuestionSets(5) },
+//       { id: 5, name: "Graphs", questions: generateQuestionSets(5) },
+//       { id: 6, name: "Sorting Algorithms", questions: generateQuestionSets(5) },
+//       { id: 7, name: "Searching Algorithms", questions: generateQuestionSets(5) },
+//     ]
+//   },
+//   {
+//     id: 6,
+//     name: "Java Programming",
+//     topics: [
+//       { id: 1, name: "Java Basics", questions: generateQuestionSets(5) },
+//       { id: 2, name: "Collections Framework", questions: generateQuestionSets(5) },
+//       { id: 3, name: "Multithreading", questions: generateQuestionSets(5) },
+//       { id: 4, name: "Exception Handling", questions: generateQuestionSets(5) },
+//       { id: 5, name: "Java 8 Features", questions: generateQuestionSets(5) },
+//     ]
+//   }
+// ];
 
 export const interviewQuestions: Question[] = dummyQuestions;
 export const battleQuestions: Question[] = dummyQuestions;
