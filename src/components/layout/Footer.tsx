@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Zap, Github, Twitter, Linkedin, Mail } from 'lucide-react';
+import { Zap } from 'lucide-react';
 
 const footerSections = [
   {
@@ -15,17 +15,8 @@ const footerSections = [
     links: [
       { label: 'About Us', href: '/about' },
       { label: 'Contact Us', href: '/contact' },
-      { label: 'Help Center', href: '/help' },
-      { label: 'Community', href: '/community' },
     ],
   },
-];
-
-const socialLinks = [
-  { icon: Github, href: 'https://github.com', label: 'GitHub' },
-  { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
-  { icon: Linkedin, href: 'https://linkedin.com', label: 'LinkedIn' },
-  { icon: Mail, href: 'mailto:contact@hackhustle.com', label: 'Email' },
 ];
 
 export const Footer = () => {
@@ -47,18 +38,6 @@ export const Footer = () => {
               Empowering students worldwide with AI-driven learning experiences. 
               Master skills, ace interviews, and achieve your career goals.
             </p>
-            <div className="flex space-x-4">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                  aria-label={social.label}
-                >
-                  <social.icon className="w-5 h-5" />
-                </a>
-              ))}
-            </div>
           </div>
 
           {/* Footer Links */}

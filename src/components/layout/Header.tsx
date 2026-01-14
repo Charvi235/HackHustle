@@ -1,15 +1,11 @@
+import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Zap, Info, Mail, User, Pencil, LogOut } from 'lucide-react';
+import { Zap, Info, Mail, User, Pencil, LogOut, ChevronDown, ChevronUp } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +19,7 @@ export const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const unreadDoubtsCount = 3; // Mock count
+  const [isContactOpen, setIsContactOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -64,23 +61,46 @@ export const Header = () => {
           </div>
 
           {/* Center - About Us & Contact Us (always visible) */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden md:flex items-center space-x-6 relative">
             <Button variant="ghost" onClick={handleAboutClick}>
               <Info className="h-4 w-4 mr-2" />
               About Us
             </Button>
             
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" className="cursor-default">
-                  <Mail className="h-4 w-4 mr-2" />
-                  Contact Us
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Need help? Reach us at contact@hackhustle.org</p>
-              </TooltipContent>
-            </Tooltip>
+            <div className="relative">
+              <Button 
+                variant="ghost" 
+                onClick={() => setIsContactOpen(!isContactOpen)}
+                className="flex items-center"
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                Contact Us
+                {isContactOpen ? (
+                  <ChevronUp className="h-4 w-4 ml-1" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 ml-1" />
+                )}
+              </Button>
+              
+              {/* Contact Dropdown */}
+              <div 
+                className={`absolute top-full left-0 mt-2 bg-card border border-border rounded-lg shadow-lg p-4 min-w-[280px] z-50 transition-all duration-200 ease-in-out ${
+                  isContactOpen 
+                    ? 'opacity-100 translate-y-0' 
+                    : 'opacity-0 -translate-y-2 pointer-events-none'
+                }`}
+              >
+                <p className="text-sm text-muted-foreground">
+                  Need help? Contact us at{' '}
+                  <a 
+                    href="mailto:contact@hackhustle.com" 
+                    className="text-primary hover:underline font-medium"
+                  >
+                    contact@hackhustle.com
+                  </a>
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Right Side - User Profile or Auth buttons */}
