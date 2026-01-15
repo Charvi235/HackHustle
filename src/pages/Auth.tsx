@@ -497,16 +497,10 @@ const isValidPassword = (password: string) => {
   return regex.test(password);
 };
 
-// const isValidName = (name: string) => {
-//   const regex = /^[A-Za-z][A-Za-z]*$/;
-//   return regex.test(name.trim());
-// };
-
 const isValidName = (name: string) => {
-  const regex = /^[A-Za-z]+( [A-Za-z]+)*$/;
+  const regex = /^[A-Za-z][A-Za-z]*$/;
   return regex.test(name.trim());
 };
-
 
 const isEmptyField = (data: Record<string, string>) => {
   return Object.values(data).some((value) => value.trim() === '');
@@ -1001,12 +995,12 @@ const Auth = () => {
                     <Input
                       placeholder="Subject Associated"
                       value={teacherSignupData.subjectAssociated}
-                      onChange={(e) => setTeacherSignupData({ ...teacherSignupData, subjectAssociated: e.target.value.replace(/\s+/g, ' ') })}
+                      onChange={(e) => setTeacherSignupData({ ...teacherSignupData, subjectAssociated: e.target.value })}
                     />
                     <Input
                       placeholder="Institute"
                       value={teacherSignupData.institute}
-                      onChange={(e) => setTeacherSignupData({ ...teacherSignupData, institute: e.target.value.replace(/\s+/g, ' ') })}
+                      onChange={(e) => setTeacherSignupData({ ...teacherSignupData, institute: e.target.value })}
                     />
                     <Button className="w-full" onClick={handleTeacherSignup} disabled={isLoading}>
                       {isLoading ? 'Signing up...' : 'Sign Up as Teacher'}
