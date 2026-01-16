@@ -1,8 +1,6 @@
 
 import { apiClient, API_CONFIG } from '@/config/api';
 
-/* ===================== TYPES ===================== */
-
 export interface LoginRequest {
   emailId: string;
   password: string;
@@ -19,36 +17,12 @@ export interface SignupRequest {
   institute?: string;
 }
 
-/* ===================== SERVICE ===================== */
-
-// Mock student credentials
-const MOCK_STUDENT_EMAIL = 'student@gmail.com';
-const MOCK_STUDENT_PASSWORD = 'Student@123';
 
 export const authService = {
-  /**
-   * LOGIN
-   * Backend returns ResponseEntity<Void>
-   * Includes mock student login bypass
-   */
-  login: async ({ emailId, password, role }: LoginRequest): Promise<{ success: boolean; user?: any }> => {
-    // Mock Student Login bypass
-    if (role === 'STUDENT' && emailId === MOCK_STUDENT_EMAIL && password === MOCK_STUDENT_PASSWORD) {
-      const mockUser = {
-        student_id: 'mock-student-001',
-        first_name: 'Charvi',
-        last_name: 'Singh',
-        emailId: MOCK_STUDENT_EMAIL,
-        role: 'STUDENT' as const,
-        points: 1250,
-        stats: {
-          battleWins: 12,
-          questionsSolved: 150,
-        },
-      };
-      return { success: true, user: mockUser };
-    }
 
+  login: async ({ emailId, password, role }: LoginRequest): Promise<{ success: boolean; user?: any }> => {
+
+  
     const payload = { emailId, password };
 
     const endpoint =
@@ -59,11 +33,6 @@ export const authService = {
     await apiClient.post(endpoint, payload);
     return { success: true };
   },
-
-  /**
-   * SIGNUP
-   * Backend returns created user (optional body)
-   */
   signup: async (userData: SignupRequest): Promise<boolean> => {
     const isTeacher = userData.role === 'TEACHER';
 

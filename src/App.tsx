@@ -86,13 +86,11 @@ const AppContent = () => {
                 <FacultyStudents />
               </ProtectedRoute>
             } />
-            {/* Profile page - accessible to all authenticated users */}
             <Route path="/profile" element={
               <ProtectedRoute allowFaculty={true} allowStudent={true}>
                 <Profile />
               </ProtectedRoute>
             } />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

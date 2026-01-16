@@ -1,6 +1,5 @@
 import { apiClient } from '@/config/api';
 
-/* DTO – matches Spring Boot QuestionDto */
 export interface QuestionDto {
   questionID: number;
   questionText: string;
@@ -33,12 +32,11 @@ export const questionService = {
       `/api/questionstatus/visited/${encodeURIComponent(emailId)}`
     );
   },
-   // New API for topic-wise assessment
+   //API for topic-wise assessment
   getTopicAssessmentQuestions: async (
     topicName: string
   ): Promise<QuestionDto[]> => {
     return apiClient.get(
-      //`/api/question/topicassessments`
       `/api/question/topicassesment/${encodeURIComponent(topicName)}`
     );
   }
