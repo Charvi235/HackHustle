@@ -78,10 +78,10 @@ const Battle = () => {
   const handleStartGame = (modeId: number) => {
     setSelectedMode(modeId);
     if (modeId === 2) {
-      // Private Room - show lobby with options to invite or join
+      // Private Room
       setGameMode('menu');
     } else {
-      // Quick Battle - start immediately
+      // Quick Battle
       startBattle(modeId);
     }
   };

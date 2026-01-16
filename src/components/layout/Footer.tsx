@@ -59,13 +59,6 @@ export const Footer = () => {
             </div>
           ))}
         </div>
-
-        {/* Bottom Section - just social text, no copyright */}
-        <div className="border-t border-border mt-12 pt-8 flex justify-center items-center">
-          <div className="text-muted-foreground text-sm">
-            Built with ❤️ for students worldwide
-          </div>
-        </div>
       </div>
     </footer>
   );

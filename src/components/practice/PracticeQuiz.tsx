@@ -132,12 +132,12 @@ useEffect(() => {
       <h1 className="text-2xl font-bold">{topicName}</h1>
       <p className="text-muted-foreground mb-4">{subjectName}</p>
 
-      <Progress
+      {/* <Progress
         value={questions.length > 0
           ? (Object.keys(answered).length / totalQuestionsInTopic) * 100
           : 0
         }
-      />
+      /> */}
 
       <div className="space-y-6 mt-6">
         {questions.map((q, index) => {
