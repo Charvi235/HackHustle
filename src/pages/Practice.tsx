@@ -19,6 +19,7 @@ import { assessmentService } from '@/services/assessmentService';
 // user.email comes from login response
  const user = JSON.parse(localStorage.getItem('user') || '{}');
   const emailId: string = user.emailId;
+  console.log(emailId);
 
 /* ---------------- SUBJECT & TOPIC CONFIG ---------------- */
 
