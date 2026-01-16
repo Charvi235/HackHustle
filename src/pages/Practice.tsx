@@ -16,12 +16,11 @@ import {
 import PracticeQuiz from '../components/practice/PracticeQuiz';
 import { questionService, QuestionDto } from '@/services/questionsServices';
 import { assessmentService } from '@/services/assessmentService';
-// user.email comes from login response
+
  const user = JSON.parse(localStorage.getItem('user') || '{}');
   const emailId: string = user.emailId;
-  console.log(emailId);
+ // console.log(emailId);
 
-/* ---------------- SUBJECT & TOPIC CONFIG ---------------- */
 
 interface TopicConfig {
   id: number;
@@ -69,7 +68,6 @@ const subjects: SubjectConfig[] = [
   }
 ];
 
-/* ---------------- HELPERS ---------------- */
 
 const splitIntoSets = (questions: QuestionDto[], size = 10) => {
   const sets: QuestionDto[][] = [];
@@ -79,7 +77,6 @@ const splitIntoSets = (questions: QuestionDto[], size = 10) => {
   return sets;
 };
 
-/* ---------------- COMPONENT ---------------- */
 
 const Practice = () => {
   const [selectedSubject, setSelectedSubject] = useState<SubjectConfig | null>(null);
@@ -101,21 +98,6 @@ const Practice = () => {
     setStartQuiz(false);
   };
 
-  // const handleSelectTopic = async (topic: TopicConfig) => {
-  //   setSelectedTopic(topic);
-  //   setLoading(true);
-
-  //   try {
-  //     const data = await questionService.getQuestionsByTopic(topic.name);
-  //     setQuestionSets(splitIntoSets(data, 10));
-  //     setSelectedSet(0);
-  //   } catch (err) {
-  //     console.error(err);
-  //     setQuestionSets([]);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 const handleSelectTopic = async (topic: TopicConfig) => {
     setSelectedTopic(topic);
     setLoading(true);
@@ -131,23 +113,7 @@ const handleSelectTopic = async (topic: TopicConfig) => {
       setLoading(false);
     }
   };
-  // const handleTopicAssessment = async () => {
-  //   if (!selectedTopic) return;
 
-  //   setLoading(true);
-  //   try {
-  //     const data = await questionService.getTopicAssessmentQuestions(
-  //       selectedTopic.name
-  //     );
-  //     setQuestionSets([data]);
-  //     setSelectedSet(0);
-  //     setStartQuiz(true);
-  //   } catch (err) {
-  //     console.error(err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
   const handleTopicAssessment = async () => {
   if (!selectedTopic) return;
 
@@ -227,9 +193,7 @@ const handleSubmitAssessment = async () => {
     console.error('Assessment submission failed', err);
   }
 };
-  /* ---------------- RENDER FLOW ---------------- */
 
-  // 1️⃣ Quiz view
   if (startQuiz && selectedSubject) {
     return (
       <div className="min-h-screen bg-background pt-20 pb-24">
@@ -263,63 +227,6 @@ const handleSubmitAssessment = async () => {
     );
   }
 
-
-//   if (selectedSubject && selectedTopic) {
-//     return (
-//       <div className="min-h-screen bg-background pt-20 pb-16">
-//         <div className="container mx-auto px-4 max-w-4xl">
-//           <Button variant="outline" onClick={handleBackToTopics} className="mb-6">
-//             <ChevronLeft className="w-4 h-4 mr-2" /> Back to Topics
-//           </Button>
-
-//           <Badge variant="secondary">{selectedSubject.name}</Badge>
-//           <h1 className="text-3xl font-bold mt-2 mb-6">{selectedTopic.name}</h1>
-
-//           {!loading && questionSets.length > 0 && (
-//             <div className="flex items-center justify-between gap-4 mb-6">
-//               <div className="flex gap-3 flex-wrap">
-//                 {questionSets.map((_, index) => (
-//                   <Button
-//                     key={index}
-//                     variant={index === selectedSet ? 'default' : 'outline'}
-//                     onClick={() => setSelectedSet(index)}
-//                   >
-//                     Set {index + 1}
-//                   </Button>
-//                 ))}
-//               </div>
-
-//               <Button variant="secondary" onClick={handleTopicAssessment}>
-//                 Take Topic-wise Assessment
-//               </Button>
-//             </div>
-//           )}
-
-//           {!loading && questionSets.length > 0 && (
-//             // <PracticeQuiz
-//             //   questions={questionSets[selectedSet]}
-//             //   topicName={selectedTopic.name}
-//             //   subjectName={selectedSubject.name}
-//             //   onBack={handleBackToTopics}
-//             //   totalQuestionsInTopic={questionSets.flat().length}
-//             //   onScoreCalculated={setAssessmentScore}
-//             // />
-//             <PracticeQuiz
-//   questions={questionSets[selectedSet]}
-//   topicName={selectedTopic.name}
-//   subjectName={selectedSubject.name}
-//   onBack={() => setStartQuiz(false)}
-//   totalQuestionsInTopic={questionSets.flat().length}
-//  onScoreCalculated={setAssessmentScore}
-//   isAssessment={true}
-//   topicId={selectedTopic.id}
-//   subjectId={selectedSubject.id}
-// />
-//           )}
-//         </div>
-//       </div>
-//     );
-//   }
 if (selectedSubject && selectedTopic) {
     return (
       <div className="min-h-screen bg-background pt-20 pb-16">
@@ -394,7 +301,6 @@ if (selectedSubject && selectedTopic) {
       </div>
     );
   }
-  // 3️⃣ Subject selected → show topics
   if (selectedSubject) {
     return (
       <div className="min-h-screen bg-background pt-20 pb-16">
@@ -432,7 +338,7 @@ if (selectedSubject && selectedTopic) {
     );
   }
 
-  // 4️⃣ Default → show subjects
+
   return (
     <div className="min-h-screen bg-background pt-20 pb-16">
       <div className="container mx-auto px-4">

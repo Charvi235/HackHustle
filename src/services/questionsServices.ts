@@ -32,7 +32,6 @@ export const questionService = {
       `/api/questionstatus/visited/${encodeURIComponent(emailId)}`
     );
   },
-   //API for topic-wise assessment
   getTopicAssessmentQuestions: async (
     topicName: string
   ): Promise<QuestionDto[]> => {

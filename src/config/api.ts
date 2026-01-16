@@ -56,17 +56,14 @@ export const apiClient = {
 
     const text = await response.text();
 
-    // 🔥 CRITICAL FIX
     if (!text) {
-      return [] as T; // prevents JSON crash
+      return [] as T; 
     }
 
     return JSON.parse(text);
   },
 
-  /* ======================
-     POST
-     ====================== */
+
   post: async <T>(endpoint: string, data: any): Promise<T | null> => {
     const token = localStorage.getItem('authToken');
 
@@ -112,9 +109,6 @@ export const apiClient = {
     return text ? JSON.parse(text) : null;
   },
 
-  /* ======================
-     DELETE
-     ====================== */
   delete: async (endpoint: string): Promise<boolean> => {
     const token = localStorage.getItem('authToken');
 

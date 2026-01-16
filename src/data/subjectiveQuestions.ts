@@ -4,7 +4,7 @@ export interface SubjectiveQuestion {
   expectedKeyPoints: string[];
   sampleAnswer: string;
 }
-
+// dummy for now only(will replace by real data later)
 export const subjectiveInterviewQuestions: SubjectiveQuestion[] = [
   {
     id: 1,
