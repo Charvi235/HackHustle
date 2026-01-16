@@ -9,7 +9,11 @@ const Index = () => {
       <HeroSection />
       <FeaturesSection />
       <StatsSection />
+<<<<<<< HEAD
 
+=======
+      {/* <CTASection /> */}
+>>>>>>> b31659ba0074189233f5515f87db156eed7aaf62
     </div>
   );
 };

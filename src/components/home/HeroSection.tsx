@@ -24,19 +24,19 @@ export const HeroSection = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-20 container mx-auto px-4 py-32">
+      <div className="relative z-10 container mx-auto px-4 py-15">
         <div className="max-w-4xl mx-auto text-center">
-          {/* Badge */}
+          {/* Badge
           <Badge variant="secondary" className="mb-6 text-sm font-medium px-4 py-2">
             <Sparkles className="w-4 h-4 mr-2" />
             AI-Powered Learning Platform
-          </Badge>
+          </Badge> */}
 
           {/* Main Headline */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-            Master Skills with{' '}
-            <span className="bg-gradient-primary bg-clip-text text-transparent">
-              HackHustle
+            HackHustle{' '}
+            <span className="text-4xl md:text-6xl sm:text-7xl font-bold mb-6 leading-tight">
+              Practise.Prepare.Ace
             </span>
           </h1>
 
@@ -57,7 +57,7 @@ export const HeroSection = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto">
+          {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto">
             <div className="flex flex-col items-center">
               <div className="flex items-center justify-center w-12 h-12 bg-gradient-primary rounded-full mb-2">
                 <Users className="w-6 h-6 text-white" />
@@ -79,7 +79,7 @@ export const HeroSection = () => {
               <div className="text-2xl font-bold">1M+</div>
               <div className="text-sm text-muted-foreground">Questions Solved</div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
