@@ -45,7 +45,7 @@ const Auth = () => {
   const { toast } = useToast();
 
   const [loginData, setLoginData] = useState({ emailId: '', password: '' });
-  // Is code ko apne existing useState ke paas paste karein
+
   const [loginTouched, setLoginTouched] = useState({ emailId: false, password: false });
   
   const [signupTouched, setSignupTouched] = useState({ 
@@ -534,7 +534,7 @@ const Auth = () => {
                         value={teacherSignupData.lastName}
                         onBlur={() => setTeacherTouched({...teacherTouched, lastName: true})}
                         onChange={(e) => setTeacherSignupData({ ...teacherSignupData, lastName: e.target.value })}
-                        // Validation: Red border agar Khali ho YA Name Invalid ho
+                        
                         className={getInputClass(teacherTouched.lastName && (teacherSignupData.lastName === '' || !isValidName(teacherSignupData.lastName)))}
                       />
                       {renderError(teacherTouched.lastName && teacherSignupData.lastName === '', "This field is mandatory")}
