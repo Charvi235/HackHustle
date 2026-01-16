@@ -19,10 +19,7 @@ const isValidPassword = (password: string) => {
   return regex.test(password);
 };
 
-// const isValidName = (name: string) => {
-//   const regex = /^[A-Za-z][A-Za-z]*$/;
-//   return regex.test(name.trim());
-// };
+
 const isValidName = (name: string) => {
   const regex = /^[A-Za-z]+( [A-Za-z]+)*$/;
   return regex.test(name.trim());
@@ -32,13 +29,31 @@ const isEmptyField = (data: Record<string, string>) => {
   return Object.values(data).some((value) => value.trim() === '');
 };
 
+// --- Helper Functions ---
+const getInputClass = (isError: boolean) => 
+  `transition-all ${isError ? 'border-red-500 focus-visible:ring-red-500 ring-2 ring-red-500/20' : ''}`;
+
+const renderError = (isError: boolean, message = "This field is mandatory") => 
+  isError && <p className="text-[10px] text-red-500 font-medium mt-1 ml-1">{message}</p>;
+
 const Auth = () => {
   const navigate = useNavigate();
   const { login, signup } = useAuth();
   const { toast } = useToast();
 
   const [loginData, setLoginData] = useState({ emailId: '', password: '' });
+  // Is code ko apne existing useState ke paas paste karein
+  const [loginTouched, setLoginTouched] = useState({ emailId: false, password: false });
   
+  const [signupTouched, setSignupTouched] = useState({ 
+    firstName: false, lastName: false, emailId: false, password: false, confirmPassword: false 
+  });
+  
+  const [teacherTouched, setTeacherTouched] = useState({
+    firstName: false, lastName: false, emailId: false, password: false, confirmPassword: false, subjectAssociated: false, institute: false
+  });
+
+
   // Added confirmPassword to signupData
   const [signupData, setSignupData] = useState({ 
     firstName: '', 
@@ -344,19 +359,28 @@ const Auth = () => {
                 <CardDescription>Login to access your account</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <Input
-                  placeholder="Email"
-                  value={loginData.emailId}
-                  onChange={(e) => setLoginData({ ...loginData, emailId: e.target.value })}
-                />
+                <div className="space-y-1">
+                  <Input
+                    placeholder="Email"
+                    value={loginData.emailId}
+                    onBlur={() => setLoginTouched({ ...loginTouched, emailId: true })}
+                    onChange={(e) => setLoginData({ ...loginData, emailId: e.target.value })}
+                    // Niche wali line border red karegi
+                    className={getInputClass(loginTouched.emailId && loginData.emailId === '')}
+                  />
+                  {/* Niche wali line "This field is mandatory" dikhayegi */}
+                  {renderError(loginTouched.emailId && loginData.emailId === '')}
+                </div>
+                
                 <div className="space-y-1">
                   <div className="relative">
                     <Input
                       type={showLoginPassword ? 'text' : 'password'}
                       placeholder="Password"
                       value={loginData.password}
+                      onBlur={() => setLoginTouched({ ...loginTouched, password: true })}
                       onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                      className="pr-10"
+                      className={`pr-10 ${getInputClass(loginTouched.password && loginData.password === '')}`}
                     />
                     <button
                       type="button"
@@ -366,6 +390,8 @@ const Auth = () => {
                       {showLoginPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
+                  {renderError(loginTouched.password && loginData.password === '')}
+
                   <div className="flex justify-end">
                     <button
                       type="button"
@@ -403,36 +429,49 @@ const Auth = () => {
 
                   {/* STUDENT SIGNUP */}
                   <TabsContent value="STUDENT" className="space-y-4">
-                    <Input
-                      placeholder="First Name"
-                      value={signupData.firstName}
-                      onChange={(e) => setSignupData({ ...signupData, firstName: e.target.value })}
-                    />
+                    <div>
+                      <Input
+                        placeholder="First Name"
+                        value={signupData.firstName} // (Teacher wale me teacherSignupData use krna)
+                        onBlur={() => setSignupTouched({...signupTouched, firstName: true})} // Change 1: onBlur add kiya
+                        onChange={(e) => setSignupData({ ...signupData, firstName: e.target.value })}
+                        className={getInputClass(signupTouched.firstName && signupData.firstName === '')} // Change 2: Red border logic
+                      />
+                      {renderError(signupTouched.firstName && signupData.firstName === '')} {/* Change 3: Error Message */}
+                    </div>
+                   <div>
                     <Input
                       placeholder="Last Name"
                       value={signupData.lastName}
+                      onBlur={() => setSignupTouched({...signupTouched, lastName: true})}
                       onChange={(e) => setSignupData({ ...signupData, lastName: e.target.value })}
+                      className={getInputClass(signupTouched.lastName && signupData.lastName === '')}
                     />
-                    <Input
-                      placeholder="Email"
-                      value={signupData.emailId}
-                      onChange={(e) => setSignupData({ ...signupData, emailId: e.target.value })}
-                    />
+                    {renderError(signupTouched.lastName && signupData.lastName === '')}
+                  </div>
+                   <div>
+                      <Input
+                        placeholder="Email"
+                        value={signupData.emailId}
+                        onBlur={() => setSignupTouched({...signupTouched, emailId: true})}
+                        onChange={(e) => setSignupData({ ...signupData, emailId: e.target.value })}
+                        className={getInputClass(signupTouched.emailId && signupData.emailId === '')}
+                      />
+                      {renderError(signupTouched.emailId && signupData.emailId === '')}
+                    </div>
                     <div className="relative">
                       <Input
                         type={showStudentSignupPassword ? 'text' : 'password'}
                         placeholder="Password"
                         value={signupData.password}
+                        onBlur={() => setSignupTouched({...signupTouched, password: true})}
                         onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
-                        className="pr-10"
+                        className={`pr-10 ${getInputClass(signupTouched.password && signupData.password === '')}`}
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowStudentSignupPassword(!showStudentSignupPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                      >
+                      <button type="button" onClick={() => setShowStudentSignupPassword(!showStudentSignupPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                         {showStudentSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
+                      {renderError(signupTouched.password && signupData.password === '')}
                     </div>
 
                     {/* Student Confirm Password */}
@@ -441,13 +480,11 @@ const Auth = () => {
                         type={showStudentConfirmPassword ? 'text' : 'password'}
                         placeholder="Confirm Password"
                         value={signupData.confirmPassword}
+                        onBlur={() => setSignupTouched({...signupTouched, confirmPassword: true})}
                         onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })}
-                        className={`pr-10 ${
-                            signupData.confirmPassword && signupData.password !== signupData.confirmPassword 
-                            ? 'border-destructive focus-visible:ring-destructive' 
-                            : ''
-                        }`}
+                        className={`pr-10 ${getInputClass(signupTouched.confirmPassword && (signupData.confirmPassword === '' || signupData.password !== signupData.confirmPassword))}`}
                       />
+                      
                       <button
                         type="button"
                         onClick={() => setShowStudentConfirmPassword(!showStudentConfirmPassword)}
@@ -457,6 +494,10 @@ const Auth = () => {
                       </button>
                     </div>
 
+                    {/* Ye do lines Error Message dikhayengi */}
+                    {renderError(signupTouched.confirmPassword && signupData.confirmPassword === '')}
+                    {renderError(signupData.confirmPassword !== '' && signupData.password !== signupData.confirmPassword, "Passwords don't match")}
+
                     <Button className="w-full" onClick={handleStudentSignup} disabled={isLoading}>
                       {isLoading ? 'Signing up...' : 'Sign Up as Student'}
                     </Button>
@@ -464,50 +505,60 @@ const Auth = () => {
 
                   {/* TEACHER SIGNUP */}
                   <TabsContent value="TEACHER" className="space-y-4">
-                    <Input
-                      placeholder="First Name"
-                      value={teacherSignupData.firstName}
-                      onChange={(e) => setTeacherSignupData({ ...teacherSignupData, firstName: e.target.value })}
-                    />
-                    <Input
-                      placeholder="Last Name"
-                      value={teacherSignupData.lastName}
-                      onChange={(e) => setTeacherSignupData({ ...teacherSignupData, lastName: e.target.value })}
-                    />
-                    <Input
-                      placeholder="Email"
-                      value={teacherSignupData.emailId}
-                      onChange={(e) => setTeacherSignupData({ ...teacherSignupData, emailId: e.target.value })}
-                    />
+                    <div>
+                      <Input
+                        placeholder="First Name"
+                        value={teacherSignupData.firstName}
+                        onBlur={() => setTeacherTouched({...teacherTouched, firstName: true})}
+                        onChange={(e) => setTeacherSignupData({ ...teacherSignupData, firstName: e.target.value })}
+                        className={getInputClass(teacherTouched.firstName && teacherSignupData.firstName === '')}
+                      />
+                      {renderError(teacherTouched.firstName && teacherSignupData.firstName === '')}
+                    </div>
+                    <div>
+                      <Input
+                        placeholder="Last Name"
+                        value={teacherSignupData.lastName}
+                        onBlur={() => setTeacherTouched({...teacherTouched, lastName: true})}
+                        onChange={(e) => setTeacherSignupData({ ...teacherSignupData, lastName: e.target.value })}
+                        className={getInputClass(teacherTouched.lastName && teacherSignupData.lastName === '')}
+                      />
+                      {renderError(teacherTouched.lastName && teacherSignupData.lastName === '')}
+                    </div>
+                    <div>
+                      <Input
+                        placeholder="Email"
+                        value={teacherSignupData.emailId}
+                        onBlur={() => setTeacherTouched({...teacherTouched, emailId: true})}
+                        onChange={(e) => setTeacherSignupData({ ...teacherSignupData, emailId: e.target.value })}
+                        className={getInputClass(teacherTouched.emailId && teacherSignupData.emailId === '')}
+                      />
+                      {renderError(teacherTouched.emailId && teacherSignupData.emailId === '')}
+                    </div>
+                   {/* Teacher Password */}
                     <div className="relative">
                       <Input
                         type={showTeacherSignupPassword ? 'text' : 'password'}
                         placeholder="Password"
                         value={teacherSignupData.password}
+                        onBlur={() => setTeacherTouched({...teacherTouched, password: true})}
                         onChange={(e) => setTeacherSignupData({ ...teacherSignupData, password: e.target.value })}
-                        className="pr-10"
+                        className={`pr-10 ${getInputClass(teacherTouched.password && teacherSignupData.password === '')}`}
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowTeacherSignupPassword(!showTeacherSignupPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                      >
+                      <button type="button" onClick={() => setShowTeacherSignupPassword(!showTeacherSignupPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                         {showTeacherSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
+                      {renderError(teacherTouched.password && teacherSignupData.password === '')}
                     </div>
-
                     {/* Teacher Confirm Password */}
-                    <div className="relative">
+                    <div className="relative mt-2">
                       <Input
                         type={showTeacherConfirmPassword ? 'text' : 'password'}
                         placeholder="Confirm Password"
                         value={teacherSignupData.confirmPassword}
+                        onBlur={() => setTeacherTouched({...teacherTouched, confirmPassword: true})}
                         onChange={(e) => setTeacherSignupData({ ...teacherSignupData, confirmPassword: e.target.value })}
-                        className={`pr-10 ${
-                            teacherSignupData.confirmPassword && teacherSignupData.password !== teacherSignupData.confirmPassword 
-                            ? 'border-destructive focus-visible:ring-destructive' 
-                            : ''
-                        }`}
+                        className={`pr-10 ${getInputClass(teacherTouched.confirmPassword && (teacherSignupData.confirmPassword === '' || teacherSignupData.password !== teacherSignupData.confirmPassword))}`}
                       />
                       <button
                         type="button"
@@ -516,18 +567,31 @@ const Auth = () => {
                       >
                         {showTeacherConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
+                      {/* Error Messages */}
+                      {renderError(teacherTouched.confirmPassword && teacherSignupData.confirmPassword === '')}
+                      {renderError(teacherSignupData.confirmPassword !== '' && teacherSignupData.password !== teacherSignupData.confirmPassword, "Passwords don't match")}
                     </div>
 
-                    <Input
-                      placeholder="Subject Associated"
-                      value={teacherSignupData.subjectAssociated}
-                      onChange={(e) => setTeacherSignupData({ ...teacherSignupData, subjectAssociated: e.target.value.replace(/\s+/g, ' ')})}
-                    />
-                    <Input
-                      placeholder="Institute"
-                      value={teacherSignupData.institute}
-                      onChange={(e) => setTeacherSignupData({ ...teacherSignupData, institute: e.target.value.replace(/\s+/g, ' ') })}
-                    />
+                    <div>
+                      <Input
+                        placeholder="Subject Associated"
+                        value={teacherSignupData.subjectAssociated}
+                        onBlur={() => setTeacherTouched({...teacherTouched, subjectAssociated: true})}
+                        onChange={(e) => setTeacherSignupData({ ...teacherSignupData, subjectAssociated: e.target.value.replace(/\s+/g, ' ')})}
+                        className={getInputClass(teacherTouched.subjectAssociated && teacherSignupData.subjectAssociated === '')}
+                      />
+                      {renderError(teacherTouched.subjectAssociated && teacherSignupData.subjectAssociated === '')}
+                    </div>
+                                        <div>
+                      <Input
+                        placeholder="Institute"
+                        value={teacherSignupData.institute}
+                        onBlur={() => setTeacherTouched({...teacherTouched, institute: true})}
+                        onChange={(e) => setTeacherSignupData({ ...teacherSignupData, institute: e.target.value.replace(/\s+/g, ' ') })}
+                        className={getInputClass(teacherTouched.institute && teacherSignupData.institute === '')}
+                      />
+                      {renderError(teacherTouched.institute && teacherSignupData.institute === '')}
+                    </div>
                     <Button className="w-full" onClick={handleTeacherSignup} disabled={isLoading}>
                       {isLoading ? 'Signing up...' : 'Sign Up as Teacher'}
                     </Button>
