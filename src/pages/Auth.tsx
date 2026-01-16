@@ -19,7 +19,10 @@ const isValidPassword = (password: string) => {
   return regex.test(password);
 };
 
-
+// const isValidName = (name: string) => {
+//   const regex = /^[A-Za-z][A-Za-z]*$/;
+//   return regex.test(name.trim());
+// };
 const isValidName = (name: string) => {
   const regex = /^[A-Za-z]+( [A-Za-z]+)*$/;
   return regex.test(name.trim());
@@ -365,13 +368,13 @@ const Auth = () => {
                     value={loginData.emailId}
                     onBlur={() => setLoginTouched({ ...loginTouched, emailId: true })}
                     onChange={(e) => setLoginData({ ...loginData, emailId: e.target.value })}
-                    // Niche wali line border red karegi
-                    className={getInputClass(loginTouched.emailId && loginData.emailId === '')}
+                    
+                    className={getInputClass(loginTouched.emailId && (loginData.emailId === '' || !isValidGmail(loginData.emailId)))}
                   />
-                  {/* Niche wali line "This field is mandatory" dikhayegi */}
-                  {renderError(loginTouched.emailId && loginData.emailId === '')}
+                  
+                  {renderError(loginTouched.emailId && loginData.emailId === '', "This field is mandatory")}
+                  {renderError(loginTouched.emailId && loginData.emailId !== '' && !isValidGmail(loginData.emailId), "Invalid Email (Must end with @gmail.com)")}
                 </div>
-                
                 <div className="space-y-1">
                   <div className="relative">
                     <Input
@@ -380,7 +383,7 @@ const Auth = () => {
                       value={loginData.password}
                       onBlur={() => setLoginTouched({ ...loginTouched, password: true })}
                       onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                      className={`pr-10 ${getInputClass(loginTouched.password && loginData.password === '')}`}
+                      className={`pr-10 ${getInputClass(loginTouched.password && (loginData.password === '' || !isValidPassword(loginData.password)))}`}
                     />
                     <button
                       type="button"
@@ -390,19 +393,19 @@ const Auth = () => {
                       {showLoginPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
-                  {renderError(loginTouched.password && loginData.password === '')}
+                  {renderError(loginTouched.password && loginData.password === '', "This field is mandatory")}
+                  {renderError(loginTouched.password && loginData.password !== '' && !isValidPassword(loginData.password), "Password must be atleast 8 chars and it should have 1 uppercase and  1 special char")}
 
-                  <div className="flex justify-end">
-                    <button
-                      type="button"
-                      onClick={handleForgotPassword}
-                      className="text-xs text-primary hover:underline"
-                    >
-                      Forgot Password?
-                    </button>
-                  </div>
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Forgot Password?
+                  </button>
                 </div>
-
+            </div>
                 <Button className="w-full" onClick={() => handleLogin('STUDENT')} disabled={isLoading}>
                   {isLoading ? 'Logging in...' : 'Login as Student'}
                 </Button>
@@ -432,32 +435,37 @@ const Auth = () => {
                     <div>
                       <Input
                         placeholder="First Name"
-                        value={signupData.firstName} // (Teacher wale me teacherSignupData use krna)
-                        onBlur={() => setSignupTouched({...signupTouched, firstName: true})} // Change 1: onBlur add kiya
+                        value={signupData.firstName}
+                        onBlur={() => setSignupTouched({...signupTouched, firstName: true})}
                         onChange={(e) => setSignupData({ ...signupData, firstName: e.target.value })}
-                        className={getInputClass(signupTouched.firstName && signupData.firstName === '')} // Change 2: Red border logic
+                        
+                        className={getInputClass(signupTouched.firstName && (signupData.firstName === '' || !isValidName(signupData.firstName)))}
                       />
-                      {renderError(signupTouched.firstName && signupData.firstName === '')} {/* Change 3: Error Message */}
+                      
+                      {renderError(signupTouched.firstName && signupData.firstName === '', "This field is mandatory")}
+                      {renderError(signupTouched.firstName && signupData.firstName !== '' && !isValidName(signupData.firstName), "Invalid first name (Only letters allowed)")}
                     </div>
                    <div>
-                    <Input
-                      placeholder="Last Name"
-                      value={signupData.lastName}
-                      onBlur={() => setSignupTouched({...signupTouched, lastName: true})}
-                      onChange={(e) => setSignupData({ ...signupData, lastName: e.target.value })}
-                      className={getInputClass(signupTouched.lastName && signupData.lastName === '')}
-                    />
-                    {renderError(signupTouched.lastName && signupData.lastName === '')}
-                  </div>
-                   <div>
+                      <Input
+                        placeholder="Last Name"
+                        value={signupData.lastName}
+                        onBlur={() => setSignupTouched({...signupTouched, lastName: true})}
+                        onChange={(e) => setSignupData({ ...signupData, lastName: e.target.value })}
+                        className={getInputClass(signupTouched.lastName && (signupData.lastName === '' || !isValidName(signupData.lastName)))}
+                      />
+                      {renderError(signupTouched.lastName && signupData.lastName === '', "This field is mandatory")}
+                      {renderError(signupTouched.lastName && signupData.lastName !== '' && !isValidName(signupData.lastName), "Invalid last name (Only letters allowed)")}
+                    </div>
+                    <div>
                       <Input
                         placeholder="Email"
                         value={signupData.emailId}
                         onBlur={() => setSignupTouched({...signupTouched, emailId: true})}
                         onChange={(e) => setSignupData({ ...signupData, emailId: e.target.value })}
-                        className={getInputClass(signupTouched.emailId && signupData.emailId === '')}
+                        className={getInputClass(signupTouched.emailId && (signupData.emailId === '' || !isValidGmail(signupData.emailId)))}
                       />
-                      {renderError(signupTouched.emailId && signupData.emailId === '')}
+                      {renderError(signupTouched.emailId && signupData.emailId === '', "This field is mandatory")}
+                      {renderError(signupTouched.emailId && signupData.emailId !== '' && !isValidGmail(signupData.emailId), "Invalid Email (Must end with @gmail.com)")}
                     </div>
                     <div className="relative">
                       <Input
@@ -466,38 +474,42 @@ const Auth = () => {
                         value={signupData.password}
                         onBlur={() => setSignupTouched({...signupTouched, password: true})}
                         onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
-                        className={`pr-10 ${getInputClass(signupTouched.password && signupData.password === '')}`}
+
+                        className={`pr-10 ${getInputClass(signupTouched.password && (signupData.password === '' || !isValidPassword(signupData.password)))}`}
                       />
                       <button type="button" onClick={() => setShowStudentSignupPassword(!showStudentSignupPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                         {showStudentSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
-                      {renderError(signupTouched.password && signupData.password === '')}
+                      
+                      {renderError(signupTouched.password && signupData.password === '', "This field is mandatory")}
+
+                      {renderError(signupTouched.password && signupData.password !== '' && !isValidPassword(signupData.password), "Password must be atleast 8 chars and It should have 1 uppercase and  1 special char")}
                     </div>
+                    
 
                     {/* Student Confirm Password */}
-                    <div className="relative">
-                      <Input
-                        type={showStudentConfirmPassword ? 'text' : 'password'}
-                        placeholder="Confirm Password"
-                        value={signupData.confirmPassword}
-                        onBlur={() => setSignupTouched({...signupTouched, confirmPassword: true})}
-                        onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })}
-                        className={`pr-10 ${getInputClass(signupTouched.confirmPassword && (signupData.confirmPassword === '' || signupData.password !== signupData.confirmPassword))}`}
-                      />
-                      
-                      <button
-                        type="button"
-                        onClick={() => setShowStudentConfirmPassword(!showStudentConfirmPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        {showStudentConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
+                    <div className="relative mt-2">
+                        <Input
+                          type={showStudentConfirmPassword ? 'text' : 'password'}
+                          placeholder="Confirm Password"
+                          value={signupData.confirmPassword}
+                          onBlur={() => setSignupTouched({...signupTouched, confirmPassword: true})}
+                          onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })}
+
+                          className={`pr-10 ${getInputClass(signupTouched.confirmPassword && (signupData.confirmPassword === '' || signupData.password !== signupData.confirmPassword))}`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowStudentConfirmPassword(!showStudentConfirmPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          {showStudentConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+
+                        {renderError(signupTouched.confirmPassword && signupData.confirmPassword === '', "This field is mandatory")}
+
+                        {renderError(signupData.confirmPassword !== '' && signupData.password !== signupData.confirmPassword, "Passwords don't match")}
                     </div>
-
-                    {/* Ye do lines Error Message dikhayengi */}
-                    {renderError(signupTouched.confirmPassword && signupData.confirmPassword === '')}
-                    {renderError(signupData.confirmPassword !== '' && signupData.password !== signupData.confirmPassword, "Passwords don't match")}
-
                     <Button className="w-full" onClick={handleStudentSignup} disabled={isLoading}>
                       {isLoading ? 'Signing up...' : 'Sign Up as Student'}
                     </Button>
@@ -511,9 +523,10 @@ const Auth = () => {
                         value={teacherSignupData.firstName}
                         onBlur={() => setTeacherTouched({...teacherTouched, firstName: true})}
                         onChange={(e) => setTeacherSignupData({ ...teacherSignupData, firstName: e.target.value })}
-                        className={getInputClass(teacherTouched.firstName && teacherSignupData.firstName === '')}
+                        className={getInputClass(teacherTouched.firstName && (teacherSignupData.firstName === '' || !isValidName(teacherSignupData.firstName)))}
                       />
-                      {renderError(teacherTouched.firstName && teacherSignupData.firstName === '')}
+                      {renderError(teacherTouched.firstName && teacherSignupData.firstName === '', "This field is mandatory")}
+                      {renderError(teacherTouched.firstName && teacherSignupData.firstName !== '' && !isValidName(teacherSignupData.firstName), "Invalid first name (Only letters allowed)")}
                     </div>
                     <div>
                       <Input
@@ -521,19 +534,22 @@ const Auth = () => {
                         value={teacherSignupData.lastName}
                         onBlur={() => setTeacherTouched({...teacherTouched, lastName: true})}
                         onChange={(e) => setTeacherSignupData({ ...teacherSignupData, lastName: e.target.value })}
-                        className={getInputClass(teacherTouched.lastName && teacherSignupData.lastName === '')}
+                        // Validation: Red border agar Khali ho YA Name Invalid ho
+                        className={getInputClass(teacherTouched.lastName && (teacherSignupData.lastName === '' || !isValidName(teacherSignupData.lastName)))}
                       />
-                      {renderError(teacherTouched.lastName && teacherSignupData.lastName === '')}
+                      {renderError(teacherTouched.lastName && teacherSignupData.lastName === '', "This field is mandatory")}
+                      {renderError(teacherTouched.lastName && teacherSignupData.lastName !== '' && !isValidName(teacherSignupData.lastName), "Invalid last name (Only letters allowed)")}
                     </div>
                     <div>
-                      <Input
-                        placeholder="Email"
-                        value={teacherSignupData.emailId}
-                        onBlur={() => setTeacherTouched({...teacherTouched, emailId: true})}
-                        onChange={(e) => setTeacherSignupData({ ...teacherSignupData, emailId: e.target.value })}
-                        className={getInputClass(teacherTouched.emailId && teacherSignupData.emailId === '')}
-                      />
-                      {renderError(teacherTouched.emailId && teacherSignupData.emailId === '')}
+                        <Input
+                          placeholder="Email"
+                          value={teacherSignupData.emailId}
+                          onBlur={() => setTeacherTouched({...teacherTouched, emailId: true})}
+                          onChange={(e) => setTeacherSignupData({ ...teacherSignupData, emailId: e.target.value })}
+                          className={getInputClass(teacherTouched.emailId && (teacherSignupData.emailId === '' || !isValidGmail(teacherSignupData.emailId)))}
+                        />
+                        {renderError(teacherTouched.emailId && teacherSignupData.emailId === '', "This field is mandatory")}
+                        {renderError(teacherTouched.emailId && teacherSignupData.emailId !== '' && !isValidGmail(teacherSignupData.emailId), "Invalid Email (Must end with @gmail.com)")}
                     </div>
                    {/* Teacher Password */}
                     <div className="relative">
@@ -543,12 +559,13 @@ const Auth = () => {
                         value={teacherSignupData.password}
                         onBlur={() => setTeacherTouched({...teacherTouched, password: true})}
                         onChange={(e) => setTeacherSignupData({ ...teacherSignupData, password: e.target.value })}
-                        className={`pr-10 ${getInputClass(teacherTouched.password && teacherSignupData.password === '')}`}
+                        className={`pr-10 ${getInputClass(teacherTouched.password && (teacherSignupData.password === '' || !isValidPassword(teacherSignupData.password)))}`}
                       />
                       <button type="button" onClick={() => setShowTeacherSignupPassword(!showTeacherSignupPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                         {showTeacherSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
-                      {renderError(teacherTouched.password && teacherSignupData.password === '')}
+                      {renderError(teacherTouched.password && teacherSignupData.password === '', "This field is mandatory")}
+                      {renderError(teacherTouched.password && teacherSignupData.password !== '' && !isValidPassword(teacherSignupData.password), "Password must be atleast 8 chars and it should have 1 uppercase and 1 special char")}
                     </div>
                     {/* Teacher Confirm Password */}
                     <div className="relative mt-2">
@@ -567,30 +584,33 @@ const Auth = () => {
                       >
                         {showTeacherConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
-                      {/* Error Messages */}
-                      {renderError(teacherTouched.confirmPassword && teacherSignupData.confirmPassword === '')}
+                      {renderError(teacherTouched.confirmPassword && teacherSignupData.confirmPassword === '', "This field is mandatory")}
                       {renderError(teacherSignupData.confirmPassword !== '' && teacherSignupData.password !== teacherSignupData.confirmPassword, "Passwords don't match")}
                     </div>
-
                     <div>
                       <Input
                         placeholder="Subject Associated"
                         value={teacherSignupData.subjectAssociated}
                         onBlur={() => setTeacherTouched({...teacherTouched, subjectAssociated: true})}
                         onChange={(e) => setTeacherSignupData({ ...teacherSignupData, subjectAssociated: e.target.value.replace(/\s+/g, ' ')})}
-                        className={getInputClass(teacherTouched.subjectAssociated && teacherSignupData.subjectAssociated === '')}
+                        
+                        className={getInputClass(teacherTouched.subjectAssociated && (teacherSignupData.subjectAssociated === '' || !isValidName(teacherSignupData.subjectAssociated)))}
                       />
-                      {renderError(teacherTouched.subjectAssociated && teacherSignupData.subjectAssociated === '')}
+
+                      {renderError(teacherTouched.subjectAssociated && teacherSignupData.subjectAssociated === '', "This field is mandatory")}
+
+                      {renderError(teacherTouched.subjectAssociated && teacherSignupData.subjectAssociated !== '' && !isValidName(teacherSignupData.subjectAssociated), "Invalid subject name (Only letters allowed)")}
                     </div>
-                                        <div>
+                    <div>
                       <Input
                         placeholder="Institute"
                         value={teacherSignupData.institute}
                         onBlur={() => setTeacherTouched({...teacherTouched, institute: true})}
                         onChange={(e) => setTeacherSignupData({ ...teacherSignupData, institute: e.target.value.replace(/\s+/g, ' ') })}
-                        className={getInputClass(teacherTouched.institute && teacherSignupData.institute === '')}
+                        className={getInputClass(teacherTouched.institute && (teacherSignupData.institute === '' || !isValidName(teacherSignupData.institute)))}
                       />
-                      {renderError(teacherTouched.institute && teacherSignupData.institute === '')}
+                      {renderError(teacherTouched.institute && teacherSignupData.institute === '', "This field is mandatory")}
+                      {renderError(teacherTouched.institute && teacherSignupData.institute !== '' && !isValidName(teacherSignupData.institute), "Invalid institute name (Only letters allowed)")}
                     </div>
                     <Button className="w-full" onClick={handleTeacherSignup} disabled={isLoading}>
                       {isLoading ? 'Signing up...' : 'Sign Up as Teacher'}
