@@ -1,10 +1,12 @@
 import { useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ForgotPasswordModal from '../components/auth/ForgotPasswordModal';
 import { useToast } from '@/hooks/use-toast';
 import { Zap, Eye, EyeOff } from 'lucide-react';
 
@@ -56,6 +58,7 @@ const Auth = () => {
     firstName: false, lastName: false, emailId: false, password: false, confirmPassword: false, subjectAssociated: false, institute: false
   });
 
+  const [isForgotOpen, setIsForgotOpen] = useState(false);
 
   // Added confirmPassword to signupData
   const [signupData, setSignupData] = useState({ 
@@ -87,12 +90,12 @@ const Auth = () => {
   const [showTeacherSignupPassword, setShowTeacherSignupPassword] = useState(false);
   const [showTeacherConfirmPassword, setShowTeacherConfirmPassword] = useState(false);
 
-  const handleForgotPassword = () => {
-    toast({
-      title: 'Coming Soon',
-      description: 'Password reset feature is under development.',
-    });
-  };
+  // const handleForgotPassword = () => {
+  //   toast({
+  //     title: 'Coming Soon',
+  //     description: 'Password reset feature is under development.',
+  //   });
+  // };
 
   const handleLogin = async (role: RoleType) => {
     if (isEmptyField(loginData)) {
@@ -399,12 +402,17 @@ const Auth = () => {
                 <div className="flex justify-end">
                   <button
                     type="button"
-                    onClick={handleForgotPassword}
+                   onClick={() => setIsForgotOpen(true)}
                     className="text-xs text-primary hover:underline"
                   >
                     Forgot Password?
                   </button>
                 </div>
+                <ForgotPasswordModal 
+        isOpen={isForgotOpen} 
+        onClose={() => setIsForgotOpen(false)} 
+      />
+
             </div>
                 <Button className="w-full" onClick={() => handleLogin('STUDENT')} disabled={isLoading}>
                   {isLoading ? 'Logging in...' : 'Login as Student'}
