@@ -23,9 +23,9 @@ const interviewTypes = [
   {
     id: 1,
     title: 'Technical Interview',
-    description: 'Data structures, algorithms, and coding challenges',
+    // description: 'Data structures, algorithms, and coding challenges',
     duration: '15-20 minutes',
-    difficulty: 'Intermediate',
+    //difficulty: 'Intermediate',
     icon: Brain,
     color: 'bg-blue-500',
     questions: 3,
@@ -33,9 +33,9 @@ const interviewTypes = [
   {
     id: 2,
     title: 'Behavioral Interview',
-    description: 'Soft skills, teamwork, and problem-solving scenarios',
+    // description: 'Soft skills, teamwork, and problem-solving scenarios',
     duration: '15-20 minutes',
-    difficulty: 'All Levels',
+    //difficulty: 'All Levels',
     icon: User,
     color: 'bg-green-500',
     questions: 3,
@@ -68,6 +68,14 @@ const Interview = () => {
   const [totalTime, setTotalTime] = useState(0);
   const [startTime, setStartTime] = useState<number>(0);
 
+  // Aisa hona chahiye upar:
+const [experience, setExperience] = useState("");
+const [difficulty, setDifficulty] = useState("Medium"); 
+const [role, setRole] = useState("");                 // Role (e.g., Frontend Developer)
+  const [targetCompany, setTargetCompany] = useState(""); // Company (e.g., Google)
+  const [techSkills, setTechSkills] = useState("");
+
+
   const handleStartInterview = (typeId: number) => {
     setSelectedType(typeId);
     setIsSetupMode(true);
@@ -91,6 +99,100 @@ const Interview = () => {
       handleFinish();
     }
   };
+  // const handleStart = () => {
+  //   if (!experience.trim()) return;
+    
+  //   // Console mein check kar lo
+  //   console.log("Starting Interview, Experience:", experience);
+    
+  //   // Ye line interview screen ko ON karegi
+  //   setIsInterviewActive(true); 
+    
+  //   // Agar setup mode band karna ho toh ye bhi add kar sakte ho:
+  //   // setIsSetupMode(false);
+  // };
+  // const handleStart = async () => {
+  //   // --- VALIDATION STEP ---
+  //   // Agar Role ya Experience khali hai, toh start mat karo.
+  //   // Difficulty check karne ki zarurat nahi kyunki wo default "Medium" rehta hai.
+  //   if (!role.trim() || !experience.trim()) {
+  //     alert("Please enter Role and Years of Experience to continue.");
+  //     return;
+  //   }
+
+  //   // Tech Skills ko Array mein convert karna (Optional field)
+  //   const skillsArray = techSkills 
+  //       ? techSkills.split(',').map(s => s.trim()).filter(s => s !== "") 
+  //       : [];
+
+  //   const interviewData = {
+  //     role: role,
+  //     experience: experience,
+  //     difficulty: difficulty,
+  //     tech_skills: skillsArray,    // Empty array jayega agar user ne kuch nahi bhara
+  //     target_company: targetCompany // Empty string jayega agar user ne kuch nahi bhara
+  //   };
+
+  //   console.log("Starting Interview with:", interviewData);
+
+  //   try {
+  //     const response = await fetch('http://localhost:8000/interview/setup', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify(interviewData)
+  //     });
+
+  //     if (response.ok) {
+  //       setIsInterviewActive(true);
+  //       setCurrentQuestion(0);
+  //       setRecordings({});
+  //       setStartTime(Date.now());
+  //     }
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //   }
+  // };
+  const handleStart = async () => {
+    // Check: Agar Role ya Experience khali hai toh ruk jao
+    if (!role.trim() || !experience.trim()) {
+      alert("Please enter Job Role and Experience.");
+      return;
+    }
+
+    // Skills ko Array banana (comma se split karke)
+    const skillsArray = techSkills 
+        ? techSkills.split(',').map(s => s.trim()).filter(s => s !== "") 
+        : [];
+
+    const interviewData = {
+      role: role,
+      experience: experience,
+      difficulty: difficulty,
+      tech_skills: skillsArray,
+      target_company: targetCompany
+    };
+
+    console.log("Sending Data:", interviewData);
+
+    // Backend Call
+    try {
+      const response = await fetch('http://localhost:8000/interview/setup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(interviewData)
+      });
+      
+      // Agar backend response OK hai, ya testing kar rahe ho:
+      if (response.ok) {
+         setIsInterviewActive(true);
+         setStartTime(Date.now());
+      }
+    } catch (error) {
+      console.log("Backend error, starting locally for test...");
+      setIsInterviewActive(true); // Testing ke liye ON kar diya
+      setStartTime(Date.now());
+    }
+  };
 
   const handleFinish = () => {
     const timeTaken = Math.floor((Date.now() - startTime) / 1000);
@@ -110,9 +212,9 @@ const Interview = () => {
   const generateResults = (): QuestionResult[] => {
     return subjectiveInterviewQuestions.slice(0, 3).map((q, idx) => ({
       question: q.question,
-      userResponse: "This is a simulated user response based on the recording. In a real implementation, this would be transcribed from the audio.",
+      userResponse: "To be connected to api.",
       betterResponse: q.sampleAnswer,
-      marks: Math.floor(Math.random() * 3) + 7, // Random marks between 7-10
+      marks: Math.floor(Math.random() * 3) + 7, // Random marks between 7-10 (future-by api)
       maxMarks: 10
     }));
   };
@@ -213,11 +315,11 @@ const Interview = () => {
                       <div className={`w-12 h-12 ${type.color} rounded-lg flex items-center justify-center shadow-md`}>
                         <type.icon className="w-6 h-6 text-white" />
                       </div>
-                      <Badge variant="outline">{type.difficulty}</Badge>
+                      {/* <Badge variant="outline">{type.difficulty}</Badge> */}
                     </div>
                     
                     <h3 className="text-xl font-semibold mb-2">{type.title}</h3>
-                    <p className="text-muted-foreground mb-4">{type.description}</p>
+                    {/* <p className="text-muted-foreground mb-4">{type.description}</p> */}
                     
                     <div className="flex justify-between text-sm text-muted-foreground mb-4">
                       <span className="flex items-center">
@@ -279,7 +381,7 @@ const Interview = () => {
             <Card className="p-8 bg-gradient-card">
               <div className="space-y-6">
                 {/* Experience Level */}
-                <div>
+                {/* <div>
                   <label className="text-sm font-medium mb-3 block">Experience Level</label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {experienceLevels.map((level) => (
@@ -296,8 +398,112 @@ const Interview = () => {
                       </Button>
                     ))}
                   </div>
-                </div>
-
+                </div> */}
+                {/* --- NEW SECTION START --- */}
+                <div className="space-y-6 mb-8">
+                  
+                  {/* 1. Input Field */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-400 mb-2">
+                      Years of Experience 
+                    </label>
+                    <input
+                      type="text"
+                      value={experience} 
+                      onChange={(e) => setExperience(e.target.value)}
+                      placeholder="Ex: Fresher, 2 Years, or Senior Developer..." 
+                      className="w-full bg-[#1d1d2e] border border-gray-700 text-white rounded-lg p-4 outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent placeholder-gray-500 transition-all"
+                    />
+                  </div>
+                  {/* 2. Interview Difficulty Dropdown */}
+  <div>
+    <label className="block text-sm font-medium text-gray-400 mb-2">
+      Interview Difficulty
+    </label>
+    <div className="relative">
+      <select
+        value={difficulty}
+        onChange={(e) => setDifficulty(e.target.value)}
+        className="w-full bg-[#1d1d2e] border border-gray-700 text-white rounded-lg p-4 appearance-none outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent cursor-pointer transition-all"
+      >
+        <option value="Easy">Easy</option>
+        <option value="Medium">Medium</option>
+        <option value="Hard">Hard</option>
+      </select>
+      
+      {/* Arrow Icon */}
+      <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
+  </div>
+    <div>
+        <label className="block text-sm font-medium text-gray-400 mb-2">
+        Job Role (Optional) <span className="text-red-500"></span>
+        </label>
+        <input
+        type="text"
+        value={role}
+        onChange={(e) => setRole(e.target.value)}
+        placeholder="Ex: Frontend Developer, Data Scientist..."
+        className="w-full bg-[#1d1d2e] border border-gray-700 text-white rounded-lg p-4 outline-none focus:ring-2 focus:ring-red-500 transition-all"
+        />
+    </div>
+     <div>
+        <label className="block text-sm font-medium text-gray-400 mb-2">
+        Target Company (Optional)
+        </label>
+        <input
+        type="text"
+        value={targetCompany}
+        onChange={(e) => setTargetCompany(e.target.value)}
+        placeholder="Ex: Google, Amazon..."
+        className="w-full bg-[#1d1d2e] border border-gray-700 text-white rounded-lg p-4 outline-none focus:ring-2 focus:ring-red-500 transition-all"
+        />
+    </div>
+     <div>
+        <label className="block text-sm font-medium text-gray-400 mb-2">
+        Tech Skills (Optional)
+        </label>
+        <input
+        type="text"
+        value={techSkills}
+        onChange={(e) => setTechSkills(e.target.value)}
+        placeholder="Ex: React, Java, Python (Comma separated)"
+        className="w-full bg-[#1d1d2e] border border-gray-700 text-white rounded-lg p-4 outline-none focus:ring-2 focus:ring-red-500 transition-all"
+        />
+    </div>       
+                  {/* 3. Action Button (Sabse Niche) */}
+  {/* <button
+    onClick={handleStart} 
+    disabled={!experience.trim()} 
+    className={`w-full py-4 rounded-lg font-bold text-lg transition-all duration-300 ${
+      experience.trim() 
+        ? "bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white shadow-lg transform hover:scale-[1.02]" 
+        : "bg-gray-800 text-gray-500 cursor-not-allowed"
+    }`}
+  >
+    Start Interview &rarr;
+  </button> */}
+  {/* START BUTTON */}
+        <button
+          onClick={handleStart}
+          // Sirf Role aur Experience check kar rahe hain
+          disabled={!role.trim() || !experience.trim()} 
+          
+          className={`w-full py-4 rounded-lg font-bold text-lg transition-all duration-300 ${
+            role.trim() && experience.trim()
+              ? "bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white shadow-lg transform hover:scale-[1.02] cursor-pointer"
+              : "bg-gray-800 text-gray-500 cursor-not-allowed"
+          }`}
+        >
+          Start Interview &rarr;
+        </button>
+</div>
+                {/* --- NEW SECTION END --- */}
+            
                 {/* Camera/Mic Check */}
                 <div className="border border-border rounded-lg p-6">
                   <h3 className="font-medium mb-4 flex items-center">

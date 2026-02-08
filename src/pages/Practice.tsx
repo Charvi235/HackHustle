@@ -1,5 +1,4 @@
 
-
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,10 +16,8 @@ import PracticeQuiz from '../components/practice/PracticeQuiz';
 import { questionService, QuestionDto } from '@/services/questionsServices';
 import { assessmentService } from '@/services/assessmentService';
 
- const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const emailId: string = user.emailId;
- // console.log(emailId);
-
+const user = JSON.parse(localStorage.getItem('user') || '{}');
+const emailId: string = user.emailId;
 
 interface TopicConfig {
   id: number;
@@ -68,7 +65,6 @@ const subjects: SubjectConfig[] = [
   }
 ];
 
-
 const splitIntoSets = (questions: QuestionDto[], size = 10) => {
   const sets: QuestionDto[][] = [];
   for (let i = 0; i < questions.length; i += size) {
@@ -76,7 +72,6 @@ const splitIntoSets = (questions: QuestionDto[], size = 10) => {
   }
   return sets;
 };
-
 
 const Practice = () => {
   const [selectedSubject, setSelectedSubject] = useState<SubjectConfig | null>(null);
@@ -89,8 +84,6 @@ const Practice = () => {
 
   const [assessmentScore, setAssessmentScore] = useState(0);
 
-  /* ---------------- HANDLERS ---------------- */
-
   const handleSelectSubject = (subject: SubjectConfig) => {
     setSelectedSubject(subject);
     setSelectedTopic(null);
@@ -98,7 +91,7 @@ const Practice = () => {
     setStartQuiz(false);
   };
 
-const handleSelectTopic = async (topic: TopicConfig) => {
+  const handleSelectTopic = async (topic: TopicConfig) => {
     setSelectedTopic(topic);
     setLoading(true);
 
@@ -115,23 +108,23 @@ const handleSelectTopic = async (topic: TopicConfig) => {
   };
 
   const handleTopicAssessment = async () => {
-  if (!selectedTopic) return;
+    if (!selectedTopic) return;
 
-  setLoading(true);
-  try {
-    const data = await questionService. getTopicAssessmentQuestions(
-      selectedTopic.name
-    );
+    setLoading(true);
+    try {
+      const data = await questionService.getTopicAssessmentQuestions(
+        selectedTopic.name
+      );
 
-    setQuestionSets([data]); // full topic, no sets
-    setSelectedSet(0);
-    setStartQuiz(true);
-  } catch (err) {
-    console.error(err);
-  } finally {
-    setLoading(false);
-  }
-};
+      setQuestionSets([data]);
+      setSelectedSet(0);
+      setStartQuiz(true);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubjectAssessment = async () => {
     if (!selectedSubject) return;
@@ -164,62 +157,41 @@ const handleSelectTopic = async (topic: TopicConfig) => {
     setStartQuiz(false);
   };
 
-const handleSubmitAssessment = async () => {
-  //if (!emailId || !selectedSubject) return;
+  const handleSubmitAssessment = async () => {
+    console.log("Email ID:", emailId);
+    try {
+      await fetch('http://localhost:8080/api/assessments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          emailId: emailId,
+          topicID: selectedTopic?.id || 1015,
+          subjectID: selectedSubject!.id,
+          assessmentScore
+        })
+      });
+      alert('Assessment submitted successfully!');
+    } catch (err) {
+      console.error('Assessment submission failed', err);
+    }
+  };
 
-  //const emailId = localStorage.getItem('emailId');
-  console.log("Email ID:", emailId);
-  try {
-    await fetch('http://localhost:8080/api/assessments', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        
-        emailId: emailId ,
-        topicID: selectedTopic?.id || 1015,
-        subjectID: selectedSubject.id,
-        assessmentScore
-      })
-    });
-    alert('Assessment submitted successfully!');
-    //onBack();
-  } catch (err) {
-    console.log("Submitting assessment payload:", {
-  emailId,
-  subjectID: selectedSubject?.id,
-  topicID: selectedTopic?.id,
-  assessmentScore
-});
-    console.error('Assessment submission failed', err);
-  }
-};
-
+  /* ================= ASSESSMENT MODE ================= */
   if (startQuiz && selectedSubject) {
     return (
       <div className="min-h-screen bg-background pt-20 pb-24">
-        {/* <PracticeQuiz
+        <PracticeQuiz
           questions={questionSets[selectedSet]}
-          topicName={selectedTopic?.name}
           subjectName={selectedSubject.name}
           onBack={() => setStartQuiz(false)}
           totalQuestionsInTopic={questionSets.flat().length}
           onScoreCalculated={setAssessmentScore}
-        /> */}
-        <PracticeQuiz
-  questions={questionSets[selectedSet]}
-  subjectName={selectedSubject.name}
-  onBack={() => setStartQuiz(false)}
-  totalQuestionsInTopic={questionSets.flat().length}
- onScoreCalculated={setAssessmentScore}
-  isAssessment={true}
-  subjectId={selectedSubject.id}
-/>
+          isAssessment={true}
+          subjectId={selectedSubject.id}
+        />
 
         <div className="bottom-0 right-100 p-4 flex justify-center">
-  <Button
-    className="ml-4 w-[240px]"
-    onClick={handleSubmitAssessment}
-  >
+          <Button className="ml-4 w-[240px]" onClick={handleSubmitAssessment}>
             Submit Assessment
           </Button>
         </div>
@@ -227,7 +199,8 @@ const handleSubmitAssessment = async () => {
     );
   }
 
-if (selectedSubject && selectedTopic) {
+  /* ================= PRACTICE MODE ================= */
+  if (selectedSubject && selectedTopic) {
     return (
       <div className="min-h-screen bg-background pt-20 pb-16">
         <div className="container mx-auto px-4 max-w-4xl">
@@ -239,68 +212,45 @@ if (selectedSubject && selectedTopic) {
           <Badge variant="secondary">{selectedSubject.name}</Badge>
           <h1 className="text-3xl font-bold mt-2 mb-6">{selectedTopic.name}</h1>
 
-          {loading && <p>Loading questions...</p>}
-
-          {/* {!loading && (
-            <div className="flex gap-3 flex-wrap">
-              {questionSets.map((_, index) => (
-                <Button
-                  key={index}
-                  variant={index === selectedSet ? 'default' : 'outline'}
-                  onClick={() => setSelectedSet(index)}
-                >
-                  Set {index + 1}
-                </Button>
-              ))}
-            </div>
-          )} */}
           {!loading && questionSets.length > 0 && (
-          <>
-            {/* Set selector buttons */}
-            <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
-  <div className="flex gap-3 flex-wrap">
-    {questionSets.map((_, index) => (
-      <Button
-        key={index}
-        variant={index === selectedSet ? 'default' : 'outline'}
-        onClick={() => setSelectedSet(index)}
-      >
-        Set {index + 1}
-      </Button>
-    ))}
-  </div>
+            <>
+              <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
+                <div className="flex gap-3 flex-wrap">
+                  {questionSets.map((_, index) => (
+                    <Button
+                      key={index}
+                      variant={index === selectedSet ? 'default' : 'outline'}
+                      onClick={() => setSelectedSet(index)}
+                    >
+                      Set {index + 1}
+                    </Button>
+                  ))}
+                </div>
 
-  <Button
-    variant="secondary"
-    onClick={handleTopicAssessment}
-  >
-    Take Topic-wise Assessment
-  </Button>
-</div>
+                <Button variant="secondary" onClick={handleTopicAssessment}>
+                  Take Topic-wise Assessment
+                </Button>
+              </div>
 
-
-            {/* Auto-load quiz */}
-            <PracticeQuiz
-              questions={questionSets[selectedSet]}
-              topicName={selectedTopic.name}
-              subjectName={selectedSubject.name}
-              onBack={handleBackToTopics}
-              totalQuestionsInTopic={questionSets.flat().length}
-            />
-          </>
+              {/* ✅ REQUIRED FIX HERE */}
+              <PracticeQuiz
+                questions={questionSets[selectedSet]}
+                topicName={selectedTopic.name}
+                subjectName={selectedSubject.name}
+                onBack={handleBackToTopics}
+                totalQuestionsInTopic={questionSets.flat().length}
+                isAssessment={false}
+                subjectId={selectedSubject.id}
+                topicId={selectedTopic.id}
+              />
+            </>
           )}
-          {/* {!loading && questionSets.length > 0 && (
-            <Button
-              className="mt-6"
-              onClick={() => setStartQuiz(true)}
-            >
-              Start Set {selectedSet + 1}
-            </Button>
-          )} */}
         </div>
       </div>
     );
   }
+
+  /* ================= SUBJECT LIST ================= */
   if (selectedSubject) {
     return (
       <div className="min-h-screen bg-background pt-20 pb-16">
@@ -338,7 +288,7 @@ if (selectedSubject && selectedTopic) {
     );
   }
 
-
+  /* ================= SUBJECT HOME ================= */
   return (
     <div className="min-h-screen bg-background pt-20 pb-16">
       <div className="container mx-auto px-4">

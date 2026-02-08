@@ -175,7 +175,25 @@ const Battle = () => {
   }
 
   if (gameMode === 'game') {
+    // Guard against empty questions array
+    if (!battleQuestions || battleQuestions.length === 0) {
+      return (
+        <div className="min-h-screen bg-background pt-20 pb-16">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-2xl font-bold mb-4">No Questions Available</h2>
+            <p className="text-muted-foreground mb-6">Battle questions are not loaded yet.</p>
+            <Button onClick={() => setGameMode('menu')}>Back to Menu</Button>
+          </div>
+        </div>
+      );
+    }
+
     const question = battleQuestions[currentQuestion];
+    if (!question) {
+      handleFinishGame();
+      return null;
+    }
+    
     const questionId = question.questionID;
     const options = getOptionsArray(question);
     const isAnswered = showResults[questionId];
