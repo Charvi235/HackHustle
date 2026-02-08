@@ -10,7 +10,8 @@ import {
   MessageSquare, 
   Clock,
   Trophy,
-  CheckCircle
+  CheckCircle,
+  Star
 } from 'lucide-react';
 import { FaLinkedin, FaGithub, FaGlobe } from 'react-icons/fa';
 import { useToast } from '@/hooks/use-toast';
@@ -142,12 +143,12 @@ const Profile = () => {
                   <Label className="text-foreground">Rating</Label>
                   <p className="text-sm text-muted-foreground">{localUser.rating ? `${localUser.rating} ⭐` : 'No ratings yet'}</p>
                 </div>
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Label className="text-foreground">Bio</Label>
                   <p className="text-muted-foreground">
                     {localUser.bio || 'No bio added yet'}
                   </p>
-                </div>
+                </div> */}
               </>
             )}
           </CardContent>
@@ -185,7 +186,7 @@ const Profile = () => {
               <CardTitle>Your Stats</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4">
+              {/* <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-4 bg-muted rounded-lg">
                   <Trophy className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
                   <p className="text-3xl font-bold text-primary">
@@ -200,76 +201,47 @@ const Profile = () => {
                   </p>
                   <p className="text-muted-foreground text-sm">Questions Solved</p>
                 </div>
+              </div> */}
+              <CardContent>
+              {/* Grid ko 3 columns mein kiya */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                {/* 1. NEW POINTS BOX */}
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  {/* Star Icon Import karna mat bhulna */}
+                  <Star className="h-8 w-8 text-blue-500 mx-auto mb-2" /> 
+                  <p className="text-3xl font-bold text-primary">
+                    {(localUser.stats as any)?.points || 120} {/* Points variable */}
+                  </p>
+                  <p className="text-muted-foreground text-sm">Total Points</p>
+                </div>
+
+                {/* 2. BATTLE WINS */}
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  <Trophy className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
+                  <p className="text-3xl font-bold text-primary">
+                    {localUser.stats?.battleWins || 0}
+                  </p>
+                  <p className="text-muted-foreground text-sm">Battle Wins</p>
+                </div>
+
+                {/* 3. QUESTIONS SOLVED */}
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                  <p className="text-3xl font-bold text-primary">
+                    {localUser.stats?.questionsSolved || 0}
+                  </p>
+                  <p className="text-muted-foreground text-sm">Questions Solved</p>
+                </div>
+
               </div>
+            </CardContent>
             </CardContent>
           </Card>
         )}
 
         {/* Contact & Availability (Faculty only) */}
-        {isFaculty && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Contact & Availability</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Office Hours */}
-              <div className="flex items-center gap-3">
-                <Clock className="h-5 w-5 text-primary" />
-                <div>
-                  <Label className="text-muted-foreground">Office Hours</Label>
-                  <p className="text-lg">
-                    {localUser.officeHours || 'Not specified'}
-                  </p>
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Social Links with Labels */}
-              <div>
-                <Label className="text-muted-foreground mb-3 block">Social Links</Label>
-                <div className="flex flex-col gap-3">
-                  {localUser.socials?.linkedin && (
-                    <a
-                      href={localUser.socials.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-3 rounded-lg bg-muted hover:bg-[#0077B5] hover:text-white transition-colors"
-                    >
-                      <FaLinkedin className="h-5 w-5" />
-                      <span>LinkedIn URL</span>
-                    </a>
-                  )}
-                  {localUser.socials?.github && (
-                    <a
-                      href={localUser.socials.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-3 rounded-lg bg-muted hover:bg-foreground hover:text-background transition-colors"
-                    >
-                      <FaGithub className="h-5 w-5" />
-                      <span>GitHub URL</span>
-                    </a>
-                  )}
-                  {localUser.socials?.website && (
-                    <a
-                      href={localUser.socials.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-3 rounded-lg bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
-                    >
-                      <FaGlobe className="h-5 w-5" />
-                      <span>Personal Website URL</span>
-                    </a>
-                  )}
-                  {!localUser.socials?.linkedin && !localUser.socials?.github && !localUser.socials?.website && (
-                    <p className="text-muted-foreground text-sm">No social links added yet.</p>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        
 
         {/* Quick Actions */}
         <Card>
@@ -322,3 +294,4 @@ const Profile = () => {
 };
 
 export default Profile;
+
