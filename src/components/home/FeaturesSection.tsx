@@ -467,7 +467,7 @@ const features = [
   {
     title: "Quiz Battles",
     description: "Compete with friends or random players in fast-paced, real-time quiz competitions.",
-    backDetail: "Challenge peers in real-time coding duels. Climb the global leaderboard and test your speed and accuracy against the best developers.",
+    backDetail: "Compete in fast-paced quiz battles. Climb the HackHustle leaderboard and prove your speed and accuracy against the sharpest minds in real time.",
     icon: Trophy,
     badge: "Multiplayer",
     color: "from-yellow-600 to-yellow-900"
@@ -483,7 +483,7 @@ const features = [
   {
     title: "Expert Support",
     description: "Get help from verified faculty members for complex doubts and concepts.",
-    backDetail: "Stuck on a problem? Connect 1-on-1 with industry experts and professors to clear doubts and get career guidance instantly.",
+    backDetail: "Stuck on a problem? Connect 1-on-1 with industry experts and professors to clear doubts and get guidance instantly.",
     icon: Users,
     badge: "Expert Help",
     color: "from-purple-600 to-purple-900"
@@ -491,7 +491,7 @@ const features = [
   {
     title: "Gamification",
     description: "Earn points, badges, and climb leaderboards to stay motivated.",
-    backDetail: "Turn preparation into a game! Earn XP for every correct answer, unlock achievement badges, and showcase your streak on your profile.",
+    backDetail: "Turn preparation into a game! Earn rewards for every correct answer, unlock achievement badges, and showcase your streak on your profile.",
     icon: Zap,
     badge: "Rewards",
     color: "from-orange-600 to-orange-900"
