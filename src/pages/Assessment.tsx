@@ -12,51 +12,50 @@ const getOptionsArray = (q: Question): string[] => {
   return [q.option1, q.option2, q.option3, q.option4];
 };
 
+const TOTAL_TIME = 1800; // 30 minutes
+
 const Assessment = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { questions, assessmentName, subjectName, type } = location.state as {
+
+  const { questions, assessmentName, subjectName } = location.state as {
     questions: Question[];
     assessmentName: string;
     subjectName: string;
-    type: 'topic' | 'subject';
   };
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: number }>({});
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
   const [showResults, setShowResults] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(1800); // 30 minutes
+  const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
   const [isActive, setIsActive] = useState(true);
 
+  /* ---------------- TIMER ---------------- */
   useEffect(() => {
-    if (isActive && timeLeft > 0 && !showResults) {
-      const timer = setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
-      }, 1000);
-      return () => clearInterval(timer);
-    } else if (timeLeft === 0 && !showResults) {
-      handleFinish();
-    }
-  }, [isActive, timeLeft, showResults]);
+    if (!isActive || showResults) return;
 
-  const handleAnswer = (answerIndex: number) => {
-    const questionId = questions[currentQuestion].questionID;
-    setSelectedAnswers({ ...selectedAnswers, [questionId]: answerIndex });
+    if (timeLeft === 0) {
+      finishAssessment();
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft, isActive, showResults]);
+
+  /* ---------------- HANDLERS ---------------- */
+  const handleAnswer = (optionIndex: number) => {
+    const qid = questions[currentQuestion].questionID;
+    setSelectedAnswers((prev) => ({
+      ...prev,
+      [qid]: optionIndex,
+    }));
   };
 
-  const handleNext = () => {
-    if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1);
-    }
-  };
-
-  const handleFinish = () => {
+  const finishAssessment = () => {
     setIsActive(false);
     setShowResults(true);
   };
@@ -67,50 +66,71 @@ const Assessment = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  /* ===========================
+     RESULT SCREEN (ONLY AFTER SUBMIT)
+     =========================== */
   if (showResults) {
     const correctCount = Object.keys(selectedAnswers).filter((qId) => {
-      const question = questions.find(q => q.questionID === parseInt(qId));
+      const question = questions.find(q => q.questionID === Number(qId));
       if (!question) return false;
       const options = getOptionsArray(question);
-      const selectedOption = options[selectedAnswers[parseInt(qId)]];
-      return selectedOption === question.correctAnswer;
+      return options[selectedAnswers[Number(qId)]] === question.correctAnswer;
     }).length;
+
     const percentage = Math.round((correctCount / questions.length) * 100);
 
     return (
       <div className="min-h-screen bg-background pt-20 pb-16">
         <div className="container mx-auto px-4 max-w-4xl">
-          <Button variant="outline" onClick={() => navigate('/practice')} className="mb-6">
+          <Button
+            variant="outline"
+            onClick={() => navigate('/practice')}
+            className="mb-6"
+          >
             <ChevronLeft className="w-4 h-4 mr-2" />
             Back to Practice
           </Button>
 
-          <Card className="p-8 bg-gradient-card text-center">
-            <Badge variant="secondary" className="mb-4">Assessment Complete</Badge>
+          <Card className="p-8 text-center">
+            <Badge className="mb-4">Assessment Complete</Badge>
+
             <h1 className="text-4xl font-bold mb-6">{assessmentName}</h1>
-            <div className="text-6xl font-bold mb-4">{percentage}%</div>
+
+            <div className="text-6xl font-bold mb-4">
+              {percentage}%
+            </div>
+
             <Progress value={percentage} className="h-3 mb-6" />
+
             <p className="text-xl mb-8">
-              You scored {correctCount} out of {questions.length} questions
+              You scored <b>{correctCount}</b> out of <b>{questions.length}</b>
             </p>
+
             <div className="grid grid-cols-3 gap-4 mb-8">
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <CheckCircle2 className="w-8 h-8 mx-auto mb-2 text-green-500" />
+              <div className="p-4 rounded-lg bg-muted/50">
+                <CheckCircle2 className="mx-auto text-green-500 mb-2" />
                 <div className="text-2xl font-bold">{correctCount}</div>
-                <div className="text-sm text-muted-foreground">Correct</div>
+                <div className="text-sm">Correct</div>
               </div>
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <XCircle className="w-8 h-8 mx-auto mb-2 text-red-500" />
-                <div className="text-2xl font-bold">{questions.length - correctCount}</div>
-                <div className="text-sm text-muted-foreground">Wrong</div>
+
+              <div className="p-4 rounded-lg bg-muted/50">
+                <XCircle className="mx-auto text-red-500 mb-2" />
+                <div className="text-2xl font-bold">
+                  {questions.length - correctCount}
+                </div>
+                <div className="text-sm">Wrong</div>
               </div>
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <Clock className="w-8 h-8 mx-auto mb-2 text-blue-500" />
-                <div className="text-2xl font-bold">{formatTime(1800 - timeLeft)}</div>
-                <div className="text-sm text-muted-foreground">Time Taken</div>
+
+              <div className="p-4 rounded-lg bg-muted/50">
+                <Clock className="mx-auto text-blue-500 mb-2" />
+                <div className="text-2xl font-bold">
+                  {formatTime(TOTAL_TIME - timeLeft)}
+                </div>
+                <div className="text-sm">Time Taken</div>
               </div>
             </div>
-            <Button onClick={() => navigate('/practice')} size="lg">
+
+            <Button size="lg" onClick={() => navigate('/practice')}>
               Back to Practice
             </Button>
           </Card>
@@ -119,6 +139,9 @@ const Assessment = () => {
     );
   }
 
+  /* ===========================
+     TEST SCREEN (NO SCORE ANYWHERE)
+     =========================== */
   const question = questions[currentQuestion];
   const options = getOptionsArray(question);
   const selectedAnswer = selectedAnswers[question.questionID];
@@ -126,16 +149,20 @@ const Assessment = () => {
   return (
     <div className="min-h-screen bg-background pt-20 pb-16">
       <div className="container mx-auto px-4 max-w-4xl">
+
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
-            <Badge variant="secondary" className="mb-2">{subjectName}</Badge>
+            <Badge className="mb-2">{subjectName}</Badge>
             <h1 className="text-2xl font-bold">{assessmentName}</h1>
           </div>
-          <Card className="p-4 bg-gradient-card">
+
+          <Card className="p-4">
             <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5 text-primary" />
-              <span className="text-2xl font-bold">{formatTime(timeLeft)}</span>
+              <Clock className="w-5 h-5" />
+              <span className="text-2xl font-bold">
+                {formatTime(timeLeft)}
+              </span>
             </div>
           </Card>
         </div>
@@ -143,34 +170,42 @@ const Assessment = () => {
         {/* Progress */}
         <div className="mb-6">
           <div className="flex justify-between text-sm mb-2">
-            <span>Question {currentQuestion + 1} of {questions.length}</span>
-            <span>{Object.keys(selectedAnswers).length} answered</span>
+            <span>
+              Question {currentQuestion + 1} of {questions.length}
+            </span>
+            <span>
+              {Object.keys(selectedAnswers).length} answered
+            </span>
           </div>
-          <Progress value={((currentQuestion + 1) / questions.length) * 100} className="h-2" />
+          <Progress
+            value={((currentQuestion + 1) / questions.length) * 100}
+            className="h-2"
+          />
         </div>
 
-        {/* Question Card */}
-        <Card className="p-8 bg-gradient-card mb-6">
-          <div className="mb-6">
-            <Badge variant="outline" className="mb-4 text-lg px-3 py-1">
-              {currentQuestion + 1}
-            </Badge>
-            <h2 className="text-2xl font-semibold">{question.questionText}</h2>
-          </div>
+        {/* Question */}
+        <Card className="p-8 mb-6">
+          <h2 className="text-2xl font-semibold mb-6">
+            {question.questionText}
+          </h2>
 
           <div className="space-y-3">
-            {options.map((option, optionIndex) => {
-              const isSelected = selectedAnswer === optionIndex;
-              
+            {options.map((option, index) => {
+              const isSelected = selectedAnswer === index;
+
               return (
                 <Button
-                  key={optionIndex}
+                  key={index}
                   variant="outline"
-                  className={`justify-start text-left h-auto py-4 px-4 ${isSelected ? 'border-primary bg-primary/10' : ''}`}
-                  onClick={() => handleAnswer(optionIndex)}
+                  onClick={() => handleAnswer(index)}
+                  className={`w-full justify-start text-left py-4 ${
+                    isSelected ? 'border-primary bg-primary/10' : ''
+                  }`}
                 >
-                  <span className="font-semibold mr-3 text-lg">{String.fromCharCode(65 + optionIndex)}.</span>
-                  <span className="text-base">{option}</span>
+                  <span className="mr-3 font-semibold">
+                    {String.fromCharCode(65 + index)}.
+                  </span>
+                  {option}
                 </Button>
               );
             })}
@@ -181,18 +216,20 @@ const Assessment = () => {
         <div className="flex justify-between">
           <Button
             variant="outline"
-            onClick={handlePrevious}
             disabled={currentQuestion === 0}
+            onClick={() => setCurrentQuestion((p) => p - 1)}
           >
             Previous
           </Button>
+
           <div className="flex gap-2">
-            <Button variant="outline" onClick={handleFinish}>
-              Finish Assessment
+            <Button variant="outline" onClick={finishAssessment}>
+              Submit Assessment
             </Button>
+
             {currentQuestion < questions.length - 1 && (
-              <Button onClick={handleNext}>
-                Next Question
+              <Button onClick={() => setCurrentQuestion((p) => p + 1)}>
+                Next
               </Button>
             )}
           </div>

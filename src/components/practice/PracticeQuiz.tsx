@@ -174,11 +174,13 @@ const PracticeQuiz = ({
           );
         })}
       </div>
-
+        {!isAssessment && (
       <div className="mt-6 font-bold">
         Score: {score} / {questions.length}
       </div>
+        )}
     </div>
+      
   );
 };
 

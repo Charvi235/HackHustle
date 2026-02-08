@@ -188,6 +188,7 @@ const Practice = () => {
           onScoreCalculated={setAssessmentScore}
           isAssessment={true}
           subjectId={selectedSubject.id}
+          topicId={selectedTopic.id}
         />
 
         <div className="bottom-0 right-100 p-4 flex justify-center">
