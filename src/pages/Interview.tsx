@@ -110,9 +110,9 @@ const Interview = () => {
   const generateResults = (): QuestionResult[] => {
     return subjectiveInterviewQuestions.slice(0, 3).map((q, idx) => ({
       question: q.question,
-      userResponse: "This is a simulated user response based on the recording. In a real implementation, this would be transcribed from the audio.",
+      userResponse: "To be connected to api.",
       betterResponse: q.sampleAnswer,
-      marks: Math.floor(Math.random() * 3) + 7, // Random marks between 7-10
+      marks: Math.floor(Math.random() * 3) + 7, // Random marks between 7-10 (future-by api)
       maxMarks: 10
     }));
   };

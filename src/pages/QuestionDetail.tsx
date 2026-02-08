@@ -114,7 +114,7 @@ const QuestionDetail = () => {
           )}
         </div>
 
-        {/* Question Card */}
+        {/* Question */}
         <Card className="p-8 bg-gradient-card">
           <div className="flex items-start gap-4 mb-6">
             <div className="flex-1">

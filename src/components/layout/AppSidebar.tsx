@@ -129,7 +129,7 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               )}
               
-              {/* Contact Us - Collapsible Dropdown (only for public) */}
+              {/* Contact Us - Collapsible Dropdown (only for public pages) */}
               {!isAuthenticated && (
                 <SidebarMenuItem>
                   <Collapsible open={contactOpen} onOpenChange={setContactOpen}>

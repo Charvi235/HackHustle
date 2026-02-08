@@ -44,7 +44,7 @@ const features = [
   {
     icon: Zap,
     title: 'Gamification',
-    description: 'Earn points, badges, and climb leaderboards to stay motivated.',
+    description: 'Earn points and ace others.',
     badge: 'Rewards',
     color: 'bg-orange-500',
   },

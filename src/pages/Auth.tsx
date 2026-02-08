@@ -19,10 +19,6 @@ const isValidPassword = (password: string) => {
   return regex.test(password);
 };
 
-// const isValidName = (name: string) => {
-//   const regex = /^[A-Za-z][A-Za-z]*$/;
-//   return regex.test(name.trim());
-// };
 const isValidName = (name: string) => {
   const regex = /^[A-Za-z]+( [A-Za-z]+)*$/;
   return regex.test(name.trim());
@@ -32,7 +28,6 @@ const isEmptyField = (data: Record<string, string>) => {
   return Object.values(data).some((value) => value.trim() === '');
 };
 
-// --- Helper Functions ---
 const getInputClass = (isError: boolean) => 
   `transition-all ${isError ? 'border-red-500 focus-visible:ring-red-500 ring-2 ring-red-500/20' : ''}`;
 
@@ -56,8 +51,6 @@ const Auth = () => {
     firstName: false, lastName: false, emailId: false, password: false, confirmPassword: false, subjectAssociated: false, institute: false
   });
 
-
-  // Added confirmPassword to signupData
   const [signupData, setSignupData] = useState({ 
     firstName: '', 
     lastName: '', 
@@ -66,7 +59,6 @@ const Auth = () => {
     confirmPassword: '' 
   });
 
-  // Added confirmPassword to teacherSignupData
   const [teacherSignupData, setTeacherSignupData] = useState({
     firstName: '',
     lastName: '',
