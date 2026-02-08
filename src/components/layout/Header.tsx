@@ -26,18 +26,39 @@ export const Header = () => {
     navigate('/');
   };
 
-  const handleAboutClick = (e: React.MouseEvent) => {
-    e.preventDefault();
+  // const handleAboutClick = (e: React.MouseEvent) => {
+  //   e.preventDefault();
+  //   if (location.pathname !== '/') {
+  //     navigate('/');
+  //     setTimeout(() => {
+  //       document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+  //     }, 100);
+  //   } else {
+  //     document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+  //   }
+  // };
+  const handleAboutClick = () => {
+    // 1. Agar hum Home Page ('/') par nahi hain, toh pehle Home par jao
     if (location.pathname !== '/') {
       navigate('/');
+      
+      // Page load hone ka thoda wait karo, phir scroll karo
       setTimeout(() => {
-        document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+        // 'about' wahi ID hai jo aapne abhi div par lagayi thi
+        const element = document.getElementById('about');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
       }, 100);
-    } else {
-      document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+    } 
+    // 2. Agar hum pehle se Home Page par hain, toh seedha scroll karo
+    else {
+      const element = document.getElementById('about');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
-
   const getUserInitials = () => {
     if (!user) return 'U';
     return `${user.first_name?.[0] || ''}${user.last_name?.[0] || ''}`.toUpperCase();
@@ -48,7 +69,7 @@ export const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Left Side - Logo */}
-          <div className="flex items-center space-x-4">
+          {/* <div className="flex items-center space-x-4">
             {isAuthenticated && <SidebarTrigger />}
             <div className="flex items-center space-x-2 font-bold text-xl">
               <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
@@ -58,6 +79,20 @@ export const Header = () => {
                 HackHustle
               </span>
             </div>
+          </div> */}
+          <div className="flex items-center space-x-4">
+            {/* Sidebar Trigger waisa ka waisa hi rahega */}
+            {isAuthenticated && <SidebarTrigger />}
+            
+            {/* Logo Section ko Link bana diya */}
+            <Link to="/" className="flex items-center space-x-2 font-bold text-xl cursor-pointer hover:opacity-80 transition-opacity">
+              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+                <Zap className="h-5 w-5 text-white" />
+              </div>
+              <span className="bg-gradient-primary bg-clip-text text-transparent">
+                HackHustle
+              </span>
+            </Link>
           </div>
 
           {/* Center - About Us & Contact Us (always visible) */}
