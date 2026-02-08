@@ -12,6 +12,8 @@ interface PracticeQuizProps {
   totalQuestionsInTopic: number;
   onScoreCalculated?: (score: number) => void;
   isAssessment?: boolean;
+  subjectId?: number;
+  topicId?: number;
 }
 
 const getOptionsArray = (q: QuestionDto): string[] => [
