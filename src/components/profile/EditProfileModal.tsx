@@ -69,7 +69,7 @@ export const EditProfileModal = ({ open, onOpenChange, user, onSave }: EditProfi
       };
       onSave(updatedUser);
     } else {
-      // For faculty, save all fields
+      // For faculty, saving all fields
       const updatedUser: Partial<User> = {
         first_name: formData.first_name,
         last_name: formData.last_name,

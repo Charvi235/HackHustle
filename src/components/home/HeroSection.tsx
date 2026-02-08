@@ -55,35 +55,9 @@ export const HeroSection = () => {
               </Link>
             </Button>
           </div>
-
-          {/* Stats */}
-          {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto">
-            <div className="flex flex-col items-center">
-              <div className="flex items-center justify-center w-12 h-12 bg-gradient-primary rounded-full mb-2">
-                <Users className="w-6 h-6 text-white" />
-              </div>
-              <div className="text-2xl font-bold">50K+</div>
-              <div className="text-sm text-muted-foreground">Active Learners</div>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="flex items-center justify-center w-12 h-12 bg-gradient-primary rounded-full mb-2">
-                <TrendingUp className="w-6 h-6 text-white" />
-              </div>
-              <div className="text-2xl font-bold">95%</div>
-              <div className="text-sm text-muted-foreground">Success Rate</div>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="flex items-center justify-center w-12 h-12 bg-gradient-primary rounded-full mb-2">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <div className="text-2xl font-bold">1M+</div>
-              <div className="text-sm text-muted-foreground">Questions Solved</div>
-            </div>
-          </div> */}
         </div>
       </div>
 
-      {/* Floating Elements */}
       <div className="absolute top-20 left-10 w-20 h-20 bg-gradient-primary rounded-full opacity-20 animate-pulse" />
       <div className="absolute bottom-20 right-10 w-16 h-16 bg-accent rounded-full opacity-30 animate-bounce" />
       <div className="absolute top-1/2 left-5 w-12 h-12 bg-brand-warning rounded-full opacity-25 animate-ping" />

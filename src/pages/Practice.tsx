@@ -176,7 +176,7 @@ const handleSubmitAssessment = async () => {
       body: JSON.stringify({
         
         emailId: emailId ,
-        topicID: selectedTopic?.id || 1015,
+        topicID: selectedTopic?.id || 1015, //1015 is topic n/a basically for subject-wise assessment
         subjectID: selectedSubject.id,
         assessmentScore
       })
@@ -206,20 +206,20 @@ const handleSubmitAssessment = async () => {
           onScoreCalculated={setAssessmentScore}
         /> */}
         <PracticeQuiz
-  questions={questionSets[selectedSet]}
-  subjectName={selectedSubject.name}
-  onBack={() => setStartQuiz(false)}
-  totalQuestionsInTopic={questionSets.flat().length}
- onScoreCalculated={setAssessmentScore}
-  isAssessment={true}
-  subjectId={selectedSubject.id}
-/>
+          questions={questionSets[selectedSet]}
+          subjectName={selectedSubject.name}
+          onBack={() => setStartQuiz(false)}
+          totalQuestionsInTopic={questionSets.flat().length}
+          onScoreCalculated={setAssessmentScore}
+          isAssessment={true}
+          subjectId={selectedSubject.id}
+        />
 
         <div className="bottom-0 right-100 p-4 flex justify-center">
-  <Button
-    className="ml-4 w-[240px]"
-    onClick={handleSubmitAssessment}
-  >
+          <Button
+            className="ml-4 w-[240px]"
+            onClick={handleSubmitAssessment}
+          >
             Submit Assessment
           </Button>
         </div>
@@ -256,27 +256,26 @@ if (selectedSubject && selectedTopic) {
           )} */}
           {!loading && questionSets.length > 0 && (
           <>
-            {/* Set selector buttons */}
             <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
-  <div className="flex gap-3 flex-wrap">
-    {questionSets.map((_, index) => (
-      <Button
-        key={index}
-        variant={index === selectedSet ? 'default' : 'outline'}
-        onClick={() => setSelectedSet(index)}
-      >
-        Set {index + 1}
-      </Button>
-    ))}
-  </div>
+              <div className="flex gap-3 flex-wrap">
+                {questionSets.map((_, index) => (
+                  <Button
+                    key={index}
+                    variant={index === selectedSet ? 'default' : 'outline'}
+                    onClick={() => setSelectedSet(index)}
+                  >
+                    Set {index + 1}
+                  </Button>
+                ))}
+              </div>
 
-  <Button
-    variant="secondary"
-    onClick={handleTopicAssessment}
-  >
-    Take Topic-wise Assessment
-  </Button>
-</div>
+              <Button
+                variant="secondary"
+                onClick={handleTopicAssessment}
+              >
+                Take Topic-wise Assessment
+              </Button>
+            </div>
 
 
             {/* Auto-load quiz */}

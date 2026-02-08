@@ -36,11 +36,9 @@ const Profile = () => {
     setLocalUser(user);
   }, [isAuthenticated, user, navigate]);
 
-  // Check for edit query param to auto-open modal
   useEffect(() => {
     if (searchParams.get('edit') === 'true' && localUser) {
       setIsEditModalOpen(true);
-      // Clear the query param after opening
       setSearchParams({});
     }
   }, [searchParams, localUser, setSearchParams]);
@@ -99,53 +97,53 @@ const Profile = () => {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-muted-foreground">First Name</Label>
-                <p className="text-lg">{localUser.first_name || 'Not set'}</p>
+                <Label className="text-foreground">First Name</Label>
+                <p className="text-sm text-muted-foreground">{localUser.first_name || 'Not set'}</p>
               </div>
               <div className="space-y-2">
-                <Label className="text-muted-foreground">Last Name</Label>
-                <p className="text-lg">{localUser.last_name || 'Not set'}</p>
+                <Label className="text-foreground">Last Name</Label>
+                <p className="text-sm text-muted-foreground">{localUser.last_name || 'Not set'}</p>
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-muted-foreground">Email</Label>
-              <p className="text-lg">{localUser.emailId}</p>
+              <Label className="text-foreground">Email</Label>
+              <p className="text-sm text-muted-foreground">{localUser.emailId}</p>
             </div>
 
-            {/* Student stats shown inline */}
+            {/* Student stats*/}
 
             {isFaculty && (
               <>
                 <div className="space-y-2">
-                  <Label className="text-muted-foreground">Subject</Label>
-                  <p className="text-lg">{localUser.subject || 'Add Subject'}</p>
+                  <Label className="text-foreground">Subject</Label>
+                  <p className="text-sm text-muted-foreground">{localUser.subject || 'Subject not added yet'}</p>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-muted-foreground">Institute</Label>
-                  <p className="text-lg">{localUser.institute || 'Add Institute'}</p>
+                  <Label className="text-foreground">Institute</Label>
+                  <p className="text-sm text-muted-foreground">{localUser.institute || 'Institute not added yet'}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-muted-foreground">Designation</Label>
-                    <p className="text-lg">{localUser.designation || 'Add Designation'}</p>
+                    <Label className="text-foreground">Designation</Label>
+                    <p className="text-sm text-muted-foreground">{localUser.designation || 'Designation not added yet'}</p>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-muted-foreground">Department</Label>
-                    <p className="text-lg">{localUser.department || 'Add Department'}</p>
+                    <Label className="text-foreground">Department</Label>
+                    <p className="text-sm text-muted-foreground">{localUser.department || 'Department not added yet'}</p>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-muted-foreground">Experience</Label>
-                  <p className="text-lg">
-                    {localUser.experience ? `${localUser.experience} years` : 'Add Experience'}
+                  <Label className="text-foreground">Experience</Label>
+                  <p className="text-sm text-muted-foreground">
+                    {localUser.experience ? `${localUser.experience} years` : 'Experience not added yet'}
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-muted-foreground">Rating</Label>
-                  <p className="text-lg">{localUser.rating ? `${localUser.rating} ⭐` : 'No rating yet'}</p>
+                  <Label className="text-foreground">Rating</Label>
+                  <p className="text-sm text-muted-foreground">{localUser.rating ? `${localUser.rating} ⭐` : 'No ratings yet'}</p>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-muted-foreground">Bio</Label>
+                  <Label className="text-foreground">Bio</Label>
                   <p className="text-muted-foreground">
                     {localUser.bio || 'No bio added yet'}
                   </p>

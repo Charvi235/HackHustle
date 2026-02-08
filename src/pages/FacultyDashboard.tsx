@@ -23,7 +23,7 @@ const FacultyDashboard = () => {
   const [selectedDoubt, setSelectedDoubt] = useState<Doubt | null>(null);
   const [answer, setAnswer] = useState('');
 
-  // Mock doubts data
+  // Mock doubts data(will convert later)
   const [doubts, setDoubts] = useState<Doubt[]>([
     {
       id: '1',
