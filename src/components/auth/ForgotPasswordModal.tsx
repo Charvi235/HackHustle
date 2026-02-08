@@ -119,6 +119,8 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ isOpen, onClo
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isOtpVerified, setIsOtpVerified] = useState(false); // OTP verify hua ya nahi track karne ke liye
+  const [newPassword, setNewPassword] = useState("");        // Naya password store karne ke liye
 
   // Step 1: Email se OTP bhejo
   const handleSendOtp = (e: React.FormEvent) => {
@@ -135,22 +137,71 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ isOpen, onClo
   };
 
   // Step 2: OTP Verify karo
+  // const handleVerifyOtp = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   if (!otp) return;
+
+  //   setIsLoading(true);
+  //   // Fake Verification
+  //   setTimeout(() => {
+  //     setIsLoading(false);
+  //     alert("OTP Verified! Password Reset Successful.");
+  //     onClose(); // Modal band kar do
+  //     setStep(1); // Wapis reset kar do next time ke liye
+  //     setEmail("");
+  //     setOtp("");
+  //   }, 1500);
+  // };
+  // Step 2: OTP Verify Logic
   const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
     if (!otp) return;
 
     setIsLoading(true);
-    // Fake Verification
+
+    // Fake Verification for now
     setTimeout(() => {
       setIsLoading(false);
-      alert("OTP Verified! Password Reset Successful.");
-      onClose(); // Modal band kar do
-      setStep(1); // Wapis reset kar do next time ke liye
-      setEmail("");
-      setOtp("");
-    }, 1500);
+      // alert("OTP Verified!"); // Alert hata sakte ho agar chaho
+      
+      // onClose();  <--- IS LINE KO HATA DO OR COMMENT KAR DO
+      setStep(3); // <--- YE NAYI LINE ADD KARO (Step 3 = Password Reset Screen)
+    }, 1000);
   };
+  const handleSaveNewPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPassword.trim()) return;
 
+    setIsLoading(true);
+
+    try {
+      // Backend API Call to Save Password
+      const response = await fetch('http://localhost:8000/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            email: email, 
+            new_password: newPassword 
+        })
+      });
+
+      // Agar backend abhi ready nahi hai toh bas ye Simulation chalne do:
+      setTimeout(() => {
+        setIsLoading(false);
+        alert("Password Reset Successful! Please Login.");
+        
+        onClose(); // Ab Modal band karo
+        setStep(1); // Reset sab kuch
+        setEmail("");
+        setOtp("");
+        setNewPassword("");
+      }, 1000);
+      
+    } catch (error) {
+      console.error("Error:", error);
+      setIsLoading(false);
+    }
+  };
   if (!isOpen) return null;
 
   return (
@@ -239,7 +290,42 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ isOpen, onClo
             </form>
           </>
         )}
+        {/* --- STEP 3: NEW PASSWORD SCREEN --- */}
+          {step === 3 && (
+            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
+              <div className="text-center mb-6">
+                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  {/* Lock Icon */}
+                  <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-white">Set New Password</h3>
+                <p className="text-gray-400 text-sm">Create a strong password for your account</p>
+              </div>
 
+              <form onSubmit={handleSaveNewPassword} className="space-y-4">
+                <div>
+                  <input
+                    type="password"
+                    placeholder="Enter new password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full bg-[#1a1a2e] border border-gray-700 rounded-lg px-4 py-3 text-white outline-none focus:ring-2 focus:ring-green-500 transition-all placeholder:text-gray-600"
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold py-3 rounded-lg transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? "Saving..." : "Save Password"}
+                </button>
+              </form>
+            </div>
+          )}
       </div>
     </div>
   );

@@ -50,14 +50,14 @@ export const Header = () => {
           {/* Left Side - Logo */}
           <div className="flex items-center space-x-4">
             {isAuthenticated && <SidebarTrigger />}
-            <Link to={isAuthenticated ? '/dashboard' : '/'} className="flex items-center space-x-2 font-bold text-xl">
+            <div className="flex items-center space-x-2 font-bold text-xl">
               <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
                 <Zap className="h-5 w-5 text-white" />
               </div>
               <span className="bg-gradient-primary bg-clip-text text-transparent">
                 HackHustle
               </span>
-            </Link>
+            </div>
           </div>
 
           {/* Center - About Us & Contact Us (always visible) */}
@@ -96,7 +96,7 @@ export const Header = () => {
                     href="mailto:contact@hackhustle.com" 
                     className="text-primary hover:underline font-medium"
                   >
-                    contact@hackhustle.com
+                    hackhustle062@gmail.com
                   </a>
                 </p>
               </div>
