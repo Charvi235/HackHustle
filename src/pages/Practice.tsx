@@ -3,13 +3,15 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import {
   BookOpen,
   Code,
   Database,
   Play,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  Trophy, X
 } from 'lucide-react';
 
 import PracticeQuiz from '../components/practice/PracticeQuiz';
@@ -81,8 +83,29 @@ const Practice = () => {
   const [selectedSet, setSelectedSet] = useState(0);
   const [startQuiz, setStartQuiz] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const [showResult, setShowResult] = useState(false);
+  
+  //const [score, setScore] = useState(0);
   const [assessmentScore, setAssessmentScore] = useState(0);
+  const handleSubmitAssessment = async () => {
+    
+    setShowResult(true);
+    try {
+      await fetch('http://localhost:8080/api/assessments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          emailId: emailId,
+          topicID: selectedTopic?.id || 1015,
+          subjectID: selectedSubject!.id,
+          assessmentScore 
+        })
+      });
+      console.log("Data saved successfully");
+    } catch (err) {
+      console.error('Data save nahi hua (Backend Error):', err);
+    }
+  };
 
   const handleSelectSubject = (subject: SubjectConfig) => {
     setSelectedSubject(subject);
@@ -90,6 +113,8 @@ const Practice = () => {
     setQuestionSets([]);
     setStartQuiz(false);
   };
+
+  
 
   const handleSelectTopic = async (topic: TopicConfig) => {
     setSelectedTopic(topic);
@@ -157,24 +182,45 @@ const Practice = () => {
     setStartQuiz(false);
   };
 
-  const handleSubmitAssessment = async () => {
-    console.log("Email ID:", emailId);
-    try {
-      await fetch('http://localhost:8080/api/assessments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          emailId: emailId,
-          topicID: selectedTopic?.id || 1015,
-          subjectID: selectedSubject!.id,
-          assessmentScore
-        })
-      });
-      alert('Assessment submitted successfully!');
-    } catch (err) {
-      console.error('Assessment submission failed', err);
-    }
-  };
+  // const handleSubmitAssessment = async () => {
+  //   console.log("Email ID:", emailId);
+  //   try {
+  //     await fetch('http://localhost:8080/api/assessments', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({
+  //         emailId: emailId,
+  //         topicID: selectedTopic?.id || 1015,
+  //         subjectID: selectedSubject!.id,
+  //         assessmentScore
+  //       })
+  //     });
+  //     alert('Assessment submitted successfully!');
+  //   } catch (err) {
+  //     console.error('Assessment submission failed', err);
+  //   }
+  // };
+  // const handleSubmitAssessment = async () => {
+  //   console.log("Email ID:", emailId);
+  //   try {
+  //     console.log("Submitting assessment...");
+  //     await fetch('http://localhost:8080/api/assessments', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({
+  //         emailId: emailId,
+  //         topicID: selectedTopic?.id || 1015,
+  //         subjectID: selectedSubject!.id,
+  //         assessmentScore // Ye score hum popup me dikhayenge
+  //       })
+  //     });
+  //     setShowResult(true); 
+
+  //   } catch (err) {
+  //     console.error('Assessment submission failed', err);
+  //   }
+  // };
+  
 
   /* ================= ASSESSMENT MODE ================= */
   if (startQuiz && selectedSubject) {
@@ -196,6 +242,64 @@ const Practice = () => {
             Submit Assessment
           </Button>
         </div>
+        {/* --- RESULT POPUP START --- */}
+      <Dialog open={showResult} onOpenChange={setShowResult}>
+        <DialogContent className="bg-[#1a1a2e] border border-gray-800 text-white sm:max-w-md p-0 overflow-hidden outline-none">
+          
+          {/* Close Button (Cross) */}
+          {/* <div className="absolute right-4 top-4 z-50">
+            <button 
+              onClick={() => setShowResult(false)}
+              className="p-1 rounded-full hover:bg-white/10 transition-colors"
+            >
+              <X className="h-5 w-5 text-gray-400" />
+            </button>
+          </div> */}
+
+          {/* Popup Content */}
+          <div className="flex flex-col items-center justify-center p-8 space-y-6">
+            
+            {/* Animated Trophy */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-red-600 blur-2xl opacity-20 rounded-full"></div>
+              <div className="relative bg-[#2a2a3e] p-5 rounded-full border border-gray-700 shadow-xl">
+                <Trophy className="h-10 w-10 text-red-500" />
+              </div>
+            </div>
+
+            {/* Title Text */}
+            <div className="text-center space-y-1">
+              <h2 className="text-2xl font-bold tracking-tight text-white">
+                Assessment Submitted!
+              </h2>
+              <p className="text-gray-400 text-sm">
+                Here is your final score
+              </p>
+            </div>
+
+            {/* Score Display Box */}
+            <div className="bg-[#0f0f1a] w-full py-6 rounded-xl border border-gray-800 flex flex-col items-center shadow-inner">
+              <span className="text-gray-500 text-xs uppercase tracking-wider font-bold mb-2">Total Score</span>
+              <div className="flex items-baseline gap-2">
+                {/* Ye wahi variable hai jo aap backend bhej rahe ho */}
+                <span className="text-5xl font-extrabold text-red-500">{assessmentScore}</span>
+                <span className="text-xl text-gray-600 font-medium">Points</span>
+              </div>
+            </div>
+
+            {/* Close Button */}
+            <button 
+              onClick={() => setShowResult(false)}
+              className="w-full py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition-colors shadow-lg shadow-red-600/20"
+            >
+              Close Result
+            </button>
+
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* --- RESULT POPUP END --- */}
+
       </div>
     );
   }
@@ -324,6 +428,63 @@ const Practice = () => {
           ))}
         </div>
       </div>
+      {/* --- RESULT POPUP START --- */}
+      <Dialog open={showResult} onOpenChange={setShowResult}>
+        <DialogContent className="bg-[#1a1a2e] border border-gray-800 text-white sm:max-w-md p-0 overflow-hidden outline-none">
+          
+          {/* Close Button (Cross)
+          <div className="absolute right-4 top-4 z-50">
+            <button 
+              onClick={() => setShowResult(false)}
+              className="p-1 rounded-full hover:bg-white/10 transition-colors"
+            >
+              <X className="h-5 w-5 text-gray-400" />
+            </button>
+          </div> */}
+
+          {/* Popup Content */}
+          <div className="flex flex-col items-center justify-center p-8 space-y-6">
+            
+            {/* Animated Trophy */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-red-600 blur-2xl opacity-20 rounded-full"></div>
+              <div className="relative bg-[#2a2a3e] p-5 rounded-full border border-gray-700 shadow-xl">
+                <Trophy className="h-10 w-10 text-red-500" />
+              </div>
+            </div>
+
+            {/* Title Text */}
+            <div className="text-center space-y-1">
+              <h2 className="text-2xl font-bold tracking-tight text-white">
+                Assessment Submitted!
+              </h2>
+              <p className="text-gray-400 text-sm">
+                Here is your final score
+              </p>
+            </div>
+
+            {/* Score Display Box */}
+            <div className="bg-[#0f0f1a] w-full py-6 rounded-xl border border-gray-800 flex flex-col items-center shadow-inner">
+              <span className="text-gray-500 text-xs uppercase tracking-wider font-bold mb-2">Total Score</span>
+              <div className="flex items-baseline gap-2">
+                {/* Ye wahi variable hai jo aap backend bhej rahe ho */}
+                <span className="text-5xl font-extrabold text-red-500">{assessmentScore}</span>
+                <span className="text-xl text-gray-600 font-medium">Points</span>
+              </div>
+            </div>
+
+            {/* Close Button */}
+            <button 
+              onClick={() => setShowResult(false)}
+              className="w-full py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition-colors shadow-lg shadow-red-600/20"
+            >
+              Close Result
+            </button>
+
+          </div>
+        </DialogContent>
+      </Dialog>
+      {/* --- RESULT POPUP END --- */}   
     </div>
   );
 };
