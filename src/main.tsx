@@ -9,7 +9,7 @@ createRoot(document.getElementById("root")!).render(
   <ThemeProvider 
     attribute="class" 
     defaultTheme="dark" 
-    forcedTheme="dark"
+    forcedTheme="light"
     disableTransitionOnChange
   >
     <App />
