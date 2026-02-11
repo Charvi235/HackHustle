@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Mic, Square, Video, VideoOff } from 'lucide-react';
 import { toast } from 'sonner';
+import { interviewService } from '@/services/interviewService';
+
 
 interface AudioRecorderProps {
   onRecordingComplete: (audioBlob: Blob, videoBlob: Blob | null) => void;
@@ -138,15 +140,34 @@ export const AudioRecorder = ({ onRecordingComplete, question }: AudioRecorderPr
       };
 
       if (audioRecorderRef.current && audioRecorderRef.current.state !== 'inactive') {
-        audioRecorderRef.current.onstop = () => {
-          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-          const videoBlob = videoEnabled && videoChunksRef.current.length > 0
-            ? new Blob(videoChunksRef.current, { type: 'video/webm' })
-            : null;
+        // audioRecorderRef.current.onstop = () => {
+        //   const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        //   const videoBlob = videoEnabled && videoChunksRef.current.length > 0
+        //     ? new Blob(videoChunksRef.current, { type: 'video/webm' })
+        //     : null;
           
+        //   onRecordingComplete(audioBlob, videoBlob);
+        //   checkAndResolve();
+        // };
+        audioRecorderRef.current.onstop = async () => {
+          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+          const videoBlob =
+            videoEnabled && videoChunksRef.current.length > 0
+              ? new Blob(videoChunksRef.current, { type: 'video/webm' })
+              : null;
+
+          // 🔴 TEMP: since STT wiring not done yet
+          const userAnswerText = "User answered via audio (STT pending)";
+
+          try {
+            await interviewService.evaluateAnswer(question, userAnswerText);
+          } catch (err) {
+            console.error("Evaluation failed", err);
+          }
+
           onRecordingComplete(audioBlob, videoBlob);
-          checkAndResolve();
         };
+
         audioRecorderRef.current.stop();
       }
 

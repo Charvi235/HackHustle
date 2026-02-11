@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -182,6 +181,7 @@ const Practice = () => {
     setStartQuiz(false);
   };
 
+
   // const handleSubmitAssessment = async () => {
   //   console.log("Email ID:", emailId);
   //   try {
@@ -220,7 +220,7 @@ const Practice = () => {
   //     console.error('Assessment submission failed', err);
   //   }
   // };
-  
+
 
   /* ================= ASSESSMENT MODE ================= */
   if (startQuiz && selectedSubject) {

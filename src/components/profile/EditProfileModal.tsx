@@ -124,7 +124,7 @@ export const EditProfileModal = ({ open, onOpenChange, user, onSave }: EditProfi
                 />
               </div>
             </div>
-            <div className="space-y-2 mt-4">
+          {/*   <div className="space-y-2 mt-4">
               <Label htmlFor="emailId">Email</Label>
               <Input
                 id="emailId"
@@ -132,7 +132,7 @@ export const EditProfileModal = ({ open, onOpenChange, user, onSave }: EditProfi
                 value={formData.emailId}
                 onChange={(e) => handleChange('emailId', e.target.value)}
               />
-            </div>
+            </div> */}
           </div>
 
           {/* Faculty-only sections */}
@@ -207,7 +207,7 @@ export const EditProfileModal = ({ open, onOpenChange, user, onSave }: EditProfi
               <Separator />
 
               {/* Socials & Availability Section */}
-              <div>
+              {/* <div>
                 <h3 className="text-sm font-semibold text-muted-foreground mb-3">Socials & Availability</h3>
                 <div className="space-y-2">
                   <Label htmlFor="officeHours">Office Hours</Label>
@@ -245,7 +245,7 @@ export const EditProfileModal = ({ open, onOpenChange, user, onSave }: EditProfi
                     placeholder="https://yourwebsite.com"
                   />
                 </div>
-              </div>
+              </div> */}
             </>
           )}
         </div>
