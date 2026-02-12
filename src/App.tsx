@@ -23,7 +23,7 @@ import FacultyDoubts from "@/pages/FacultyDoubts";
 import FacultyStudents from "@/pages/FacultyStudents";
 import Profile from "@/pages/Profile";
 import NotFound from "@/pages/NotFound";
-
+import TeacherProfile from "./pages/TeacherProfile";
 const queryClient = new QueryClient();
 
 const AppContent = () => {
@@ -88,10 +88,16 @@ return (
                   <FacultyStudents />
                 </ProtectedRoute>
               } />
+              <Route path="/teacher-profile" element={
+  <ProtectedRoute allowFaculty={true} allowStudent={false}>
+    <TeacherProfile />
+  </ProtectedRoute>
+} />
               <Route path="/profile" element={
                 <ProtectedRoute allowFaculty={true} allowStudent={true}>
                   <Profile />
                 </ProtectedRoute>
+
               } />
               <Route path="*" element={<NotFound />} />
             </Routes>

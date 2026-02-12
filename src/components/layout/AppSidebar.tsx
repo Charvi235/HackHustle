@@ -64,12 +64,17 @@ export function AppSidebar() {
   ];
 
   // Faculty navigation items - Dashboard, Student Doubts, Profile only
+  // const facultyItems = [
+  //   { title: 'Dashboard', url: '/faculty-dashboard', icon: LayoutDashboard },
+  //   { title: 'Student Doubts', url: '/faculty-doubts', icon: MessageSquare },
+  //   { title: 'Profile', url: '/profile', icon: User },
+  // ];
+  // Faculty navigation items - Dashboard, Student Doubts, Profile only
   const facultyItems = [
     { title: 'Dashboard', url: '/faculty-dashboard', icon: LayoutDashboard },
     { title: 'Student Doubts', url: '/faculty-doubts', icon: MessageSquare },
-    { title: 'Profile', url: '/profile', icon: User },
+    { title: 'Profile', url: '/teacher-profile', icon: User }, // ✅ Ab ye Teacher Profile kholega
   ];
-
   // Public navigation items (Home only - About/Contact handled specially)
   const publicItems = [
     { title: 'Home', url: '/', icon: Home },
