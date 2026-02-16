@@ -24,6 +24,7 @@ import FacultyStudents from "@/pages/FacultyStudents";
 import Profile from "@/pages/Profile";
 import NotFound from "@/pages/NotFound";
 import TeacherProfile from "./pages/TeacherProfile";
+import Doubts from "./pages/Doubts";
 const queryClient = new QueryClient();
 
 const AppContent = () => {
@@ -62,6 +63,15 @@ return (
                   <Battle />
                 </ProtectedRoute>
               } />
+              {/* Student Routes ke beech mein kahin bhi daal do */}
+<Route 
+  path="/doubts" 
+  element={
+    <ProtectedRoute>
+      <Doubts />
+    </ProtectedRoute>
+  } 
+/>
               <Route path="/question-detail" element={
                 <ProtectedRoute allowFaculty={false} allowStudent={true}>
                   <QuestionDetail />
