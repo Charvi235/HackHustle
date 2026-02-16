@@ -24,6 +24,7 @@ import {
   Home,
   ChevronDown,
   ChevronUp,
+  MessageCircle,
   User
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -61,15 +62,15 @@ export function AppSidebar() {
     { title: 'Mock Interview', url: '/interview', icon: Brain },
     { title: 'Quiz Battle', url: '/battle', icon: Trophy },
     { title: 'Profile', url: '/profile', icon: User },
+    { title: 'Doubts', url: '/doubts', icon: MessageCircle },
   ];
 
-  // Faculty navigation items - Dashboard, Student Doubts, Profile only
+  // Profile only
   const facultyItems = [
     { title: 'Dashboard', url: '/faculty-dashboard', icon: LayoutDashboard },
     { title: 'Student Doubts', url: '/faculty-doubts', icon: MessageSquare },
-    { title: 'Profile', url: '/profile', icon: User },
+    { title: 'Profile', url: '/teacher-profile', icon: User }, // ✅ Ab ye Teacher Profile kholega
   ];
-
   // Public navigation items (Home only - About/Contact handled specially)
   const publicItems = [
     { title: 'Home', url: '/', icon: Home },

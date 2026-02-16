@@ -3,9 +3,19 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Mic, Square, Video, VideoOff } from 'lucide-react';
 import { toast } from 'sonner';
+import { interviewService } from '@/services/interviewService';
 
+
+// interface AudioRecorderProps {
+//   onRecordingComplete: (audioBlob: Blob, videoBlob: Blob | null) => void;
+//   question: string;
+// }
 interface AudioRecorderProps {
-  onRecordingComplete: (audioBlob: Blob, videoBlob: Blob | null) => void;
+  onRecordingComplete: (
+    audioBlob: Blob,
+    videoBlob: Blob | null,
+    transcript: string
+  ) => void;
   question: string;
 }
 
@@ -96,8 +106,12 @@ export const AudioRecorder = ({ onRecordingComplete, question }: AudioRecorderPr
     const audioStream = new MediaStream(
       streamRef.current.getAudioTracks()
     );
+    // audioRecorderRef.current = new MediaRecorder(audioStream, {
+    //   mimeType: 'audio/ogg'
+    // });
+
     audioRecorderRef.current = new MediaRecorder(audioStream);
-    
+
     audioRecorderRef.current.ondataavailable = (event) => {
       if (event.data.size > 0) {
         audioChunksRef.current.push(event.data);
@@ -138,15 +152,108 @@ export const AudioRecorder = ({ onRecordingComplete, question }: AudioRecorderPr
       };
 
       if (audioRecorderRef.current && audioRecorderRef.current.state !== 'inactive') {
-        audioRecorderRef.current.onstop = () => {
-          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-          const videoBlob = videoEnabled && videoChunksRef.current.length > 0
-            ? new Blob(videoChunksRef.current, { type: 'video/webm' })
-            : null;
+        // audioRecorderRef.current.onstop = () => {
+        //   const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        //   const videoBlob = videoEnabled && videoChunksRef.current.length > 0
+        //     ? new Blob(videoChunksRef.current, { type: 'video/webm' })
+        //     : null;
           
-          onRecordingComplete(audioBlob, videoBlob);
-          checkAndResolve();
+        //   onRecordingComplete(audioBlob, videoBlob);
+        //   checkAndResolve();
+        // };
+        // audioRecorderRef.current.onstop = async () => {
+        //   const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/ogg' });
+        //   const videoBlob =
+        //     videoEnabled && videoChunksRef.current.length > 0
+        //       ? new Blob(videoChunksRef.current, { type: 'video/webm' })
+        //       : null;
+
+        //   // 🔴 TEMP: since STT wiring not done yet
+        //   const userAnswerText = "User answered via audio (STT pending)";
+
+        //   try {
+        //     await interviewService.evaluateAnswer(question, userAnswerText);
+        //   } catch (err) {
+        //     console.error("Evaluation failed", err);
+        //   }
+
+        //   onRecordingComplete(audioBlob, videoBlob);
+        // };
+        // audioRecorderRef.current.onstop = async () => {
+        //   const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        //   const videoBlob =
+        //     videoEnabled && videoChunksRef.current.length > 0
+        //       ? new Blob(videoChunksRef.current, { type: 'video/webm' })
+        //       : null;
+
+        //   try {
+        //     // 🎤 SPEECH → TEXT
+        //     const sttResponse = await interviewService.speechToText(audioBlob);
+        //     const userAnswerText = sttResponse.text || "";
+
+        //     console.log("STT Text:", userAnswerText);
+
+        //     // 🧠 Evaluate answer
+        //     await interviewService.evaluateAnswer(question, userAnswerText);
+        //   } catch (err) {
+        //     console.error("STT / Evaluation failed", err);
+        //   }
+
+        //   onRecordingComplete(audioBlob, videoBlob);
+        // };
+      //   audioRecorderRef.current.onstop = async () => {
+      //   const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/ogg' });
+      //   const videoBlob =
+      //     videoEnabled && videoChunksRef.current.length > 0
+      //       ? new Blob(videoChunksRef.current, { type: 'video/webm' })
+      //       : null;
+      //   const audioUrl = URL.createObjectURL(audioBlob);
+      //   const audio = new Audio(audioUrl);
+      //   audio.controls = true;
+      //   document.body.appendChild(audio);
+      //   audio.play();
+
+      //   console.log("🎤 Audio blob size:", audioBlob.size); // 🔍 DEBUG
+
+      //   try {
+      //     const sttResponse = await interviewService.speechToText(audioBlob);
+      //     const userAnswerText = sttResponse.text || "";
+
+      //     console.log("STT Text:", userAnswerText);
+
+      //    // await interviewService.evaluateAnswer(question, userAnswerText);
+      //   } catch (err) {
+      //     console.error("STT / Evaluation failed", err);
+      //   }
+      //   onRecordingComplete(audioBlob, videoBlob, userAnswerText);
+      //   //onRecordingComplete(audioBlob, videoBlob);
+      // };
+        audioRecorderRef.current.onstop = async () => {
+          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/ogg' });
+          const videoBlob =
+            videoEnabled && videoChunksRef.current.length > 0
+              ? new Blob(videoChunksRef.current, { type: 'video/webm' })
+              : null;
+
+          let userAnswerText = ""; // ✅ yahin define karo (outer scope)
+
+          try {
+            const sttResponse = await interviewService.speechToText(audioBlob);
+            //userAnswerText = sttResponse?.transcript || ""; // ✅ correct key
+            console.log("STT Response:", sttResponse); // 🔍 DEBUG
+            userAnswerText =
+            sttResponse?.transcript ||
+            sttResponse?.text ||
+            "";
+
+            console.log("STT Text:", userAnswerText);
+          } catch (err) {
+            console.error("STT failed", err);
+          }
+
+          onRecordingComplete(audioBlob, videoBlob, userAnswerText);
         };
+
         audioRecorderRef.current.stop();
       }
 

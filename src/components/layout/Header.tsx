@@ -26,18 +26,29 @@ export const Header = () => {
     navigate('/');
   };
 
-  const handleAboutClick = (e: React.MouseEvent) => {
-    e.preventDefault();
+ 
+  const handleAboutClick = () => {
+    
     if (location.pathname !== '/') {
       navigate('/');
+      
+     
       setTimeout(() => {
-        document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+      
+        const element = document.getElementById('about');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
       }, 100);
-    } else {
-      document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+    } 
+   
+    else {
+      const element = document.getElementById('about');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
-
   const getUserInitials = () => {
     if (!user) return 'U';
     return `${user.first_name?.[0] || ''}${user.last_name?.[0] || ''}`.toUpperCase();
@@ -47,17 +58,20 @@ export const Header = () => {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Left Side - Logo */}
+          
           <div className="flex items-center space-x-4">
+            {/* Sidebar Trigger waisa ka waisa hi rahega */}
             {isAuthenticated && <SidebarTrigger />}
-            <div className="flex items-center space-x-2 font-bold text-xl">
+            
+            {/* Logo Section ko Link bana diya */}
+            <Link to="/" className="flex items-center space-x-2 font-bold text-xl cursor-pointer hover:opacity-80 transition-opacity">
               <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
                 <Zap className="h-5 w-5 text-white" />
               </div>
               <span className="bg-gradient-primary bg-clip-text text-transparent">
                 HackHustle
               </span>
-            </div>
+            </Link>
           </div>
 
           {/* Center - About Us & Contact Us (always visible) */}
@@ -127,14 +141,32 @@ export const Header = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 bg-background border border-border">
-                  <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
+                  {/* <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
                     View Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/profile?edit=true')} className="cursor-pointer">
+                  </DropdownMenuItem> */}
+                  {/* ✅ View Profile Logic Updated */}
+<DropdownMenuItem 
+  onClick={() => navigate(isFaculty ? '/teacher-profile' : '/profile')} 
+  className="cursor-pointer"
+>
+  <User className="mr-2 h-4 w-4" />
+  View Profile
+</DropdownMenuItem>
+
+{/* ✅ Edit Profile Logic Updated */}
+<DropdownMenuItem 
+  // 👇 Maine yahan '?edit=true' add kar diya hai
+  onClick={() => navigate(isFaculty ? '/teacher-profile?edit=true' : '/profile?edit=true')} 
+  className="cursor-pointer"
+>
+  <Pencil className="mr-2 h-4 w-4" />
+  Edit Profile
+</DropdownMenuItem>
+                  {/* <DropdownMenuItem onClick={() => navigate('/profile?edit=true')} className="cursor-pointer">
                     <Pencil className="mr-2 h-4 w-4" />
                     Edit Profile
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive">
                     <LogOut className="mr-2 h-4 w-4" />

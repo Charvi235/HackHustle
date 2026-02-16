@@ -31,7 +31,7 @@ export const InterviewReport = ({ results, totalTime, onBack }: InterviewReportP
   const totalMarks = results.reduce((sum, r) => sum + r.marks, 0);
   const maxTotalMarks = results.reduce((sum, r) => sum + r.maxMarks, 0);
   const percentage = Math.round((totalMarks / maxTotalMarks) * 100);
-
+  console.log(results)
   const getGrade = (percentage: number) => {
     if (percentage >= 90) return { grade: 'A+', color: 'text-green-600' };
     if (percentage >= 80) return { grade: 'A', color: 'text-green-500' };

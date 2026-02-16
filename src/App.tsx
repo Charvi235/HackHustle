@@ -23,7 +23,8 @@ import FacultyDoubts from "@/pages/FacultyDoubts";
 import FacultyStudents from "@/pages/FacultyStudents";
 import Profile from "@/pages/Profile";
 import NotFound from "@/pages/NotFound";
-
+import TeacherProfile from "./pages/TeacherProfile";
+import Doubts from "./pages/Doubts";
 const queryClient = new QueryClient();
 
 const AppContent = () => {
@@ -62,6 +63,15 @@ return (
                   <Battle />
                 </ProtectedRoute>
               } />
+              {/* Student Routes ke beech mein kahin bhi daal do */}
+<Route 
+  path="/doubts" 
+  element={
+    <ProtectedRoute>
+      <Doubts />
+    </ProtectedRoute>
+  } 
+/>
               <Route path="/question-detail" element={
                 <ProtectedRoute allowFaculty={false} allowStudent={true}>
                   <QuestionDetail />
@@ -88,10 +98,16 @@ return (
                   <FacultyStudents />
                 </ProtectedRoute>
               } />
+              <Route path="/teacher-profile" element={
+  <ProtectedRoute allowFaculty={true} allowStudent={false}>
+    <TeacherProfile />
+  </ProtectedRoute>
+} />
               <Route path="/profile" element={
                 <ProtectedRoute allowFaculty={true} allowStudent={true}>
                   <Profile />
                 </ProtectedRoute>
+
               } />
               <Route path="*" element={<NotFound />} />
             </Routes>

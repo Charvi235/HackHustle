@@ -124,7 +124,7 @@ const FacultyDashboard = () => {
       </div>
 
       {/* Pending Doubts Section */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Pending Student Doubts</CardTitle>
           <CardDescription>
@@ -161,7 +161,7 @@ const FacultyDashboard = () => {
       </Card>
 
       {/* View Doubt Modal */}
-      <Dialog open={!!selectedDoubt} onOpenChange={() => setSelectedDoubt(null)}>
+      {/* <Dialog open={!!selectedDoubt} onOpenChange={() => setSelectedDoubt(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>{selectedDoubt?.title}</DialogTitle>
@@ -191,7 +191,46 @@ const FacultyDashboard = () => {
             </Button>
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog> */} 
+      <Card>
+        <CardHeader>
+          <CardTitle>Recently Solved Doubts</CardTitle>
+          <CardDescription>
+            History of doubts you have answered
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {/* Static Data for Solved Doubts */}
+            {[
+              { id: 1, title: "Normalization Forms", student: "Rahul K.", subject: "DBMS", time: "2h ago" },
+              { id: 2, title: "Binary Search Tree", student: "Priya S.", subject: "DSA", time: "5h ago" },
+              { id: 3, title: "useEffect Hook", student: "Amit B.", subject: "React", time: "1d ago" }
+            ].map((doubt) => (
+              <div key={doubt.id} className="flex items-center justify-between p-4 border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                
+                {/* Doubt Details */}
+                <div>
+                  <h4 className="font-semibold text-sm">{doubt.title}</h4>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                    <span>{doubt.student}</span>
+                    <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                    <span>{doubt.subject}</span>
+                    <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                    <span>{doubt.time}</span>
+                  </div>
+                </div>
+
+                {/* Solved Badge */}
+                <div className="px-2.5 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold border border-green-200">
+                  SOLVED
+                </div>
+
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
