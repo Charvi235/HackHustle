@@ -96,7 +96,8 @@ const Practice = () => {
         body: JSON.stringify({
           emailId: emailId,
           topicID: selectedTopic?.id || 1015,
-          subjectID: selectedSubject!.id,
+      //    subjectID: selectedSubject!.id,
+      subjectID: selectedSubject.id,
           assessmentScore 
         })
       });
@@ -234,7 +235,7 @@ const Practice = () => {
           onScoreCalculated={setAssessmentScore}
           isAssessment={true}
           subjectId={selectedSubject.id}
-          topicId={selectedTopic.id}
+          topicId={selectedTopic?.id || 1015}
         />
 
         <div className="bottom-0 right-100 p-4 flex justify-center">
