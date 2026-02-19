@@ -81,7 +81,7 @@ const Practice = () => {
   const [startQuiz, setStartQuiz] = useState(false);
   const [loading, setLoading] = useState(false);
   const [assessmentScore, setAssessmentScore] = useState(0);
-<<<<<<< HEAD
+
   const handleSubmitAssessment = async () => {
     
     setShowResult(true);
@@ -102,9 +102,11 @@ const Practice = () => {
       console.error('Data save nahi hua (Backend Error):', err);
     }
   };
-=======
+
   const [showResult, setShowResult] = useState(false);
->>>>>>> main
+
+
+
 
   const handleSelectSubject = (subject: SubjectConfig) => {
     setSelectedSubject(subject);
@@ -171,24 +173,24 @@ const Practice = () => {
     setStartQuiz(false);
   };
 
-  const handleSubmitAssessment = async () => {
-    try {
-      await fetch('http://localhost:8080/api/assessments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          emailId,
-          topicID: selectedTopic?.id || 1015,
-          subjectID: selectedSubject?.id || null,
-          assessmentScore
-        })
-      });
+  // const handleSubmitAssessment = async () => {
+  //   try {
+  //     await fetch('http://localhost:8080/api/assessments', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({
+  //         emailId,
+  //         topicID: selectedTopic?.id || 1015,
+  //         subjectID: selectedSubject?.id || null,
+  //         assessmentScore
+  //       })
+  //     });
 
-      setShowResult(true);
-    } catch (err) {
-      console.error('Assessment submission failed', err);
-    }
-  };
+  //     setShowResult(true);
+  //   } catch (err) {
+  //     console.error('Assessment submission failed', err);
+  //   }
+  // };
 
   /* ================= ASSESSMENT MODE ================= */
   if (startQuiz && selectedSubject) {
@@ -203,11 +205,11 @@ const Practice = () => {
           onScoreCalculated={setAssessmentScore}
           isAssessment={true}
           subjectId={selectedSubject.id}
-<<<<<<< HEAD
+
           topicId={selectedTopic?.id || 1015}
-=======
-          topicId={selectedTopic?.id || null}
->>>>>>> main
+
+
+   
         />
 
         <div className="p-4 flex justify-center">
