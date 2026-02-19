@@ -10,15 +10,14 @@ import {
   Play,
   ChevronRight,
   ChevronLeft,
-  Trophy, X
+  Trophy
 } from 'lucide-react';
 
 import PracticeQuiz from '../components/practice/PracticeQuiz';
 import { questionService, QuestionDto } from '@/services/questionsServices';
-import { assessmentService } from '@/services/assessmentService';
 
 const user = JSON.parse(localStorage.getItem('user') || '{}');
-const emailId: string = user.emailId;
+const emailId: string = user?.emailId || '';
 
 interface TopicConfig {
   id: number;
@@ -77,15 +76,12 @@ const splitIntoSets = (questions: QuestionDto[], size = 10) => {
 const Practice = () => {
   const [selectedSubject, setSelectedSubject] = useState<SubjectConfig | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<TopicConfig | null>(null);
-
   const [questionSets, setQuestionSets] = useState<QuestionDto[][]>([]);
   const [selectedSet, setSelectedSet] = useState(0);
   const [startQuiz, setStartQuiz] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showResult, setShowResult] = useState(false);
-  
-  //const [score, setScore] = useState(0);
   const [assessmentScore, setAssessmentScore] = useState(0);
+<<<<<<< HEAD
   const handleSubmitAssessment = async () => {
     
     setShowResult(true);
@@ -106,6 +102,9 @@ const Practice = () => {
       console.error('Data save nahi hua (Backend Error):', err);
     }
   };
+=======
+  const [showResult, setShowResult] = useState(false);
+>>>>>>> main
 
   const handleSelectSubject = (subject: SubjectConfig) => {
     setSelectedSubject(subject);
@@ -114,12 +113,9 @@ const Practice = () => {
     setStartQuiz(false);
   };
 
-  
-
   const handleSelectTopic = async (topic: TopicConfig) => {
     setSelectedTopic(topic);
     setLoading(true);
-
     try {
       const data = await questionService.getQuestionsByTopic(topic.name);
       setQuestionSets(splitIntoSets(data, 10));
@@ -134,13 +130,9 @@ const Practice = () => {
 
   const handleTopicAssessment = async () => {
     if (!selectedTopic) return;
-
     setLoading(true);
     try {
-      const data = await questionService.getTopicAssessmentQuestions(
-        selectedTopic.name
-      );
-
+      const data = await questionService.getTopicAssessmentQuestions(selectedTopic.name);
       setQuestionSets([data]);
       setSelectedSet(0);
       setStartQuiz(true);
@@ -153,12 +145,9 @@ const Practice = () => {
 
   const handleSubjectAssessment = async () => {
     if (!selectedSubject) return;
-
     setLoading(true);
     try {
-      const data = await questionService.getQuestionsBySubject(
-        selectedSubject.id
-      );
+      const data = await questionService.getQuestionsBySubject(selectedSubject.id);
       setQuestionSets([data]);
       setSelectedSet(0);
       setStartQuiz(true);
@@ -182,125 +171,89 @@ const Practice = () => {
     setStartQuiz(false);
   };
 
+  const handleSubmitAssessment = async () => {
+    try {
+      await fetch('http://localhost:8080/api/assessments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          emailId,
+          topicID: selectedTopic?.id || 1015,
+          subjectID: selectedSubject?.id || null,
+          assessmentScore
+        })
+      });
 
-  // const handleSubmitAssessment = async () => {
-  //   console.log("Email ID:", emailId);
-  //   try {
-  //     await fetch('http://localhost:8080/api/assessments', {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({
-  //         emailId: emailId,
-  //         topicID: selectedTopic?.id || 1015,
-  //         subjectID: selectedSubject!.id,
-  //         assessmentScore
-  //       })
-  //     });
-  //     alert('Assessment submitted successfully!');
-  //   } catch (err) {
-  //     console.error('Assessment submission failed', err);
-  //   }
-  // };
-  // const handleSubmitAssessment = async () => {
-  //   console.log("Email ID:", emailId);
-  //   try {
-  //     console.log("Submitting assessment...");
-  //     await fetch('http://localhost:8080/api/assessments', {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({
-  //         emailId: emailId,
-  //         topicID: selectedTopic?.id || 1015,
-  //         subjectID: selectedSubject!.id,
-  //         assessmentScore // Ye score hum popup me dikhayenge
-  //       })
-  //     });
-  //     setShowResult(true); 
-
-  //   } catch (err) {
-  //     console.error('Assessment submission failed', err);
-  //   }
-  // };
-
+      setShowResult(true);
+    } catch (err) {
+      console.error('Assessment submission failed', err);
+    }
+  };
 
   /* ================= ASSESSMENT MODE ================= */
   if (startQuiz && selectedSubject) {
     return (
       <div className="min-h-screen bg-background pt-20 pb-24">
         <PracticeQuiz
-          questions={questionSets[selectedSet]}
+          questions={questionSets[selectedSet] || []}
           subjectName={selectedSubject.name}
+          topicName={selectedTopic?.name}
           onBack={() => setStartQuiz(false)}
           totalQuestionsInTopic={questionSets.flat().length}
           onScoreCalculated={setAssessmentScore}
           isAssessment={true}
           subjectId={selectedSubject.id}
+<<<<<<< HEAD
           topicId={selectedTopic?.id || 1015}
+=======
+          topicId={selectedTopic?.id || null}
+>>>>>>> main
         />
 
-        <div className="bottom-0 right-100 p-4 flex justify-center">
-          <Button className="ml-4 w-[240px]" onClick={handleSubmitAssessment}>
+        <div className="p-4 flex justify-center">
+          <Button className="w-[240px]" onClick={handleSubmitAssessment}>
             Submit Assessment
           </Button>
         </div>
-        {/* --- RESULT POPUP START --- */}
-      <Dialog open={showResult} onOpenChange={setShowResult}>
-        <DialogContent className="bg-[#1a1a2e] border border-gray-800 text-white sm:max-w-md p-0 overflow-hidden outline-none">
-          
-          {/* Close Button (Cross) */}
-          {/* <div className="absolute right-4 top-4 z-50">
-            <button 
-              onClick={() => setShowResult(false)}
-              className="p-1 rounded-full hover:bg-white/10 transition-colors"
-            >
-              <X className="h-5 w-5 text-gray-400" />
-            </button>
-          </div> */}
 
-          {/* Popup Content */}
-          <div className="flex flex-col items-center justify-center p-8 space-y-6">
-            
-            {/* Animated Trophy */}
-            <div className="relative">
-              <div className="absolute inset-0 bg-red-600 blur-2xl opacity-20 rounded-full"></div>
-              <div className="relative bg-[#2a2a3e] p-5 rounded-full border border-gray-700 shadow-xl">
-                <Trophy className="h-10 w-10 text-red-500" />
+        <Dialog open={showResult} onOpenChange={setShowResult}>
+          <DialogContent className="bg-[#1a1a2e] border border-gray-800 text-white sm:max-w-md p-0 overflow-hidden">
+            <div className="flex flex-col items-center justify-center p-8 space-y-6">
+              <div className="relative">
+                <div className="absolute inset-0 bg-red-600 blur-2xl opacity-20 rounded-full"></div>
+                <div className="relative bg-[#2a2a3e] p-5 rounded-full border border-gray-700 shadow-xl">
+                  <Trophy className="h-10 w-10 text-red-500" />
+                </div>
               </div>
-            </div>
 
-            {/* Title Text */}
-            <div className="text-center space-y-1">
-              <h2 className="text-2xl font-bold tracking-tight text-white">
-                Assessment Submitted!
-              </h2>
-              <p className="text-gray-400 text-sm">
-                Here is your final score
-              </p>
-            </div>
-
-            {/* Score Display Box */}
-            <div className="bg-[#0f0f1a] w-full py-6 rounded-xl border border-gray-800 flex flex-col items-center shadow-inner">
-              <span className="text-gray-500 text-xs uppercase tracking-wider font-bold mb-2">Total Score</span>
-              <div className="flex items-baseline gap-2">
-                {/* Ye wahi variable hai jo aap backend bhej rahe ho */}
-                <span className="text-5xl font-extrabold text-red-500">{assessmentScore}</span>
-                <span className="text-xl text-gray-600 font-medium">Points</span>
+              <div className="text-center">
+                <h2 className="text-2xl font-bold">Assessment Submitted!</h2>
+                <p className="text-gray-400 text-sm">
+                  Here is your final score
+                </p>
               </div>
+
+              <div className="bg-[#0f0f1a] w-full py-6 rounded-xl border border-gray-800 flex flex-col items-center">
+                <span className="text-gray-500 text-xs uppercase font-bold mb-2">
+                  Total Score
+                </span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-5xl font-extrabold text-red-500">
+                    {assessmentScore}
+                  </span>
+                  <span className="text-xl text-gray-600">Points</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowResult(false)}
+                className="w-full py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold"
+              >
+                Close Result
+              </button>
             </div>
-
-            {/* Close Button */}
-            <button 
-              onClick={() => setShowResult(false)}
-              className="w-full py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition-colors shadow-lg shadow-red-600/20"
-            >
-              Close Result
-            </button>
-
-          </div>
-        </DialogContent>
-      </Dialog>
-      {/* --- RESULT POPUP END --- */}
-
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
@@ -316,7 +269,9 @@ const Practice = () => {
           </Button>
 
           <Badge variant="secondary">{selectedSubject.name}</Badge>
-          <h1 className="text-3xl font-bold mt-2 mb-6">{selectedTopic.name}</h1>
+          <h1 className="text-3xl font-bold mt-2 mb-6">
+            {selectedTopic.name}
+          </h1>
 
           {!loading && questionSets.length > 0 && (
             <>
@@ -338,9 +293,8 @@ const Practice = () => {
                 </Button>
               </div>
 
-              {/* ✅ REQUIRED FIX HERE */}
               <PracticeQuiz
-                questions={questionSets[selectedSet]}
+                questions={questionSets[selectedSet] || []}
                 topicName={selectedTopic.name}
                 subjectName={selectedSubject.name}
                 onBack={handleBackToTopics}
@@ -365,7 +319,9 @@ const Practice = () => {
             <ChevronLeft className="w-4 h-4 mr-2" /> Back to Subjects
           </Button>
 
-          <h1 className="text-4xl font-bold mb-6">{selectedSubject.name}</h1>
+          <h1 className="text-4xl font-bold mb-6">
+            {selectedSubject.name}
+          </h1>
 
           <div className="space-y-4">
             {selectedSubject.topics.map(topic => (
@@ -402,7 +358,9 @@ const Practice = () => {
           <Badge variant="secondary" className="mb-4">
             <BookOpen className="w-4 h-4 mr-2" /> Practice Mode
           </Badge>
-          <h1 className="text-4xl font-bold">Choose Your Subject</h1>
+          <h1 className="text-4xl font-bold">
+            Choose Your Subject
+          </h1>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -416,7 +374,9 @@ const Practice = () => {
                     <Code className="text-white" />
                   )}
                 </div>
-                <h3 className="text-xl font-semibold">{subject.name}</h3>
+                <h3 className="text-xl font-semibold">
+                  {subject.name}
+                </h3>
               </div>
 
               <Button
@@ -429,63 +389,6 @@ const Practice = () => {
           ))}
         </div>
       </div>
-      {/* --- RESULT POPUP START --- */}
-      <Dialog open={showResult} onOpenChange={setShowResult}>
-        <DialogContent className="bg-[#1a1a2e] border border-gray-800 text-white sm:max-w-md p-0 overflow-hidden outline-none">
-          
-          {/* Close Button (Cross)
-          <div className="absolute right-4 top-4 z-50">
-            <button 
-              onClick={() => setShowResult(false)}
-              className="p-1 rounded-full hover:bg-white/10 transition-colors"
-            >
-              <X className="h-5 w-5 text-gray-400" />
-            </button>
-          </div> */}
-
-          {/* Popup Content */}
-          <div className="flex flex-col items-center justify-center p-8 space-y-6">
-            
-            {/* Animated Trophy */}
-            <div className="relative">
-              <div className="absolute inset-0 bg-red-600 blur-2xl opacity-20 rounded-full"></div>
-              <div className="relative bg-[#2a2a3e] p-5 rounded-full border border-gray-700 shadow-xl">
-                <Trophy className="h-10 w-10 text-red-500" />
-              </div>
-            </div>
-
-            {/* Title Text */}
-            <div className="text-center space-y-1">
-              <h2 className="text-2xl font-bold tracking-tight text-white">
-                Assessment Submitted!
-              </h2>
-              <p className="text-gray-400 text-sm">
-                Here is your final score
-              </p>
-            </div>
-
-            {/* Score Display Box */}
-            <div className="bg-[#0f0f1a] w-full py-6 rounded-xl border border-gray-800 flex flex-col items-center shadow-inner">
-              <span className="text-gray-500 text-xs uppercase tracking-wider font-bold mb-2">Total Score</span>
-              <div className="flex items-baseline gap-2">
-                {/* Ye wahi variable hai jo aap backend bhej rahe ho */}
-                <span className="text-5xl font-extrabold text-red-500">{assessmentScore}</span>
-                <span className="text-xl text-gray-600 font-medium">Points</span>
-              </div>
-            </div>
-
-            {/* Close Button */}
-            <button 
-              onClick={() => setShowResult(false)}
-              className="w-full py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition-colors shadow-lg shadow-red-600/20"
-            >
-              Close Result
-            </button>
-
-          </div>
-        </DialogContent>
-      </Dialog>
-      {/* --- RESULT POPUP END --- */}   
     </div>
   );
 };
