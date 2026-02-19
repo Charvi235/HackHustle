@@ -552,13 +552,24 @@ const Profile = () => {
           </CardHeader>
           <CardContent className="space-y-3">
             {isFaculty ? (
-              <Button
-                variant="outline"
+              // <Button
+              //   variant="outline"
+              //   className="w-full justify-start"
+              //   onClick={() => navigate("/faculty-doubts")}
+              // >
+              //   <MessageSquare className="mr-2 h-4 w-4" />
+              //   View Doubts
+              // </Button>
+              /* src/pages/Profile.tsx mein Quick Actions card ke andar */
+
+              <Button 
+                variant="outline" 
                 className="w-full justify-start"
-                onClick={() => navigate("/faculty-doubts")}
+                // 👇 Bas ye line change karni hai: '/practice' hata ke '/doubts' likh do
+                onClick={() => navigate("/doubts")} 
               >
-                <MessageSquare className="mr-2 h-4 w-4" />
-                View Doubts
+                <BookOpen className="mr-2 h-4 w-4" />
+                My Doubts
               </Button>
             ) : (
               <Button

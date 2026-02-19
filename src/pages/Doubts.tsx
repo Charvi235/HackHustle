@@ -4,7 +4,8 @@ import {
   CheckCircle, 
   Clock, 
   Plus, 
-  Search, 
+  Star,
+ // Search, 
   MoreVertical 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -28,12 +29,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 const Doubts = () => {
   const { toast } = useToast();
   const [isAskOpen, setIsAskOpen] = useState(false);
-  
+  const [viewDoubt, setViewDoubt] = useState(null); // Kaunsa doubt khula h
+  const [rating, setRating] = useState(0); // Rating ke liye
   
   // 👇 Ye 3 lines add karo
   const [selectedSubject, setSelectedSubject] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("");
-  const [description, setDescription] = useState(""); // title hata kar ye use karenge
+  const [description, setDescription] = useState("");
+  
+  
+  // title hata kar ye use karenge
     // ✅ DATA: Yahan apne Subjects aur Topics add kar lena
 const subjectsData: Record<string, string[]> = {
   "Data Structures & Algo": ["Arrays & Strings", "Linked List", "Trees & Graphs", "Dynamic Programming", "Recursion"],
@@ -43,13 +48,40 @@ const subjectsData: Record<string, string[]> = {
   "General / Other": ["Interview Queries", "Resume Review", "Career Guidance"]
 };
 
-  // Fake Data (Backend connect hone tak)
+  
   const [doubts, setDoubts] = useState([
-    { id: 1, title: "Graph DP Problem stuck", status: "Resolved", date: "2 hours ago", desc: "I am trying to solve the Dijkstra algorithm but getting TLE." },
-    { id: 2, title: "React useEffect loop", status: "Pending", date: "5 hours ago", desc: "My useEffect is running infinite times, how to fix dependency array?" },
-    { id: 3, title: "Spring Boot CORS Error", status: "Pending", date: "1 day ago", desc: "Getting 403 Forbidden even after adding @CrossOrigin annotation." },
+    { 
+      id: 1, 
+      title: "Graph DP Problem stuck", 
+      subject: "Data Structures & Algo", 
+      topic: "Dynamic Programming", 
+      status: "Resolved", 
+      date: "2 hours ago", 
+      desc: "I am trying to solve the Dijkstra algorithm but getting TLE.",
+      // 👇 Ye nayi line add karni thi
+      solution: "You need to use a Priority Queue (Min-Heap) instead of a normal Queue to get O(E log V) complexity." 
+    },
+    { 
+      id: 2, 
+      title: "React useEffect loop", 
+      subject: "Web Development", 
+      topic: "React.js", 
+      status: "Pending", 
+      date: "5 hours ago", 
+      desc: "My useEffect is running infinite times, how to fix dependency array?",
+      solution: null // Pending doubts ke liye null rakho
+    },
+    { 
+      id: 3, 
+      title: "Spring Boot CORS Error", 
+      subject: "Web Development", 
+      topic: "API Integration", 
+      status: "Pending", 
+      date: "1 day ago", 
+      desc: "Getting 403 Forbidden even after adding @CrossOrigin annotation.",
+      solution: null
+    },
   ]);
-
   const [newDoubt, setNewDoubt] = useState({ title: '', description: '' });
 
   // Stats Calculation
@@ -85,14 +117,18 @@ const handleAskSubmit = () => {
        return;
     }
 
+   
     const newEntry = {
       id: doubts.length + 1,
-      title: `${selectedSubject} - ${selectedTopic}`, // Title auto-create hoga
+      title: `${selectedSubject} - ${selectedTopic}`,
+      subject: selectedSubject,   
+      topic: selectedTopic,       
       status: "Pending",
       date: "Just now",
-      desc: description
+      desc: description,
+      solution: null             
     };
-    
+
     setDoubts([newEntry, ...doubts]);
     setIsAskOpen(false);
     
@@ -187,56 +223,9 @@ const handleAskSubmit = () => {
                 </div>
 
               </div>
-              {/* <div className="grid gap-4 py-4">
+              
+
                 
-                
-                <div className="grid gap-2">
-                  <Label htmlFor="subject">Select Subject</Label>
-                  <select 
-                    id="subject"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    value={selectedSubject}
-                    onChange={handleSubjectChange}
-                  >
-                    <option value="" disabled>-- Choose Subject --</option>
-                    {Object.keys(subjectsData).map((subject) => (
-                      <option key={subject} value={subject}>{subject}</option>
-                    ))}
-                  </select>
-                </div> */}
-
-                {/* 2. Topic Dropdown (Dynamic) */}
-                {/* <div className="grid gap-2">
-                  <Label htmlFor="topic">Select Topic</Label>
-                  <select 
-                    id="topic"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    value={selectedTopic}
-                    onChange={(e) => setSelectedTopic(e.target.value)}
-                    disabled={!selectedSubject} // Disable agar subject select nahi kiya
-                  >
-                    <option value="" disabled>
-                      {selectedSubject ? "-- Choose Topic --" : "-- Select Subject First --"}
-                    </option>
-                    {selectedSubject && subjectsData[selectedSubject].map((topic) => (
-                      <option key={topic} value={topic}>{topic}</option>
-                    ))}
-                  </select>
-                </div> */}
-
-                {/* 3. Description Box */}
-                {/* <div className="grid gap-2">
-                  <Label htmlFor="desc">Doubt Description</Label>
-                  <Textarea 
-                    id="desc" 
-                    placeholder="Explain your doubt here..." 
-                    rows={5}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
-                </div>
-
-              </div>  */}
 
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsAskOpen(false)}>Cancel</Button>
@@ -296,55 +285,144 @@ const handleAskSubmit = () => {
             <TabsTrigger value="resolved">Resolved</TabsTrigger>
           </TabsList>
           
-          <div className="relative w-64 hidden md:block">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          {/* <div className="relative w-64 hidden md:block">
+           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Search doubts..." className="pl-8" />
-          </div>
-        </div>
+          </div> */}
+        </div>  
 
-        <TabsContent value="all" className="space-y-4">
+        {/* <TabsContent value="all" className="space-y-4">
           {doubts.map((doubt) => (
             <DoubtCard key={doubt.id} data={doubt} />
           ))}
+        </TabsContent> */}
+        <TabsContent value="all" className="space-y-4">
+          {doubts.map((doubt) => (
+            // 👇 Yahan onClick add kiya hai
+            <DoubtCard key={doubt.id} data={doubt} onClick={() => setViewDoubt(doubt)} />
+          ))}
         </TabsContent>
         
-        <TabsContent value="pending" className="space-y-4">
+        {/* <TabsContent value="pending" className="space-y-4">
           {doubts.filter(d => d.status === "Pending").map((doubt) => (
             <DoubtCard key={doubt.id} data={doubt} />
           ))}
+        </TabsContent> */}
+        <TabsContent value="pending" className="space-y-4">
+          {doubts.filter(d => d.status === "Pending").map((doubt) => (
+            // 👇 Yahan onClick add kiya hai
+            <DoubtCard key={doubt.id} data={doubt} onClick={() => setViewDoubt(doubt)} />
+          ))}
         </TabsContent>
 
-        <TabsContent value="resolved" className="space-y-4">
+        {/* <TabsContent value="resolved" className="space-y-4">
           {doubts.filter(d => d.status === "Resolved").map((doubt) => (
             <DoubtCard key={doubt.id} data={doubt} />
           ))}
+        </TabsContent> */}
+        <TabsContent value="resolved" className="space-y-4">
+          {doubts.filter(d => d.status === "Resolved").map((doubt) => (
+            // 👇 Yahan onClick add kiya hai
+            <DoubtCard key={doubt.id} data={doubt} onClick={() => setViewDoubt(doubt)} />
+          ))}
         </TabsContent>
       </Tabs>
+      {/* ✨ VIEW DOUBT & RATING MODAL (Isse return ke </div> se pehle paste karna) */}
+      <Dialog open={!!viewDoubt} onOpenChange={(open) => { if(!open) setViewDoubt(null); setRating(0); }}>
+        <DialogContent className="sm:max-w-[600px]">
+          {viewDoubt && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-xl flex justify-between items-center">
+                    {viewDoubt.title}
+                    <Badge className={viewDoubt.status === "Resolved" ? "bg-green-600" : "bg-orange-500"}>
+                        {viewDoubt.status}
+                    </Badge>
+                </DialogTitle>
+              </DialogHeader>
+
+              <div className="space-y-4 py-2">
+                {/* Question */}
+                <div className="p-3 bg-muted/30 rounded-md text-sm">
+                    <strong>Question:</strong> <br/> {viewDoubt.desc}
+                </div>
+
+                {/* Solution */}
+                <div>
+                    <h4 className="font-semibold text-sm flex items-center gap-2 mb-2">
+                        <CheckCircle className="h-4 w-4 text-green-600" /> Faculty Solution
+                    </h4>
+                    {viewDoubt.solution ? (
+                        <div className="p-4 bg-green-50 border border-green-100 rounded-md text-sm text-green-900">
+                            {viewDoubt.solution}
+                        </div>
+                    ) : (
+                        <div className="text-sm text-orange-600 italic">Waiting for solution...</div>
+                    )}
+                </div>
+
+                {/* ✨ RATING STARS */}
+                {viewDoubt.solution && (
+                    <div className="pt-2 text-center">
+                        <p className="text-sm font-semibold mb-2">Rate this Solution</p>
+                        <div className="flex justify-center gap-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <Star 
+                                    key={star}
+                                    className={`h-8 w-8 cursor-pointer transition-colors ${rating >= star ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                                    onClick={() => setRating(star)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
+              </div>
+
+              <DialogFooter>
+                 {/* Rating Submit Button */}
+                 {viewDoubt.solution && (
+                    <Button onClick={() => {
+                        toast({ title: "Rated!", description: `You gave ${rating} stars.` });
+                        setViewDoubt(null);
+                        setRating(0);
+                    }}>
+                        Submit Rating
+                    </Button>
+                 )}
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
+    
   );
 };
 
+
+
 // Helper Component for List Item
-const DoubtCard = ({ data }: { data: any }) => (
-  <Card className="hover:shadow-md transition-shadow cursor-pointer">
-    <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-      <div className="space-y-1 flex-1">
-        <div className="flex items-center gap-2">
+const DoubtCard = ({ data, onClick }: { data: any, onClick: () => void }) => (
+  
+  <div onClick={onClick}>
+    <Card className="hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-primary">
+      <CardContent className="p-4 flex flex-col md:flex-row gap-4 justify-between">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-xs">{data.subject}</Badge>
+              <Badge variant="secondary" className="text-xs">{data.topic}</Badge>
+          </div>
           <h4 className="font-semibold text-lg">{data.title}</h4>
-          <Badge variant={data.status === "Resolved" ? "default" : "secondary"} className={data.status === "Resolved" ? "bg-green-600" : "bg-orange-500 text-white"}>
-            {data.status}
-          </Badge>
+          <p className="text-muted-foreground text-sm line-clamp-1">{data.desc || "No description provided."}</p>
         </div>
-        <p className="text-muted-foreground text-sm line-clamp-1">{data.desc}</p>
-      </div>
-      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-        <span>{data.date}</span>
-        <Button variant="ghost" size="icon">
-          <MoreVertical className="h-4 w-4" />
-        </Button>
-      </div>
-    </CardContent>
-  </Card>
+        <div className="flex items-center gap-4 text-sm">
+          <Badge className={data.status === "Resolved" ? "bg-green-600" : "bg-orange-500"}>{data.status}</Badge>
+          <span className="text-muted-foreground">{data.date}</span>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
 );
+
 
 export default Doubts;
