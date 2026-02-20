@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import {
   BookOpen,
   Code,
@@ -82,6 +82,32 @@ const Practice = () => {
   const [loading, setLoading] = useState(false);
   const [assessmentScore, setAssessmentScore] = useState(0);
 
+
+  const handleSubmitAssessment = async () => {
+    
+    setShowResult(true);
+    try {
+      await fetch('http://localhost:8080/api/assessments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          emailId: emailId,
+          topicID: selectedTopic?.id || 1015,
+      //    subjectID: selectedSubject!.id,
+      subjectID: selectedSubject.id,
+          assessmentScore 
+        })
+      });
+      console.log("Data saved successfully");
+    } catch (err) {
+      console.error('Data save nahi hua (Backend Error):', err);
+    }
+  };
+
+  const [showResult, setShowResult] = useState(false);
+
+
+
   // const handleSubmitAssessment = async () => {
     
   //   setShowResult(true);
@@ -103,7 +129,8 @@ const Practice = () => {
   //   }
   // };
 
-  const [showResult, setShowResult] = useState(false);
+  //const [showResult, setShowResult] = useState(false);
+
 
 
   const handleSelectSubject = (subject: SubjectConfig) => {
@@ -171,24 +198,24 @@ const Practice = () => {
     setStartQuiz(false);
   };
 
-  const handleSubmitAssessment = async () => {
-    try {
-      await fetch('http://localhost:8080/api/assessments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          emailId,
-          topicID: selectedTopic?.id || 1015,
-          subjectID: selectedSubject?.id || null,
-          assessmentScore
-        })
-      });
+  // const handleSubmitAssessment = async () => {
+  //   try {
+  //     await fetch('http://localhost:8080/api/assessments', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({
+  //         emailId,
+  //         topicID: selectedTopic?.id || 1015,
+  //         subjectID: selectedSubject?.id || null,
+  //         assessmentScore
+  //       })
+  //     });
 
-      setShowResult(true);
-    } catch (err) {
-      console.error('Assessment submission failed', err);
-    }
-  };
+  //     setShowResult(true);
+  //   } catch (err) {
+  //     console.error('Assessment submission failed', err);
+  //   }
+  // };
 
   /* ================= ASSESSMENT MODE ================= */
   if (startQuiz && selectedSubject) {
@@ -206,7 +233,9 @@ const Practice = () => {
 
           topicId={selectedTopic?.id || 1015}
 
-         // topicId={selectedTopic?.id || null}
+
+   
+
         />
 
         <div className="p-4 flex justify-center">
