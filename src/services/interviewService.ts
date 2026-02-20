@@ -1,5 +1,6 @@
 
-const API_BASE = "http://localhost:8000";
+//const API_BASE = "http://localhost:8000";
+const API_BASE = "http://127.0.0.1:8000";
 
 export const interviewService = {
   setupInterview: async (data: {

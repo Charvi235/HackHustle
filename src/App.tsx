@@ -99,10 +99,10 @@ return (
                 </ProtectedRoute>
               } />
               <Route path="/teacher-profile" element={
-  <ProtectedRoute allowFaculty={true} allowStudent={false}>
-    <TeacherProfile />
-  </ProtectedRoute>
-} />
+                <ProtectedRoute allowFaculty={true} allowStudent={false}>
+                  <TeacherProfile />
+                </ProtectedRoute>
+              } />
               <Route path="/profile" element={
                 <ProtectedRoute allowFaculty={true} allowStudent={true}>
                   <Profile />
@@ -113,7 +113,7 @@ return (
             </Routes>
           </main>
           {/* Render footer only if user is logged in and not on public page */}
-          {isAuthenticated && !isPublicPage && <Footer />}
+          {!isPublicPage && <Footer />}
         </div>
       </div>
     </SidebarProvider>
