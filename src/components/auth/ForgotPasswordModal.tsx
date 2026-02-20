@@ -1,111 +1,4 @@
-// import React, { useState } from 'react';
-// import { X, Mail, ArrowRight, Loader2 } from 'lucide-react'; 
 
-// interface ForgotPasswordModalProps {
-//   isOpen: boolean;
-//   onClose: () => void;
-// }
-
-// const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ isOpen, onClose }) => {
-//   const [email, setEmail] = useState("");
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [isSent, setIsSent] = useState(false);
-
-//   const handleSubmit = (e: React.FormEvent) => {
-//     e.preventDefault(); // Page refresh hone se rokega
-//     if (!email) return;
-
-//     setIsLoading(true);
-
-//     // Fake API Call (Baad me yahan backend connect karenge)
-//     setTimeout(() => {
-//       setIsLoading(false);
-//       setIsSent(true);
-//       // 2 second baad modal band ho jayega
-//       setTimeout(() => {
-//         onClose();
-//         setIsSent(false);
-//         setEmail("");
-//       }, 2000);
-//     }, 1500);
-//   };
-
-//   if (!isOpen) return null;
-
-//   return (
-//     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      
-//       {/* Modal Box */}
-//       <div className="relative w-full max-w-md bg-[#1a1a2e] border border-gray-700 rounded-2xl shadow-2xl p-8 transform transition-all scale-100">
-        
-//         {/* Close Button */}
-//         <button 
-//           onClick={onClose}
-//           className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
-//         >
-//           <X size={24} />
-//         </button>
-
-//         {/* Content */}
-//         <div className="text-center mb-6">
-//           <div className="mx-auto w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-4">
-//             {isSent ? (
-//               <div className="text-green-500 font-bold text-2xl">✓</div>
-//             ) : (
-//               <Mail className="w-8 h-8 text-red-500" />
-//             )}
-//           </div>
-          
-//           <h2 className="text-2xl font-bold text-white mb-2">
-//             {isSent ? "Email Sent!" : "Reset Password"}
-//           </h2>
-          
-//           <p className="text-gray-400 text-sm">
-//             {isSent 
-//               ? `We have sent a reset link to ${email}`
-//               : "Enter your email address and we'll send you a link to reset your password."}
-//           </p>
-//         </div>
-
-//         {/* Form */}
-//         {!isSent && (
-//           <form onSubmit={handleSubmit} className="space-y-4">
-//             <div>
-//               <input 
-//                 type="email" 
-//                 value={email}
-//                 onChange={(e) => setEmail(e.target.value)}
-//                 placeholder="name@company.com"
-//                 className="w-full bg-[#0f0f1a] border border-gray-700 text-white rounded-lg p-3 outline-none focus:ring-2 focus:ring-red-500 transition-all placeholder:text-gray-600"
-//                 autoFocus
-//               />
-//             </div>
-
-//             <button 
-//               type="submit"
-//               disabled={isLoading || !email}
-//               className="w-full bg-gradient-to-r from-red-600 to-red-800 text-white font-bold py-3 rounded-lg hover:from-red-500 hover:to-red-700 transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-//             >
-//               {isLoading ? (
-//                 <>
-//                   <Loader2 className="w-5 h-5 animate-spin" />
-//                   Sending...
-//                 </>
-//               ) : (
-//                 <>
-//                   Send Reset Link
-//                   <ArrowRight size={18} />
-//                 </>
-//               )}
-//             </button>
-//           </form>
-//         )}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ForgotPasswordModal;
 import React, { useState } from 'react';
 import { X, Mail, ArrowRight, Loader2, KeyRound, CheckCircle } from 'lucide-react'; 
 
@@ -122,86 +15,107 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ isOpen, onClo
   const [isOtpVerified, setIsOtpVerified] = useState(false); // OTP verify hua ya nahi track karne ke liye
   const [newPassword, setNewPassword] = useState("");        // Naya password store karne ke liye
 
-  // Step 1: Email se OTP bhejo
-  const handleSendOtp = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
 
-    setIsLoading(true);
-    // Fake Backend Call
-    setTimeout(() => {
-      setIsLoading(false);
-      setStep(2); // <-- Yahan hum Step 2 (OTP Page) par ja rahe hain
-      alert(`OTP sent to ${email}`); // Testing ke liye
-    }, 1500);
-  };
 
-  // Step 2: OTP Verify karo
-  // const handleVerifyOtp = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   if (!otp) return;
+  const handleSendOtp = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!email) return;
 
-  //   setIsLoading(true);
-  //   // Fake Verification
-  //   setTimeout(() => {
-  //     setIsLoading(false);
-  //     alert("OTP Verified! Password Reset Successful.");
-  //     onClose(); // Modal band kar do
-  //     setStep(1); // Wapis reset kar do next time ke liye
-  //     setEmail("");
-  //     setOtp("");
-  //   }, 1500);
-  // };
-  // Step 2: OTP Verify Logic
-  const handleVerifyOtp = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!otp) return;
+  setIsLoading(true);
 
-    setIsLoading(true);
+  try {
+    const response = await fetch("http://localhost:8080/auth/send-otp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    });
 
-    // Fake Verification for now
-    setTimeout(() => {
-      setIsLoading(false);
-      // alert("OTP Verified!"); // Alert hata sakte ho agar chaho
-      
-      // onClose();  <--- IS LINE KO HATA DO OR COMMENT KAR DO
-      setStep(3); // <--- YE NAYI LINE ADD KARO (Step 3 = Password Reset Screen)
-    }, 1000);
-  };
-  const handleSaveNewPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newPassword.trim()) return;
-
-    setIsLoading(true);
-
-    try {
-      // Backend API Call to Save Password
-      const response = await fetch('http://localhost:8000/auth/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            email: email, 
-            new_password: newPassword 
-        })
-      });
-
-      // Agar backend abhi ready nahi hai toh bas ye Simulation chalne do:
-      setTimeout(() => {
-        setIsLoading(false);
-        alert("Password Reset Successful! Please Login.");
-        
-        onClose(); // Ab Modal band karo
-        setStep(1); // Reset sab kuch
-        setEmail("");
-        setOtp("");
-        setNewPassword("");
-      }, 1000);
-      
-    } catch (error) {
-      console.error("Error:", error);
-      setIsLoading(false);
+    if (response.ok) {
+      setStep(2);
+    } else {
+      alert("Failed to send OTP");
     }
-  };
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Server error");
+  }
+
+  setIsLoading(false);
+};
+
+  
+
+
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!otp) return;
+
+  setIsLoading(true);
+
+  try {
+    const response = await fetch("http://localhost:8080/auth/verify-otp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, otp }),
+    });
+
+    if (response.ok) {
+      setStep(3);
+    } else {
+      alert("Invalid OTP");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Server error");
+  }
+
+  setIsLoading(false);
+};
+
+
+
+const handleSaveNewPassword = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!newPassword.trim()) return;
+
+  setIsLoading(true);
+
+  try {
+    const response = await fetch("http://localhost:8080/api/students/update-password", {
+
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        newPassword,
+      }),
+    });
+
+    if (response.ok) {
+      alert("Password Reset Successful! Please Login.");
+      onClose();
+      setStep(1);
+      setEmail("");
+      setOtp("");
+      setNewPassword("");
+    } else {
+      alert("Failed to reset password");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Server error");
+  }
+
+  setIsLoading(false);
+};
+
   if (!isOpen) return null;
 
   return (
