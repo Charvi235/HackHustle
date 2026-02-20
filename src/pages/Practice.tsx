@@ -81,7 +81,30 @@ const Practice = () => {
   const [startQuiz, setStartQuiz] = useState(false);
   const [loading, setLoading] = useState(false);
   const [assessmentScore, setAssessmentScore] = useState(0);
+
+  // const handleSubmitAssessment = async () => {
+    
+  //   setShowResult(true);
+  //   try {
+  //     await fetch('http://localhost:8080/api/assessments', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({
+  //         emailId: emailId,
+  //         topicID: selectedTopic?.id || 1015,
+  //     //    subjectID: selectedSubject!.id,
+  //     subjectID: selectedSubject.id,
+  //         assessmentScore 
+  //       })
+  //     });
+  //     console.log("Data saved successfully");
+  //   } catch (err) {
+  //     console.error('Data save nahi hua (Backend Error):', err);
+  //   }
+  // };
+
   const [showResult, setShowResult] = useState(false);
+
 
   const handleSelectSubject = (subject: SubjectConfig) => {
     setSelectedSubject(subject);
@@ -180,7 +203,10 @@ const Practice = () => {
           onScoreCalculated={setAssessmentScore}
           isAssessment={true}
           subjectId={selectedSubject.id}
-          topicId={selectedTopic?.id || null}
+
+          topicId={selectedTopic?.id || 1015}
+
+         // topicId={selectedTopic?.id || null}
         />
 
         <div className="p-4 flex justify-center">

@@ -1,5 +1,6 @@
 
-const API_BASE = "http://localhost:8000";
+//const API_BASE = "http://localhost:8000";
+const API_BASE = "http://127.0.0.1:8000";
 
 export const interviewService = {
   setupInterview: async (data: {
@@ -8,6 +9,7 @@ export const interviewService = {
     difficulty: string;
     tech_skills: string[];
     target_company?: string;
+    interview_type: string;
   }) => {
     const res = await fetch(`${API_BASE}/interview/setup`, {
       method: "POST",
@@ -25,6 +27,28 @@ export const interviewService = {
       body: JSON.stringify({ question, answer }),
     });
 
-    return res.text(); // STRING ONLY (as you wanted)
+    return res.json(); // OBJECT from backend
+  },
+
+  speechToText: async (audioBlob: Blob) => {
+    const formData = new FormData();
+    formData.append("file", audioBlob, "answer.ogg");
+
+    const res = await fetch(`${API_BASE}/interview/speech-to-text`, {
+      method: "POST",
+      body: formData,
+    });
+
+    return res.json(); // { text: "recognized speech" }
+  },
+  getNextQuestion: async (sessionId: string) => {
+    const res = await fetch(
+      `${API_BASE}/interview/next-question?session_id=${sessionId}`,
+      {
+        method: "POST",
+      }
+    );
+
+    return res.json();
   },
 };
