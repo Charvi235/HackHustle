@@ -27,7 +27,7 @@ const stats = [
   {
     icon: Clock,
     value: '24/7',
-    label: 'AI Support',
+    label: 'Mentor Support',
     description: 'Always here to help',
     color: 'text-orange-500',
   },
