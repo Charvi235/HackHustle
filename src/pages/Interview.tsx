@@ -753,7 +753,7 @@ const Interview = () => {
         {
           question: questionText,
           userResponse: transcript,
-          betterResponse: evalResponse.better_answer || "No suggestion",
+          betterResponse: evalResponse.feedback || "No suggestion",
           marks: evalResponse.score ?? 0,
           maxMarks: 10
         }
@@ -763,7 +763,7 @@ const Interview = () => {
       if (sessionId) {
         const next = await interviewService.getNextQuestion(sessionId);
 
-        if (next.done) {
+        if (!next.question) {
           handleFinish();
           return;
         }
