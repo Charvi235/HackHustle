@@ -15,19 +15,7 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ isOpen, onClo
   const [isOtpVerified, setIsOtpVerified] = useState(false); // OTP verify hua ya nahi track karne ke liye
   const [newPassword, setNewPassword] = useState("");        // Naya password store karne ke liye
 
-  // Step 1: Email se OTP bhejo
-  // const handleSendOtp = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   if (!email) return;
 
-  //   setIsLoading(true);
-  //   // Fake Backend Call
-  //   setTimeout(() => {
-  //     setIsLoading(false);
-  //     setStep(2); // <-- Yahan hum Step 2 (OTP Page) par ja rahe hain
-  //     alert(`OTP sent to ${email}`); // Testing ke liye
-  //   }, 1500);
-  // };
 
   const handleSendOtp = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -57,22 +45,8 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ isOpen, onClo
   setIsLoading(false);
 };
 
-  // Step 2: OTP Verify karo
-  // const handleVerifyOtp = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   if (!otp) return;
+  
 
-  //   setIsLoading(true);
-  //   // Fake Verification
-  //   setTimeout(() => {
-  //     setIsLoading(false);
-  //     alert("OTP Verified! Password Reset Successful.");
-  //     onClose(); // Modal band kar do
-  //     setStep(1); // Wapis reset kar do next time ke liye
-  //     setEmail("");
-  //     setOtp("");
-  //   }, 1500);
-  // };
 
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
@@ -103,62 +77,6 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ isOpen, onClo
   setIsLoading(false);
 };
 
-  // // Step 2: OTP Verify Logic
-  // const handleVerifyOtp = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   if (!otp) return;
-
-  //   setIsLoading(true);
-
-  //   // Fake Verification for now
-  //   setTimeout(() => {
-  //     setIsLoading(false);
-  //     // alert("OTP Verified!"); // Alert hata sakte ho agar chaho
-      
-  //     // onClose();  <--- IS LINE KO HATA DO OR COMMENT KAR DO
-  //     setStep(3); // <--- YE NAYI LINE ADD KARO (Step 3 = Password Reset Screen)
-  //   }, 1000);
-  // };
-
-
-//   const handleSaveNewPassword = async (e: React.FormEvent) => {
-//     e.preventDefault();
-//     if (!newPassword.trim()) return;
-
-//     setIsLoading(true);
-
-//     try {
-//       // Backend API Call to Save Password
-//       const response = await fetch('http://localhost:8080/auth/reset-password', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         // body: JSON.stringify({ 
-//         //     email: email, 
-//         //     new_password: newPassword 
-//         // })
-//         body: JSON.stringify({ 
-//    email: email, 
-//    newPassword: newPassword 
-// })
-//       });
-
-//       // Agar backend abhi ready nahi hai toh bas ye Simulation chalne do:
-//       setTimeout(() => {
-//         setIsLoading(false);
-//         alert("Password Reset Successful! Please Login.");
-        
-//         onClose(); // Ab Modal band karo
-//         setStep(1); // Reset sab kuch
-//         setEmail("");
-//         setOtp("");
-//         setNewPassword("");
-//       }, 1000);
-      
-//     } catch (error) {
-//       console.error("Error:", error);
-//       setIsLoading(false);
-//     }
-//   };
 
 
 const handleSaveNewPassword = async (e: React.FormEvent) => {
