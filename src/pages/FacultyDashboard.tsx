@@ -1,177 +1,77 @@
 import { useState, useEffect } from 'react'; 
-import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Star, Eye, CheckCircle, Users } from 'lucide-react';
+import { Star, CheckCircle, Users, History } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+// Interface matching your backend DoubtDto exactly
 interface Doubt {
-  id: string;
-  title: string;
-  studentName: string;
-  question: string;
-  subject: string;
-  status: 'pending' | 'resolved';
+  doubtID: number;
+  doubtStatus: string; // "Pending" or "Resolved"
+  queryAsked: string;
+  answerProvided: string;
+  studentId: number;
+  teacherID: number;
+  selectedSubject: string;
+  date: string;
 }
 
 const FacultyDashboard = () => {
-  const { user } = useAuth();
   const { toast } = useToast();
-  const [selectedDoubt, setSelectedDoubt] = useState<Doubt | null>(null);
-  const [answer, setAnswer] = useState('');
-
-
-  // Naye state variables dynamic data ke liye
+  const [isLoading, setIsLoading] = useState(true);
+  const [solvedDoubtsList, setSolvedDoubtsList] = useState<Doubt[]>([]);
+  
   const [dashboardStats, setDashboardStats] = useState({
     rating: 0,
     doubtsSolved: 0,
     studentsMentored: 0
   });
-  const [solvedDoubtsList, setSolvedDoubtsList] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  // useEffect(() => {
-  //   const fetchDashboardData = async () => {
-  //     try {
-  //       const email = localStorage.getItem('emailId'); // Teacher ka email
-  //       const token = localStorage.getItem('token'); // Agar auth token hai toh
+  const fetchResolvedData = async () => {
+    setIsLoading(true);
+    try {
+      const email = localStorage.getItem('emailId'); 
+      if (!email) return;
 
-  //       // 1. Apne backend URL ko yahan update kar lena
-  //       // const response = await fetch(`http://localhost:8080/api/teachers/dashboard?email=${email}`, {
-  //       //   headers: {
-  //       //     'Authorization': `Bearer ${token}` // Agar spring security me zaroorat hai
-  //       //   }
-  //       // });
-  //       const response = await fetch(`http://localhost:8080/api/teachers/email/${email}`);
+      // 1. Get Teacher Details to get the ID (Matches TeacherDto.java -> teacherId)
+      const teacherRes = await fetch(`http://localhost:8080/api/teachers/email/${email}`);
+      if (!teacherRes.ok) throw new Error("Teacher not found");
+      const teacherData = await teacherRes.json();
+      const tId = teacherData.teacherId; 
 
-  //       if (response.ok) {
-  //         const data = await response.json();
-  //         // Backend se jo data aayega usko state me set kar do
-  //         setDashboardStats({
-  //           rating: data.rating || 0,
-  //           doubtsSolved: data.doubtsSolved || 0,
-  //           studentsMentored: data.studentsMentored || 0
-  //         });
-  //         setSolvedDoubtsList(data.recentDoubts || []);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching dashboard data:", error);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetchDashboardData();
-  // }, []); // Empty array ka matlab hai ye sirf page load hone par ek baar chalega
- 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const email = localStorage.getItem('emailId'); 
-        if (!email) return;
-
-        // 1. Get Teacher Details (Rating aur ID nikalne ke liye)
-        const teacherResponse = await fetch(`http://localhost:8080/api/teachers/email/${email}`);
+      // 2. Fetch only Resolved doubts from your backend
+      // Note: Ensure your backend has this endpoint, or use the general teacher endpoint and filter
+      const response = await fetch(`http://localhost:8080/api/doubts/teacher/${tId}/resolved`);
+      
+      if (response.ok) {
+        const allDoubts: Doubt[] = await response.json();
         
-        if (teacherResponse.ok) {
-          const teacherData = await teacherResponse.json();
-          const teacherId = teacherData.teacherID || teacherData.teacherId; 
+        // 3. Filter for 'Resolved' status only
+        const resolvedOnly = allDoubts.filter(d => d.doubtStatus === "Resolved");
 
-          // 2. Ab Teacher ID se Doubts fetch karo
-          const doubtsResponse = await fetch(`http://localhost:8080/api/doubts/teacher/${teacherId}`);
-          
-          let doubtsData = [];
-          
-          if (doubtsResponse.ok) {
-            doubtsData = await doubtsResponse.json();
-          } else if (doubtsResponse.status === 404) {
-            // 🚨 FIX: Agar 404 aaya, toh matlab list khali hai (error nahi hai)
-            doubtsData = [];
-          }
+        // 4. Calculate stats based on actual resolved data
+        const uniqueStudents = new Set(resolvedOnly.map(d => d.studentId));
+        
+        setDashboardStats({
+          rating: teacherData.rating || 0.0,
+          doubtsSolved: resolvedOnly.length,
+          studentsMentored: uniqueStudents.size
+        });
 
-          // 3. Stats Calculate karo
-          // Backend me status 'doubtStatus' me aata hai
-          const resolvedDoubts = doubtsData.filter((d: any) => 
-            d.doubtStatus && d.doubtStatus.toLowerCase() === 'resolved'
-          );
-
-          // Unique students (Backend studentId bhej raha hai, studentName nahi)
-          const uniqueStudentIds = new Set(resolvedDoubts.map((d: any) => d.studentId));
-
-          setDashboardStats({
-            rating: teacherData.rating || 0.0,
-            doubtsSolved: resolvedDoubts.length,     // Count dynamic ho gaya
-            studentsMentored: uniqueStudentIds.size  // Count dynamic ho gaya
-          });
-
-          // 4. List mapping (Backend DTO ke variables use kar rahe hain)
-          const formattedDoubts = resolvedDoubts.map((d: any) => ({
-            id: d.doubtID,
-            title: d.queryAsked ? d.queryAsked.substring(0, 30) + "..." : "Doubt Resolved", 
-            studentName: `Student #${d.studentId}`, // Name ki jagah ID dikhayenge kyunki backend name nahi bhej raha
-            subject: d.selectedSubject || 'General',
-            resolvedAt: d.date
-          }));
-
-          setSolvedDoubtsList(formattedDoubts);
-        }
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-      } finally {
-        setIsLoading(false);
+        setSolvedDoubtsList(resolvedOnly);
       }
-    };
-
-    fetchDashboardData();
-  }, []);
-
-  // Mock doubts data(will convert later)
-  const [doubts, setDoubts] = useState<Doubt[]>([
-    {
-      id: '1',
-      title: 'what is normalization',
-      studentName: 'Student A',
-      question: 'Can you explain what normalization is in database design?',
-      subject: 'Database Management',
-      status: 'pending',
-    },
-    {
-      id: '2',
-      title: 'what is time complexity of graph',
-      studentName: 'Student B',
-      question: 'What is the time complexity of graph traversal algorithms?',
-      subject: 'Data Structures',
-      status: 'pending',
-    },
-  ]);
-
-
-
-  const handleViewDoubt = (doubt: Doubt) => {
-    setSelectedDoubt(doubt);
-    setAnswer('');
-  };
-
-  const handleSendAnswer = () => {
-    if (!answer.trim()) {
-      toast({ title: 'Please write an answer', variant: 'destructive' });
-      return;
+    } catch (error) {
+      console.error("Error fetching resolved doubts:", error);
+      toast({ title: "Failed to load solved history", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
     }
-
-    // TODO: Send answer to database
-    setDoubts(doubts.map(d => 
-      d.id === selectedDoubt?.id ? { ...d, status: 'resolved' as const } : d
-    ));
-    
-    toast({ title: 'Answer sent successfully!' });
-    setSelectedDoubt(null);
-    setAnswer('');
   };
 
-  const pendingDoubts = doubts.filter(d => d.status === 'pending');
+  useEffect(() => {
+    fetchResolvedData();
+  }, []);
 
   return (
     <div className="container mx-auto py-12 px-4">
@@ -179,22 +79,18 @@ const FacultyDashboard = () => {
 
       {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        {/* Rating Card */}
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">My Rating</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              {/* <span className="text-3xl font-bold">{user?.rating || 4.5}</span> */}
               <span className="text-3xl font-bold">{dashboardStats.rating.toFixed(1)}</span>
               <div className="flex">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
                     key={star}
-                    className={`h-5 w-5 ${
-                      star <= dashboardStats.rating ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'
-                    }`}
+                    className={`h-5 w-5 ${star <= Math.round(dashboardStats.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`}
                   />
                 ))}
               </div>
@@ -202,7 +98,6 @@ const FacultyDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Doubts Solved Card */}
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Doubts Solved</CardTitle>
@@ -210,13 +105,11 @@ const FacultyDashboard = () => {
           <CardContent>
             <div className="flex items-center gap-3">
               <CheckCircle className="h-8 w-8 text-green-500" />
-             
               <span className="text-3xl font-bold">{dashboardStats.doubtsSolved}</span>
             </div>
           </CardContent>
         </Card>
 
-        {/* Students Mentored Card */}
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Students Mentored</CardTitle>
@@ -224,62 +117,78 @@ const FacultyDashboard = () => {
           <CardContent>
             <div className="flex items-center gap-3">
               <Users className="h-8 w-8 text-primary" />
-             
               <span className="text-3xl font-bold">{dashboardStats.studentsMentored}</span>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Pending Doubts Section */}
-      
-       
-            
-           
-      {/* View Doubt Modal */}
-      {/* <Dialog open={!!selectedDoubt} onOpenChange={() => setSelectedDoubt(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            
-      </Dialog> */} 
-      <Card>
-        <CardHeader>
-          <CardTitle>Recently Solved Doubts</CardTitle>
-          <CardDescription>
-            History of doubts you have answered
-          </CardDescription>
+      {/* Recently Solved Doubts - Main Focus */}
+      <Card className="shadow-lg">
+        <CardHeader className="border-b bg-muted/10">
+          <div className="flex items-center gap-2">
+            <History className="h-6 w-6 text-primary" />
+            <div>
+              <CardTitle>Recently Solved Doubts</CardTitle>
+              <CardDescription>
+                Viewing all queries you have successfully resolved.
+              </CardDescription>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <div className="space-y-4">
-            {/* Dynamic Data for Solved Doubts */}
-            {solvedDoubtsList.length === 0 ? (
-              <p className="text-muted-foreground">No recently solved doubts.</p>
+            {isLoading ? (
+              <p className="text-center py-4">Loading your history...</p>
+            ) : solvedDoubtsList.length === 0 ? (
+              <div className="text-center py-10">
+                <p className="text-muted-foreground">No resolved doubts found in your history.</p>
+              </div>
             ) : (
-              solvedDoubtsList.map((doubt: any) => (
-                <div key={doubt.id} className="flex items-center justify-between p-4 border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-                  
-                  {/* Doubt Details */}
-                  <div>
-                    <h4 className="font-semibold text-sm">{doubt.title}</h4>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                      <span>{doubt.studentName}</span>
-                      <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                      <span>{doubt.subject}</span>
-                      <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                      <span>{doubt.resolvedAt ? new Date(doubt.resolvedAt).toLocaleDateString() : 'Recently'}</span>
+              solvedDoubtsList.map((doubt) => (
+                <div 
+                  key={doubt.doubtID} 
+                  className="flex flex-col md:flex-row md:items-center justify-between p-5 border rounded-xl bg-card hover:bg-muted/20 transition-all border-l-4 border-l-green-500"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge variant="outline" className="text-xs font-semibold">
+                        {doubt.selectedSubject}
+                      </Badge>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                        {new Date(doubt.date).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <h4 className="font-bold text-base text-foreground">
+                      {doubt.queryAsked}
+                    </h4>
+                    <p className="text-sm text-muted-foreground italic">
+                      <span className="font-medium not-italic text-primary">Ans: </span> 
+                      {doubt.answerProvided}
+                    </p>
+                    <div className="flex items-center gap-2 pt-2">
+                      <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
+                        S
+                      </div>
+                      <span className="text-xs text-muted-foreground">Student ID: {doubt.studentId}</span>
                     </div>
                   </div>
 
-                  {/* Solved Badge */}
-                  <div className="px-2.5 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold border border-green-200">
-                    SOLVED
+                  <div className="mt-4 md:mt-0">
+                    <Badge className="bg-green-100 text-green-700 hover:bg-green-200 border-green-200 px-3 py-1">
+                      RESOLVED
+                    </Badge>
                   </div>
-
                 </div>
               ))
             )}
           </div>
         </CardContent>
+        <CardFooter className="border-t bg-muted/5 py-4 flex justify-center">
+          <Button variant="ghost" size="sm" onClick={fetchResolvedData}>
+            Refresh History
+          </Button>
+        </CardFooter>
       </Card>
     </div>
   );
