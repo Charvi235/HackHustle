@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; 
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,111 @@ const FacultyDashboard = () => {
   const [selectedDoubt, setSelectedDoubt] = useState<Doubt | null>(null);
   const [answer, setAnswer] = useState('');
 
+
+  // Naye state variables dynamic data ke liye
+  const [dashboardStats, setDashboardStats] = useState({
+    rating: 0,
+    doubtsSolved: 0,
+    studentsMentored: 0
+  });
+  const [solvedDoubtsList, setSolvedDoubtsList] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // useEffect(() => {
+  //   const fetchDashboardData = async () => {
+  //     try {
+  //       const email = localStorage.getItem('emailId'); // Teacher ka email
+  //       const token = localStorage.getItem('token'); // Agar auth token hai toh
+
+  //       // 1. Apne backend URL ko yahan update kar lena
+  //       // const response = await fetch(`http://localhost:8080/api/teachers/dashboard?email=${email}`, {
+  //       //   headers: {
+  //       //     'Authorization': `Bearer ${token}` // Agar spring security me zaroorat hai
+  //       //   }
+  //       // });
+  //       const response = await fetch(`http://localhost:8080/api/teachers/email/${email}`);
+
+  //       if (response.ok) {
+  //         const data = await response.json();
+  //         // Backend se jo data aayega usko state me set kar do
+  //         setDashboardStats({
+  //           rating: data.rating || 0,
+  //           doubtsSolved: data.doubtsSolved || 0,
+  //           studentsMentored: data.studentsMentored || 0
+  //         });
+  //         setSolvedDoubtsList(data.recentDoubts || []);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching dashboard data:", error);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   fetchDashboardData();
+  // }, []); // Empty array ka matlab hai ye sirf page load hone par ek baar chalega
+ 
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const email = localStorage.getItem('emailId'); 
+        if (!email) return;
+
+        // 1. Get Teacher Details (Rating aur ID nikalne ke liye)
+        const teacherResponse = await fetch(`http://localhost:8080/api/teachers/email/${email}`);
+        
+        if (teacherResponse.ok) {
+          const teacherData = await teacherResponse.json();
+          const teacherId = teacherData.teacherID || teacherData.teacherId; 
+
+          // 2. Ab Teacher ID se Doubts fetch karo
+          const doubtsResponse = await fetch(`http://localhost:8080/api/doubts/teacher/${teacherId}`);
+          
+          let doubtsData = [];
+          
+          if (doubtsResponse.ok) {
+            doubtsData = await doubtsResponse.json();
+          } else if (doubtsResponse.status === 404) {
+            // 🚨 FIX: Agar 404 aaya, toh matlab list khali hai (error nahi hai)
+            doubtsData = [];
+          }
+
+          // 3. Stats Calculate karo
+          // Backend me status 'doubtStatus' me aata hai
+          const resolvedDoubts = doubtsData.filter((d: any) => 
+            d.doubtStatus && d.doubtStatus.toLowerCase() === 'resolved'
+          );
+
+          // Unique students (Backend studentId bhej raha hai, studentName nahi)
+          const uniqueStudentIds = new Set(resolvedDoubts.map((d: any) => d.studentId));
+
+          setDashboardStats({
+            rating: teacherData.rating || 0.0,
+            doubtsSolved: resolvedDoubts.length,     // Count dynamic ho gaya
+            studentsMentored: uniqueStudentIds.size  // Count dynamic ho gaya
+          });
+
+          // 4. List mapping (Backend DTO ke variables use kar rahe hain)
+          const formattedDoubts = resolvedDoubts.map((d: any) => ({
+            id: d.doubtID,
+            title: d.queryAsked ? d.queryAsked.substring(0, 30) + "..." : "Doubt Resolved", 
+            studentName: `Student #${d.studentId}`, // Name ki jagah ID dikhayenge kyunki backend name nahi bhej raha
+            subject: d.selectedSubject || 'General',
+            resolvedAt: d.date
+          }));
+
+          setSolvedDoubtsList(formattedDoubts);
+        }
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
   // Mock doubts data(will convert later)
   const [doubts, setDoubts] = useState<Doubt[]>([
     {
@@ -42,6 +147,8 @@ const FacultyDashboard = () => {
       status: 'pending',
     },
   ]);
+
+
 
   const handleViewDoubt = (doubt: Doubt) => {
     setSelectedDoubt(doubt);
@@ -79,15 +186,14 @@ const FacultyDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              <span className="text-3xl font-bold">{user?.rating || 4.5}</span>
+              {/* <span className="text-3xl font-bold">{user?.rating || 4.5}</span> */}
+              <span className="text-3xl font-bold">{dashboardStats.rating.toFixed(1)}</span>
               <div className="flex">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
                     key={star}
                     className={`h-5 w-5 ${
-                      star <= (user?.rating || 4.5)
-                        ? 'fill-yellow-400 text-yellow-400'
-                        : 'text-muted-foreground'
+                      star <= dashboardStats.rating ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'
                     }`}
                   />
                 ))}
@@ -104,7 +210,8 @@ const FacultyDashboard = () => {
           <CardContent>
             <div className="flex items-center gap-3">
               <CheckCircle className="h-8 w-8 text-green-500" />
-              <span className="text-3xl font-bold">{user?.stats?.doubtsSolved || 450}</span>
+             
+              <span className="text-3xl font-bold">{dashboardStats.doubtsSolved}</span>
             </div>
           </CardContent>
         </Card>
@@ -117,80 +224,23 @@ const FacultyDashboard = () => {
           <CardContent>
             <div className="flex items-center gap-3">
               <Users className="h-8 w-8 text-primary" />
-              <span className="text-3xl font-bold">{user?.stats?.studentsMentored || 120}</span>
+             
+              <span className="text-3xl font-bold">{dashboardStats.studentsMentored}</span>
             </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Pending Doubts Section */}
-      {/* <Card>
-        <CardHeader>
-          <CardTitle>Pending Student Doubts</CardTitle>
-          <CardDescription>
-            {pendingDoubts.length} doubt(s) awaiting your response
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {pendingDoubts.length === 0 ? (
-              <p className="text-muted-foreground">No pending doubts at the moment.</p>
-            ) : (
-              pendingDoubts.map((doubt) => (
-                <Card key={doubt.id}>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg mb-1">{doubt.title}</h3>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          from {doubt.studentName}
-                        </p>
-                        <Badge variant="secondary">{doubt.subject}</Badge>
-                      </div>
-                      <Button onClick={() => handleViewDoubt(doubt)} size="sm">
-                        <Eye className="h-4 w-4 mr-2" />
-                        View
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
+      
+       
+            
+           
       {/* View Doubt Modal */}
       {/* <Dialog open={!!selectedDoubt} onOpenChange={() => setSelectedDoubt(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{selectedDoubt?.title}</DialogTitle>
-            <DialogDescription>
-              From {selectedDoubt?.studentName} • {selectedDoubt?.subject}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <div>
-              <h4 className="font-medium mb-2">Student's Question:</h4>
-              <p className="text-muted-foreground">{selectedDoubt?.question}</p>
-            </div>
-
-            <div>
-              <h4 className="font-medium mb-2">Your Answer:</h4>
-              <Textarea
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                placeholder="Type your answer here..."
-                className="min-h-[200px]"
-              />
-            </div>
-
-            <Button onClick={handleSendAnswer} className="w-full">
-              Send Answer
-            </Button>
-          </div>
-        </DialogContent>
+            
       </Dialog> */} 
       <Card>
         <CardHeader>
@@ -201,33 +251,33 @@ const FacultyDashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {/* Static Data for Solved Doubts */}
-            {[
-              { id: 1, title: "Normalization Forms", student: "Rahul K.", subject: "DBMS", time: "2h ago" },
-              { id: 2, title: "Binary Search Tree", student: "Priya S.", subject: "DSA", time: "5h ago" },
-              { id: 3, title: "useEffect Hook", student: "Amit B.", subject: "React", time: "1d ago" }
-            ].map((doubt) => (
-              <div key={doubt.id} className="flex items-center justify-between p-4 border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-                
-                {/* Doubt Details */}
-                <div>
-                  <h4 className="font-semibold text-sm">{doubt.title}</h4>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                    <span>{doubt.student}</span>
-                    <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                    <span>{doubt.subject}</span>
-                    <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                    <span>{doubt.time}</span>
+            {/* Dynamic Data for Solved Doubts */}
+            {solvedDoubtsList.length === 0 ? (
+              <p className="text-muted-foreground">No recently solved doubts.</p>
+            ) : (
+              solvedDoubtsList.map((doubt: any) => (
+                <div key={doubt.id} className="flex items-center justify-between p-4 border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                  
+                  {/* Doubt Details */}
+                  <div>
+                    <h4 className="font-semibold text-sm">{doubt.title}</h4>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                      <span>{doubt.studentName}</span>
+                      <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                      <span>{doubt.subject}</span>
+                      <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                      <span>{doubt.resolvedAt ? new Date(doubt.resolvedAt).toLocaleDateString() : 'Recently'}</span>
+                    </div>
                   </div>
-                </div>
 
-                {/* Solved Badge */}
-                <div className="px-2.5 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold border border-green-200">
-                  SOLVED
-                </div>
+                  {/* Solved Badge */}
+                  <div className="px-2.5 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold border border-green-200">
+                    SOLVED
+                  </div>
 
-              </div>
-            ))}
+                </div>
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
