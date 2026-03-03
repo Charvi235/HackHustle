@@ -130,10 +130,26 @@ export const connectBattleSocket = (
       console.log('✅ Battle socket connected');
       isConnected = true;
 
-      stompClient?.subscribe(`/topic/battle/${battleCode}`, (message) => {
-        onMessage(JSON.parse(message.body));
-      });
+      // stompClient?.subscribe(`/topic/battle/${battleCode}`, (message) => {
+      //   onMessage(JSON.parse(message.body));
+      // });
+      /* --- Update this in battleSocket.ts --- */
 
+    stompClient?.subscribe(`/topic/battle/${battleCode}`, (message) => {
+        // 🔥 Check if it's a plain string first
+        if (message.body === "START") {
+            onMessage("START");
+        } else {
+            try {
+                // Only parse if it's actually JSON (like the Room object)
+                onMessage(JSON.parse(message.body));
+            } catch (e) {
+                console.error("📩 WS Parsing error:", e, "Body:", message.body);
+                // Fallback: send the raw body if parsing fails
+                onMessage(message.body);
+            }
+        }
+    });
       // 🔥 SEND JOIN IF IT WAS CALLED EARLY
       if (pendingJoin) {
         stompClient.publish({
