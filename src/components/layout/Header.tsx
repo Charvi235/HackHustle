@@ -50,9 +50,17 @@ export const Header = () => {
     }
   };
   const getUserInitials = () => {
-    if (!user) return 'U';
-    return `${user.first_name?.[0] || ''}${user.last_name?.[0] || ''}`.toUpperCase();
-  };
+  if (!user) return "U";
+  
+  // Sirf wahi use karo jo tere AuthContext mein define hai
+  const first = user.first_name || "";
+  const last = user.last_name || "";
+
+  if (first && last) {
+    return (first[0] + last[0]).toUpperCase();
+  }
+  return first ? first[0].toUpperCase() : "U";
+};
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
@@ -122,23 +130,24 @@ export const Header = () => {
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="relative"
-                  >
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback>{getUserInitials()}</AvatarFallback>
-                    </Avatar>
-                    {!isFaculty && unreadDoubtsCount > 0 && (
-                      <Badge 
-                        variant="destructive" 
-                        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                      >
-                        {unreadDoubtsCount}
-                      </Badge>
-                    )}
-                  </Button>
+                <Button
+  variant="ghost"
+  size="icon"
+  className="relative rounded-full hover:bg-zinc-800 transition-all duration-300 p-0"
+>
+  <Avatar className="h-9 w-9 border border-zinc-800">
+    <AvatarFallback className="bg-zinc-900 text-zinc-400 font-bold text-xs tracking-widest border border-zinc-800">
+      {getUserInitials()}
+    </AvatarFallback>
+  </Avatar>
+  
+  {/* Notification indicator (Subtle Blue Dot) - Agar ye bhi nahi chahiye toh is poore block ko uda dena */}
+  {unreadDoubtsCount > 0 && (
+    <span className="absolute top-0 right-0 h-2 w-2 bg-blue-500 rounded-full border border-zinc-950" />
+  )}
+</Button>
+                
+                
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 bg-background border border-border">
                   {/* <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
@@ -155,14 +164,14 @@ export const Header = () => {
 </DropdownMenuItem>
 
 {/* ✅ Edit Profile Logic Updated */}
-<DropdownMenuItem 
+{/* <DropdownMenuItem 
   // 👇 Maine yahan '?edit=true' add kar diya hai
   onClick={() => navigate(isFaculty ? '/teacher-profile?edit=true' : '/profile?edit=true')} 
   className="cursor-pointer"
 >
   <Pencil className="mr-2 h-4 w-4" />
   Edit Profile
-</DropdownMenuItem>
+</DropdownMenuItem> */}
                   {/* <DropdownMenuItem onClick={() => navigate('/profile?edit=true')} className="cursor-pointer">
                     <Pencil className="mr-2 h-4 w-4" />
                     Edit Profile

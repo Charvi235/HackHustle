@@ -11,7 +11,11 @@ import {
   Trophy,
   CheckCircle,
   Star,
+  Pencil, 
+  Check,  
+  X,      
 } from "lucide-react";
+import { Input } from '@/components/ui/input';
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -39,11 +43,13 @@ const Profile = () => {
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [localUser, setLocalUser] = useState<User | null>(null);
   const [student, setStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
   const [questionsSolved, setQuestionsSolved] = useState<number>(0);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState<any>(null);
 
   // ================= FETCH PROFILE =================
   useEffect(() => {
@@ -82,13 +88,7 @@ const Profile = () => {
     setLocalUser(user);
   }, [isAuthenticated, user, navigate]);
 
-  // Open modal if ?edit=true
-  useEffect(() => {
-    if (searchParams.get("edit") === "true" && localUser) {
-      setIsEditModalOpen(true);
-      setSearchParams({});
-    }
-  }, [searchParams, localUser, setSearchParams]);
+  
 
   const getUserInitials = () => {
     if (!localUser) return "U";
@@ -192,6 +192,55 @@ const Profile = () => {
   }
 };
 
+// ================= UPDATE PROFILE (Inline Edit Logic) =================
+  const handleSaveProfile = async () => {
+    if (!student || !localUser) return;
+
+    try {
+      // 1. Naya payload banaya (sirf naam change hoga, baaki purana rahega)
+      const payload = {
+        ...student,
+        firstName: editData?.firstName || student.firstName,
+        lastName: editData?.lastName || student.lastName,
+        emailId: student.emailId,       // Email readonly hai
+        password: student.password,     // Password backend ko wapas bhejna zaroori hai
+        points: student.points,
+        quizAttempted: student.quizAttempted,
+      };
+
+      // 2. Backend API call 
+      const updatedStudent = await updateStudent(student.studentId, payload);
+
+      // 3. Student State Update
+      setStudent(updatedStudent);
+
+      // 4. LocalAuth (Navbar/Sidebar) ke liye Update
+      const updatedLocalUser = {
+        ...localUser,
+        first_name: updatedStudent.firstName,
+        last_name: updatedStudent.lastName,
+      };
+      setLocalUser(updatedLocalUser);
+      localStorage.setItem("user", JSON.stringify(updatedLocalUser));
+
+      // 5. Success UI
+      setIsEditing(false);
+      toast({
+        title: "Success",
+        description: "Profile updated successfully!",
+      });
+
+    } catch (error) {
+      console.error("Save Profile Error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile. Check console!",
+        variant: "destructive",
+      });
+    }
+  };
+
+
 
   const handleLogout = () => {
     logout();
@@ -225,7 +274,7 @@ const Profile = () => {
         </Card>
 
         
-         <Card>
+         {/* <Card>
            <CardHeader>
              <CardTitle>Profile Information</CardTitle>
            </CardHeader>
@@ -252,6 +301,76 @@ const Profile = () => {
                <p className="text-muted-foreground">
                  {student.emailId}
               </p>
+            </div>
+          </CardContent>
+        </Card> */}
+
+        {/* ===== PROFILE INFORMATION (Inline Edit) ===== */}
+        <Card className="relative border-primary/20 shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-xl">Profile Information</CardTitle>
+            
+            {/* Edit Toggle Buttons */}
+            {!isEditing ? (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => { 
+                  setEditData(student); 
+                  setIsEditing(true); 
+                }}
+              >
+                <Pencil className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+              </Button>
+            ) : (
+              <div className="flex gap-2">
+                <Button variant="ghost" size="icon" onClick={() => setIsEditing(false)}>
+                  <X className="h-4 w-4 text-red-500" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={handleSaveProfile}>
+                  <Check className="h-4 w-4 text-green-500" />
+                </Button>
+              </div>
+            )}
+          </CardHeader>
+
+          <CardContent className="space-y-4 mt-2">
+            <div className="grid grid-cols-2 gap-4">
+              
+              {/* First Name */}
+              <div>
+                <Label>First Name</Label>
+                {isEditing ? (
+                  <Input 
+                    className="mt-1"
+                    value={editData?.firstName || ''} 
+                    onChange={(e) => setEditData({...editData, firstName: e.target.value})}
+                  />
+                ) : (
+                  <p className="text-muted-foreground mt-1">{student.firstName}</p>
+                )}
+              </div>
+
+              {/* Last Name */}
+              <div>
+                <Label>Last Name</Label>
+                {isEditing ? (
+                  <Input 
+                    className="mt-1"
+                    value={editData?.lastName || ''} 
+                    onChange={(e) => setEditData({...editData, lastName: e.target.value})}
+                  />
+                ) : (
+                  <p className="text-muted-foreground mt-1">{student.lastName}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Email (Read Only - Email change nahi kar sakte) */}
+            <div>
+              <Label>Email</Label>
+              <p className="text-muted-foreground mt-1">{student.emailId}</p>
+              {isEditing && <p className="text-xs text-muted-foreground mt-1">*Email ID cannot be changed</p>}
             </div>
           </CardContent>
         </Card>
@@ -349,15 +468,7 @@ const Profile = () => {
         </Card>
       </div>
 
-      {/* ===== EDIT PROFILE MODAL ===== */}
-      {localUser && (
-        <EditProfileModal
-          open={isEditModalOpen}
-          onOpenChange={setIsEditModalOpen}
-          user={localUser}
-          onSave={handleProfileUpdate}
-        />
-      )}
+     
     </div>
   );
 };
