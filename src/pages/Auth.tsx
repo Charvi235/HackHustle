@@ -9,7 +9,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ForgotPasswordModal from '../components/auth/ForgotPasswordModal';
 import { useToast } from '@/hooks/use-toast';
 import { Zap, Eye, EyeOff } from 'lucide-react';
-
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 type RoleType = 'STUDENT' | 'TEACHER';
 
 const isValidGmail = (email: string) => {
@@ -596,15 +603,30 @@ const Auth = () => {
                       {renderError(teacherSignupData.confirmPassword !== '' && teacherSignupData.password !== teacherSignupData.confirmPassword, "Passwords don't match")}
                     </div>
                     <div>
-                      <Input
+                      {/* <Input
                         placeholder="Subject Associated"
                         value={teacherSignupData.subjectAssociated}
                         onBlur={() => setTeacherTouched({...teacherTouched, subjectAssociated: true})}
                         onChange={(e) => setTeacherSignupData({ ...teacherSignupData, subjectAssociated: e.target.value.replace(/\s+/g, ' ')})}
                         
                         className={getInputClass(teacherTouched.subjectAssociated && (teacherSignupData.subjectAssociated === '' || !isValidName(teacherSignupData.subjectAssociated)))}
-                      />
-
+                      /> */}
+                      <div className="space-y-2">
+  {/* <Label htmlFor="subject">Subject Associated</Label> */}
+  <Select 
+    onValueChange={(value) => setTeacherSignupData({ ...teacherSignupData, subjectAssociated: value })}
+    value={teacherSignupData.subjectAssociated}
+  >
+    <SelectTrigger className="w-full bg-zinc-950 border-zinc-800 text-zinc-300">
+      <SelectValue placeholder="Select Subject" />
+    </SelectTrigger>
+    <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-300">
+      <SelectItem value="OOPS">OOPS</SelectItem>
+      <SelectItem value="Data Structures">Data Structures</SelectItem>
+      <SelectItem value="DBMS">DBMS</SelectItem>
+    </SelectContent>
+  </Select>
+</div>
                       {renderError(teacherTouched.subjectAssociated && teacherSignupData.subjectAssociated === '', "This field is mandatory")}
 
                       {renderError(teacherTouched.subjectAssociated && teacherSignupData.subjectAssociated !== '' && !isValidName(teacherSignupData.subjectAssociated), "Invalid subject name (Only letters allowed)")}

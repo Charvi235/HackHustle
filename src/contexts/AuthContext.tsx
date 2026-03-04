@@ -120,11 +120,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const success = await authService.signup({
         first_name: firstName,
         last_name: lastName,
-        emailId,
-        password,
+        emailId : emailId,
+        password : password,
         role: roleUpper,
         subject_associated: subjectAssociated,
-        institute,
+        institute : institute,
       });
 
       if (success) {
