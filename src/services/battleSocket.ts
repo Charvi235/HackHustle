@@ -112,7 +112,7 @@ import { Client } from '@stomp/stompjs';
 
 let stompClient: Client | null = null;
 let isConnected = false;
-let pendingJoin: { code: string; studentId: number } | null = null;
+let pendingJoin: { code: string; studentEmail: string } | null = null;
 
 const SOCKET_URL = 'http://localhost:8080/quiz-battle';
 
@@ -164,29 +164,29 @@ export const connectBattleSocket = (
   stompClient.activate();
 };
 
-export const sendJoinBattle = (code: string, studentId: number) => {
+export const sendJoinBattle = (code: string, studentEmail: string) => {
   if (!stompClient || !isConnected) {
     // queue join safely
-    pendingJoin = { code, studentId };
+    pendingJoin = { code, studentEmail };
     return;
   }
 
   stompClient.publish({
     destination: '/app/join',
-    body: JSON.stringify({ code, studentId }),
+    body: JSON.stringify({ code, studentEmail }),
   });
 };
 
 export const sendAnswer = (
   code: string,
-  studentId: number,
+  studentEmail: string,
   answer: string
 ) => {
   if (!stompClient || !isConnected) return;
 
   stompClient.publish({
     destination: '/app/answer',
-    body: JSON.stringify({ code, studentId, answer }),
+    body: JSON.stringify({ code, studentEmail, answer }),
   });
 };
 
