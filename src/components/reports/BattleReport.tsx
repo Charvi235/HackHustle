@@ -25,6 +25,7 @@ interface BattleReportProps {
   timeTaken: number;
   totalQuestions: number;
   onBack: () => void;
+  onPlayAgain: () => void;
 }
 
 export const BattleReport = ({ 
@@ -32,7 +33,8 @@ export const BattleReport = ({
   selectedAnswers, 
   timeTaken, 
   totalQuestions,
-  onBack 
+  onBack,
+  onPlayAgain
 }: BattleReportProps) => {
   const correctCount = Object.keys(selectedAnswers).filter((qId) => {
     const question = questions.find(q => q.questionID === parseInt(qId));
@@ -158,7 +160,7 @@ export const BattleReport = ({
           <Button variant="outline" className="flex-1" onClick={onBack}>
             Back to Menu
           </Button>
-          <Button className="flex-1">
+          <Button className="flex-1" onClick={onPlayAgain}>
             Play Again
           </Button>
         </div>
