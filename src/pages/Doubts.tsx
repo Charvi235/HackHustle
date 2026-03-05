@@ -5,7 +5,8 @@ import {
   CheckCircle, 
   Clock, 
   Plus, 
-  Star 
+  Star,
+  Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -50,8 +51,7 @@ interface DoubtDto {
   answerProvided?: string;
   selectedSubject: string;
   studentId: number;
-  teacherId?: number; // Backend might send teacherId
-  teacherID?: number; // Backend might send teacherID (matches Entity)
+  teacherID?: number; 
 }
 
 const Doubts = () => {
@@ -64,30 +64,30 @@ const Doubts = () => {
 
   const [subjects, setSubjects] = useState<SubjectDto[]>([]);
   const [topics, setTopics] = useState<TopicDto[]>([]);
-  const [teachers, setTeachers] = useState<TeacherDto[]>([]);
+  const [teachers, setTeachers] = useState<TeacherDto[]>([]); // Dynamic list for dropdown
   
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>("");
   const [selectedTopicName, setSelectedTopicName] = useState("");
+  const [selectedTeacherId, setSelectedTeacherId] = useState<string>("");
   const [description, setDescription] = useState("");
   
   const [studentId, setStudentId] = useState<number | null>(null);
   const [doubts, setDoubts] = useState<DoubtDto[]>([]);
 
+  // 1. Initial Data Fetch (Student Info & Subjects)
   useEffect(() => {
     const fetchInitialData = async () => {
       const email = localStorage.getItem("emailId");
       if (!email) { setLoading(false); return; }
 
       try {
-        const [studentRes, subjectRes, teacherRes] = await Promise.all([
+        const [studentRes, subjectRes] = await Promise.all([
           axios.get(`http://localhost:8080/api/students/email/${email}`),
-          axios.get(`http://localhost:8080/api/subjects`),
-          axios.get(`http://localhost:8080/api/teachers`)
+          axios.get(`http://localhost:8080/api/subjects`)
         ]);
 
         setStudentId(studentRes.data.studentId);
         setSubjects(subjectRes.data);
-        setTeachers(teacherRes.data);
         
         const doubtRes = await axios.get(`http://localhost:8080/api/doubts/student/${studentRes.data.studentId}`);
         setDoubts(Array.isArray(doubtRes.data) ? doubtRes.data : []);
@@ -100,115 +100,131 @@ const Doubts = () => {
     fetchInitialData();
   }, []);
 
+  // 2. Fetch Topics AND Specific Teachers when Subject changes
   useEffect(() => {
-    const fetchTopics = async () => {
-      if (!selectedSubjectId) { setTopics([]); return; }
+    const fetchSubjectContext = async () => {
+      if (!selectedSubjectId) { 
+        setTopics([]); 
+        setTeachers([]); 
+        return; 
+      }
+
+      const selectedSub = subjects.find(s => s.subjectID.toString() === selectedSubjectId);
+      if (!selectedSub) return;
+
       try {
-        const res = await axios.get(`http://localhost:8080/api/topics/subject/${selectedSubjectId}`);
-        setTopics(Array.isArray(res.data) ? res.data : []);
-      } catch (error) { setTopics([]); }
+        // Fetch Topics for the subject
+        const topicRes = await axios.get(`http://localhost:8080/api/topics/subject/${selectedSubjectId}`);
+        setTopics(Array.isArray(topicRes.data) ? topicRes.data : []);
+
+        // Fetch ALL teachers handling this specific subject (as per your requirement)
+        const teacherRes = await axios.get(`http://localhost:8080/api/teachers/subject/${selectedSub.subjectName}`);
+        setTeachers(Array.isArray(teacherRes.data) ? teacherRes.data : []);
+      } catch (error) { 
+        console.error("Error fetching subject context:", error);
+        setTopics([]);
+        setTeachers([]);
+      }
     };
-    fetchTopics();
-  }, [selectedSubjectId]);
+    fetchSubjectContext();
+  }, [selectedSubjectId, subjects]);
 
-const handleAskSubmit = async () => {
+
+
+    const handleAskSubmit = async () => {
     const selectedSubObj = subjects.find(s => s.subjectID.toString() === selectedSubjectId);
-    
-    if (!studentId || !selectedSubObj || !description) {
-      toast({ title: "Error", description: "Please fill required fields.", variant: "destructive" });
-      return;
-    }
 
-    // ROBUST TEACHER LOOKUP: Trim whitespace and ignore case
-    const targetSubject = selectedSubObj.subjectName.trim().toLowerCase();
-    const associatedTeacher = teachers.find(t => 
-      t.subjectAssociated.trim().toLowerCase() === targetSubject
-    );
-
-    if (!associatedTeacher) {
+    // Validate that we have all required data
+    if (!studentId || !selectedSubObj || !description || !selectedTeacherId) {
       toast({ 
-        title: "Teacher Assignment Error", 
-        description: `No faculty is currently assigned to the subject: ${selectedSubObj.subjectName}`, 
+        title: "Error", 
+        description: "Please fill all fields, including selecting a teacher.", 
         variant: "destructive" 
       });
       return;
     }
 
-    const payload: DoubtDto = {
+    // Match your DoubtDto.java EXACTLY
+    const payload = {
       queryAsked: selectedTopicName ? `[${selectedTopicName}] ${description}` : description,
       selectedSubject: selectedSubObj.subjectName,
       studentId: studentId,
-      teacherId: associatedTeacher.teacherId, // Using lowercase 'd' from TeacherDto
-      doubtStatus: "Pending"
+      teacherID: Number(selectedTeacherId), // Changed 'teacherId' to 'teacherID'
+      doubtStatus: "Pending" 
     };
 
     try {
+      console.log("Sending payload:", payload); // Debugging line
       const response = await axios.post("http://localhost:8080/api/doubts", payload);
+      
       if (response.status === 201 || response.status === 200) {
-        toast({ title: "Success!", description: `Doubt sent to Prof. ${associatedTeacher.lastName}` });
+        toast({ title: "Success!", description: "Doubt sent successfully!" });
         setIsAskOpen(false);
+        // Reset form
         setSelectedSubjectId("");
         setSelectedTopicName("");
+        setSelectedTeacherId("");
         setDescription("");
         
+        // Refresh List
         const updated = await axios.get(`http://localhost:8080/api/doubts/student/${studentId}`);
         setDoubts(Array.isArray(updated.data) ? updated.data : []);
       }
     } catch (error) {
-      toast({ title: "Submission Failed", description: "Backend error while saving doubt.", variant: "destructive" });
+      console.error("Submission Error:", error);
+      toast({ 
+        title: "Submission Failed", 
+        description: "Check backend console. Ensure IDs are not null.", 
+        variant: "destructive" 
+      });
     }
   };
 
-  // const handleRateSubmit = async () => {
-  //   // Robust check for ID (handles teacherId or teacherID from JSON)
-  //   const tId = viewDoubt?.teacherId || viewDoubt?.teacherID;
 
-  //   if (!tId) {
-  //     toast({ title: "Error", description: "Teacher ID missing. Please check backend DTO.", variant: "destructive" });
-  //     return;
-  //   }
-
-  //   try {
-  //     await axios.post(`http://localhost:8080/api/teachers/${tId}/rate`, {
-  //       rating: rating
-  //     });
-
-  //     toast({ title: "Success!", description: `Rated ${rating} stars.` });
-  //     setViewDoubt(null);
-  //     setRating(0);
-  //   } catch (error) {
-  //     toast({ title: "Rating Failed", description: "Backend refused the request.", variant: "destructive" });
-  //   }
-  // };
 
   const handleRateSubmit = async () => {
-  const tId = viewDoubt?.teacherId || viewDoubt?.teacherID;
-  if (!tId) return;
+    const tId = viewDoubt?.teacherID; // Using consistent ID naming
+    if (!tId) return;
 
-  try {
-    // We only send the NEW rating. 
-    // The backend handles the "maintenance" of the average and count.
-    await axios.put(`http://localhost:8080/api/teachers/${tId}/rate`, {
-      rating: rating // e.g., 5
-    });
+    try {
+      // We pass an empty object {} as the body to satisfy Axios, 
+      // but the data is sent in the 'params' (the URL)
+      await axios.put(`http://localhost:8080/api/teachers/${tId}/rate`, {}, {
+        params: { 
+          rating: rating 
+        }
+      });
 
-    toast({ title: "Feedback Sent", description: "Teacher rating updated!" });
-    setViewDoubt(null);
-  } catch (error) {
-    toast({ title: "Error", variant: "destructive" });
-  }
-};
+      toast({ title: "Feedback Sent", description: "Teacher rating updated!" });
+      setViewDoubt(null);
+      setRating(0);
+      
+      // Optional: Refresh doubts if rating changes local state
+    } catch (error) {
+      console.error("Rating Error:", error);
+      toast({ 
+        title: "Error", 
+        description: "Could not submit rating. Technical error: 415", 
+        variant: "destructive" 
+      });
+    }
+  };
+
   const stats = {
     total: doubts.length,
     resolved: doubts.filter(d => d.doubtStatus === "Resolved").length,
     pending: doubts.filter(d => d.doubtStatus === "Pending").length,
   };
 
-  if (loading) return <div className="p-20 text-center text-white">Loading...</div>;
+  if (loading) return (
+    <div className="p-20 text-center text-white flex flex-col items-center gap-4">
+      <Loader2 className="animate-spin h-10 w-10" />
+      <p>Loading your academic profile...</p>
+    </div>
+  );
 
   return (
     <div className="container mx-auto px-4 py-8 pt-24 max-w-6xl text-white">
-      {/* HEADER */}
       <div className="flex flex-col gap-6 mb-8">
         <div className="flex justify-between items-center">
           <div>
@@ -217,47 +233,72 @@ const handleAskSubmit = async () => {
           </div>
           <Dialog open={isAskOpen} onOpenChange={setIsAskOpen}>
             <DialogTrigger asChild>
-              <Button size="lg" className="gap-2 bg-[#ef4444] hover:bg-red-600">
+              <Button size="lg" className="gap-2 bg-[#ef4444] hover:bg-red-600 transition-colors">
                 <Plus className="h-5 w-5" /> Ask a Doubt
               </Button>
             </DialogTrigger>
             <DialogContent className="bg-[#121212] text-white border-zinc-800">
               <DialogHeader>
                 <DialogTitle>Ask Question</DialogTitle>
-                <DialogDescription className="text-zinc-500">Provide details about your query.</DialogDescription>
+                <DialogDescription className="text-zinc-500">Select subject and teacher to submit your query.</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
                   <Label>Subject</Label>
-                  <select className="flex h-10 w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm" value={selectedSubjectId} onChange={(e) => { setSelectedSubjectId(e.target.value); setSelectedTopicName(""); }}>
+                  <select className="flex h-10 w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm" 
+                    value={selectedSubjectId} 
+                    onChange={(e) => { setSelectedSubjectId(e.target.value); setSelectedTopicName(""); setSelectedTeacherId(""); }}>
                     <option value="">-- Select Subject --</option>
                     {subjects.map((s) => <option key={s.subjectID} value={s.subjectID}>{s.subjectName}</option>)}
                   </select>
                 </div>
+
                 <div className="grid gap-2">
-                  <Label>Topic</Label>
-                  <select className="flex h-10 w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm disabled:opacity-50" value={selectedTopicName} onChange={(e) => setSelectedTopicName(e.target.value)} disabled={!selectedSubjectId || topics.length === 0}>
+                  <Label>Topic (Optional)</Label>
+                  <select className="flex h-10 w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm disabled:opacity-50" 
+                    value={selectedTopicName} 
+                    onChange={(e) => setSelectedTopicName(e.target.value)} 
+                    disabled={!selectedSubjectId || topics.length === 0}>
                     <option value="">-- Select Topic --</option>
                     {topics.map((t) => <option key={t.topicID} value={t.topicName}>{t.topicName}</option>)}
                   </select>
                 </div>
+
+                <div className="grid gap-2">
+                  <Label>Select Teacher</Label>
+                  <select className="flex h-10 w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm disabled:opacity-50" 
+                    value={selectedTeacherId} 
+                    onChange={(e) => setSelectedTeacherId(e.target.value)} 
+                    disabled={!selectedSubjectId || teachers.length === 0}>
+                    <option value="">-- Select Faculty Member --</option>
+                    {teachers.map((t) => (
+                      <option key={t.teacherId} value={t.teacherId}>Prof. {t.firstName} {t.lastName}</option>
+                    ))}
+                  </select>
+                  {selectedSubjectId && teachers.length === 0 && (
+                    <p className="text-[10px] text-red-500">No faculty assigned to this subject yet.</p>
+                  )}
+                </div>
+
                 <div className="grid gap-2">
                   <Label>Description</Label>
-                  <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe..." className="bg-zinc-900 border-zinc-700" rows={4} />
+                  <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Explain your doubt in detail..." className="bg-zinc-900 border-zinc-700" rows={4} />
                 </div>
               </div>
-              <DialogFooter><Button className="bg-[#ef4444] hover:bg-red-600" onClick={handleAskSubmit}>Submit</Button></DialogFooter>
+              <DialogFooter>
+                <Button className="bg-[#ef4444] hover:bg-red-600 w-full" onClick={handleAskSubmit}>Submit Doubt</Button>
+              </DialogFooter>
             </DialogContent>
           </Dialog>
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <StatCard title="Total" count={stats.total} icon={<MessageCircle className="text-blue-500"/>} />
+          <StatCard title="Total Questions" count={stats.total} icon={<MessageCircle className="text-blue-500"/>} />
           <StatCard title="Resolved" count={stats.resolved} icon={<CheckCircle className="text-green-500"/>} />
-          <StatCard title="Pending" count={stats.pending} icon={<Clock className="text-orange-500"/>} />
+          <StatCard title="Awaiting Answer" count={stats.pending} icon={<Clock className="text-orange-500"/>} />
         </div>
       </div>
 
-      {/* LIST TABS */}
       <Tabs defaultValue="all">
         <TabsList className="bg-zinc-900 border-zinc-800">
           <TabsTrigger value="all">All</TabsTrigger>
@@ -271,56 +312,44 @@ const handleAskSubmit = async () => {
         </div>
       </Tabs>
 
-      {/* VIEW MODAL (WITH ACCESSIBILITY FIXES) */}
       <Dialog open={!!viewDoubt} onOpenChange={(o) => { if(!o) { setViewDoubt(null); setRating(0); } }}>
         <DialogContent className="bg-[#121212] text-white border-zinc-800 sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>{viewDoubt?.selectedSubject || "Doubt Details"}</DialogTitle>
-            <DialogDescription className="text-zinc-500">View resolution and rate faculty performance.</DialogDescription>
+            <DialogTitle>{viewDoubt?.selectedSubject}</DialogTitle>
           </DialogHeader>
-          
           {viewDoubt && (
             <div className="space-y-6 pt-2">
               <Badge className={viewDoubt.doubtStatus === "Resolved" ? "bg-green-600" : "bg-orange-500"}>
                 {viewDoubt.doubtStatus}
               </Badge>
-
               <div className="space-y-2">
-                <Label className="text-zinc-400 uppercase text-[10px] font-bold">Query Asked</Label>
+                <Label className="text-zinc-400 uppercase text-[10px] font-bold tracking-widest">Your Question</Label>
                 <div className="p-4 bg-zinc-900 rounded-md border border-zinc-800">
-                  <p className="text-sm">{viewDoubt.queryAsked}</p>
+                  <p className="text-sm leading-relaxed">{viewDoubt.queryAsked}</p>
                 </div>
               </div>
-
               {viewDoubt.answerProvided ? (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-green-500 uppercase text-[10px] font-bold">Faculty Answer</Label>
+                    <Label className="text-green-500 uppercase text-[10px] font-bold tracking-widest">Faculty Response</Label>
                     <div className="p-4 bg-green-900/10 border border-green-800/30 rounded-md">
-                      <p className="text-sm text-green-50">{viewDoubt.answerProvided}</p>
+                      <p className="text-sm text-green-50 leading-relaxed">{viewDoubt.answerProvided}</p>
                     </div>
                   </div>
-
-                  {/* Rating Logic */}
                   <div className="pt-4 border-t border-zinc-800 text-center">
-                    <p className="text-sm mb-3">Rate this solution</p>
+                    <p className="text-sm mb-3 font-medium">How helpful was this solution?</p>
                     <div className="flex justify-center gap-2 mb-6">
                       {[1, 2, 3, 4, 5].map((s) => (
-                        <Star 
-                          key={s}
-                          className={`h-8 w-8 cursor-pointer ${rating >= s ? "fill-yellow-500 text-yellow-500" : "text-zinc-700"}`}
-                          onClick={() => setRating(s)}
-                        />
+                        <Star key={s} className={`h-8 w-8 cursor-pointer transition-all ${rating >= s ? "fill-yellow-500 text-yellow-500 scale-110" : "text-zinc-700"}`} onClick={() => setRating(s)} />
                       ))}
                     </div>
-                    <Button onClick={handleRateSubmit} disabled={rating === 0} className="w-full bg-white text-black hover:bg-zinc-200">
-                      Submit Feedback
-                    </Button>
+                    <Button onClick={handleRateSubmit} disabled={rating === 0} className="w-full bg-white text-black hover:bg-zinc-200">Submit Feedback</Button>
                   </div>
                 </div>
               ) : (
-                <div className="p-4 bg-zinc-900 border border-zinc-800 text-center rounded-md">
-                  <p className="text-sm text-zinc-500 italic">Solution pending from faculty...</p>
+                <div className="p-8 bg-zinc-900 border border-zinc-800 text-center rounded-md">
+                  <Clock className="h-8 w-8 text-zinc-600 mx-auto mb-2" />
+                  <p className="text-sm text-zinc-500 italic">Faculty is currently reviewing your request.</p>
                 </div>
               )}
             </div>
@@ -334,17 +363,18 @@ const handleAskSubmit = async () => {
 const StatCard = ({ title, count, icon }: any) => (
   <Card className="bg-zinc-900 border-zinc-800">
     <CardContent className="p-6 flex items-center justify-between">
-      <div><p className="text-sm text-zinc-400">{title}</p><h3 className="text-3xl font-bold">{count}</h3></div>{icon}
+      <div><p className="text-xs text-zinc-400 font-medium uppercase tracking-wider">{title}</p><h3 className="text-3xl font-bold mt-1">{count}</h3></div>{icon}
     </CardContent>
   </Card>
 );
 
 const DoubtCard = ({ data, onClick }: any) => (
-  <Card onClick={onClick} className="bg-zinc-900 border-zinc-800 cursor-pointer hover:border-red-500 transition-colors">
+  <Card onClick={onClick} className="bg-zinc-900 border-zinc-800 cursor-pointer hover:border-[#ef4444] transition-all group mb-4">
     <CardContent className="p-4 flex justify-between items-center">
       <div className="space-y-1">
-        <Badge variant="outline" className="text-zinc-500 border-zinc-800">{data.selectedSubject}</Badge>
-        <h4 className="font-semibold">{data.queryAsked}</h4>
+        <Badge variant="outline" className="text-[10px] text-zinc-500 border-zinc-800 group-hover:text-zinc-300">{data.selectedSubject}</Badge>
+        <h4 className="font-semibold text-zinc-100 group-hover:text-white transition-colors">{data.queryAsked}</h4>
+        <p className="text-[10px] text-zinc-500">{data.date ? new Date(data.date).toLocaleDateString() : 'N/A'}</p>
       </div>
       <Badge className={data.doubtStatus === "Resolved" ? "bg-green-600" : "bg-orange-500"}>{data.doubtStatus}</Badge>
     </CardContent>
