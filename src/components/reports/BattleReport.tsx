@@ -12,6 +12,8 @@ import {
   ChevronLeft,
   Zap
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { Question } from '@/data/questions';
 
 // Helper to get options as array
@@ -24,7 +26,9 @@ interface BattleReportProps {
   selectedAnswers: { [key: number]: number };
   timeTaken: number;
   totalQuestions: number;
+  winnerId: number | null;
   onBack: () => void;
+  onPlayAgain: () => void;
 }
 
 export const BattleReport = ({ 
@@ -32,12 +36,20 @@ export const BattleReport = ({
   selectedAnswers, 
   timeTaken, 
   totalQuestions,
-  onBack 
+  winnerId,
+  onBack,
+  onPlayAgain
 }: BattleReportProps) => {
+  const { user } = useAuth();
+  const studentId = Number(user?.student_id);
+  const currentWinnerId = Number(winnerId);
+  const isUserWinner = currentWinnerId === studentId;
+  console.log("Debug Winner:", { currentWinnerId, studentId, isUserWinner });
   const correctCount = Object.keys(selectedAnswers).filter((qId) => {
     const question = questions.find(q => q.questionID === parseInt(qId));
     if (!question) return false;
     const options = getOptionsArray(question);
+    
     const selectedOption = options[selectedAnswers[parseInt(qId)]];
     return selectedOption === question.correctAnswer;
   }).length;
@@ -69,6 +81,15 @@ export const BattleReport = ({
               <Trophy className="w-4 h-4 mr-2" />
               Battle Complete
             </Badge>
+            <Card className={`p-8 mb-8 border-4 ${isUserWinner ? 'border-yellow-400 bg-yellow-50/10' : 'border-primary'}`}>
+                <div className="text-center">
+                    <Trophy className={`w-20 h-20 mx-auto mb-4 ${isUserWinner ? 'text-yellow-500' : 'text-primary'}`} />
+                    <h1 className="text-4xl font-bold mb-2">
+                        {isUserWinner ? "YOU ARE THE WINNER! 👑" : `Winner: Player ${winnerId?.toString().slice(-3)}`}
+                    </h1>
+                    <p className="text-muted-foreground">The battle has ended. See your performance below.</p>
+                </div>
+            </Card>
             <performance.icon className={`w-16 h-16 mx-auto mb-4 ${performance.color}`} />
             <div className={`text-4xl font-bold mb-2 ${performance.color}`}>
               {performance.text}
@@ -158,7 +179,7 @@ export const BattleReport = ({
           <Button variant="outline" className="flex-1" onClick={onBack}>
             Back to Menu
           </Button>
-          <Button className="flex-1">
+          <Button className="flex-1" onClick={onPlayAgain}>
             Play Again
           </Button>
         </div>
