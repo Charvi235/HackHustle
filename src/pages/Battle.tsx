@@ -12,7 +12,7 @@ import {
 import { battleQuestions, Question } from '@/data/questions';
 import { BattleReport } from '@/components/reports/BattleReport';
 import { BattleLobby, JoinBattleLobby } from './BattleLobby';
-
+import { useRef } from 'react';
 import {
   connectBattleSocket,
   sendJoinBattle,
@@ -50,9 +50,9 @@ const Battle = () => {
   const navigate = useNavigate();
   const studentEmail = user?.emailId; 
   const studentId = Number(user?.student_id);
-
+  const [winnerId, setWinnerId] = useState<number | null>(null);
   const currentQuestions = dbQuestions.length > 0 ? dbQuestions : battleQuestions;
-
+  const scoresRef = useRef<{ [key: number]: number }>({});
   /* ---------------- API CALLS ---------------- */
 
   const createBattleEntry = async (email: string, status: string = "COMPLETED", score: number = 0) => {
@@ -119,6 +119,7 @@ useEffect(() => {
                     console.log("🔥 Updated Scores from Server:", data.scores);
                     console.log("Full Scores Map:", JSON.stringify(data.scores)); 
                     setLiveScores(data.scores);
+                    scoresRef.current = data.scores;
                 }
 
                 if (typeof data.currentQuestionIndex === 'number') {
@@ -172,7 +173,33 @@ const handleAnswer = (answerIndex: number) => {
 const handleFinishGame = () => {
     setIsGameActive(false);
     setGameMode('report');
-
+    let highestScore = -1;
+    let currentWinner = null;
+    const currentScores = scoresRef.current;
+    const scoreEntries = Object.entries(currentScores);
+    
+    console.log("🏆 Final Sync Scores:", currentScores);
+    console.log("Calculating Winner from Scores:", scoreEntries);
+    // Object.entries(liveScores).forEach(([pId, score]) => {
+    //   console.log(`Player ${pId} scored ${score} highest is ${highestScore}`);
+    //     if (score > highestScore) {
+    //         highestScore = score;
+    //         currentWinner = Number(pId);
+    //     }
+    // });
+    if (scoreEntries.length > 0) {
+        scoreEntries.forEach(([pId, score]) => {
+            const numericScore = Number(score);
+            const numericId = Number(pId);
+            
+            if (numericScore > highestScore) {
+                highestScore = numericScore;
+                currentWinner = numericId;
+            }
+        });
+    }
+    console.log("🏁 Game Finished! Winner ID:", currentWinner, "with score:", highestScore);
+    setWinnerId(currentWinner);
     setMasterAnswers(finalAnswers => {
       const finalScore = currentQuestions.reduce((acc, q) => {
         const selectedIdx = finalAnswers[q.questionID];
@@ -213,6 +240,7 @@ const handleFinishGame = () => {
         selectedAnswers={masterAnswers}
         timeTaken={Math.floor((Date.now() - startTime) / 1000)} 
         totalQuestions={currentQuestions.length} 
+        winnerId={winnerId}
         onBack={() => setGameMode('menu')} 
         onPlayAgain={() => {
           setGameMode('menu'); // Go back to menu to select mode
