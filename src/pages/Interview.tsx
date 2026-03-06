@@ -1002,7 +1002,7 @@ const techSkillsList = [
 
           
 
-                   <div className="relative">
+                 <div className="relative">
   <label className="block text-sm font-medium text-gray-400 mb-2">
     Job Role 
   </label>
@@ -1011,52 +1011,40 @@ const techSkillsList = [
     value={role}
     onChange={(e) => {
       setRole(e.target.value);
-      setShowRoleDropdown(true); // Type karte waqt dropdown khulega
+      setShowRoleDropdown(true);
     }}
     onFocus={() => setShowRoleDropdown(true)}
-    onBlur={() => setTimeout(() => setShowRoleDropdown(false), 200)} // Click hone ka time dene ke liye delay
+    onBlur={() => setTimeout(() => setShowRoleDropdown(false), 300)} // 👈 Thoda time badhaya taaki safe rahe
     placeholder="Type or select a role (e.g., Data Scientist)..."
     className="w-full bg-[#1d1d2e] border border-gray-700 text-white rounded-lg p-4 outline-none focus:ring-2 focus:ring-red-500 transition-all"
-  /> 
+  />
   
   {/* Custom Scrollable Dropdown */}
-   {showRoleDropdown && (
-   <ul className="absolute z-50 w-full mt-1 bg-[#1d1d2e] border border-gray-700 rounded-lg shadow-2xl max-h-60 overflow-y-auto">
-      {techSkillsList
-        // Filter karo jo type kiya hai usse, aur jo pehle se selected hai use hata do
-        .filter((s) => s.toLowerCase().includes(skillInput.toLowerCase()) && !techSkills.includes(s))
-        .map((s, index) => (
+  {showRoleDropdown && (
+    <ul className="absolute z-50 w-full mt-1 bg-[#1d1d2e] border border-gray-700 rounded-lg shadow-2xl max-h-60 overflow-y-auto">
+      {jobRolesList
+        .filter((r) => r.toLowerCase().includes(role.toLowerCase()))
+        .map((r, index) => (
           <li
             key={index}
-            // 🔥 onClick ki jagah onMouseDown aur preventDefault laga diya 🔥
+            // 🔥 onClick ki jagah onMouseDown laga diya 🔥
             onMouseDown={(e) => {
-              e.preventDefault(); // Ye input ka focus hide nahi hone dega!
-              setTechSkills([...techSkills, s]); // Naya skill array me add kiya
-              setSkillInput(""); // Input khali kiya
+              e.preventDefault(); // Input ka focus nahi jaane dega
+              setRole(r); // 👈 Sirf yahi ek role input me set ho jayega (Single Select)
+              setShowRoleDropdown(false); // Select hote hi dropdown band!
             }}
             className="p-4 hover:bg-red-600/20 hover:text-red-400 text-gray-300 cursor-pointer border-b border-gray-800/50 transition-colors"
           >
-            {s}
+            {r}
           </li>
         ))}
-     
-      {/* Agar koi aisi skill type kare jo list me nahi hai, toh "Add Custom" ka option de */}
-      {skillInput.trim() !== '' && !techSkillsList.some(s => s.toLowerCase() === skillInput.toLowerCase()) && !techSkills.includes(skillInput.trim()) && (
-        <li 
-          // 🔥 Yahan bhi onMouseDown laga diya 🔥
-          onMouseDown={(e) => {
-            e.preventDefault();
-            setTechSkills([...techSkills, skillInput.trim()]);
-            setSkillInput("");
-          }}
-          className="p-4 hover:bg-red-600/20 hover:text-red-400 text-gray-300 cursor-pointer italic"
-        >
-          Add "{skillInput}"...
-        </li>
+      {/* Agar search match na kare */}
+      {jobRolesList.filter((r) => r.toLowerCase().includes(role.toLowerCase())).length === 0 && (
+        <li className="p-4 text-gray-500 italic">No matching roles found...</li>
       )}
     </ul>
   )}
-</div>  
+</div>
 
 
 <div>
