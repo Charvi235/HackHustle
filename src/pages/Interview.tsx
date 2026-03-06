@@ -683,7 +683,7 @@ const Interview = () => {
   const [results, setResults] = useState<QuestionResult[]>([]);
   const [isEvaluating, setIsEvaluating] = useState(false);
 
-  // 🔥 ADDED (session-based interview)
+  // (session-based interview)
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [backendQuestion, setBackendQuestion] = useState<string>("");
 
@@ -691,23 +691,46 @@ const Interview = () => {
   const [difficulty, setDifficulty] = useState("Medium");
   const [role, setRole] = useState("");
   const [targetCompany, setTargetCompany] = useState("");
-  const [techSkills, setTechSkills] = useState("");
+  // Isko delete kar: const [techSkills, setTechSkills] = useState("");
+// Uski jagah ye 3 lines daal de:
+const [techSkills, setTechSkills] = useState<string[]>([]); // Ab ye array hai
+const [skillInput, setSkillInput] = useState(""); // Jo user type kar raha hai
+const [showSkillsDropdown, setShowSkillsDropdown] = useState(false);
+  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
+  const jobRolesList = [
+  "Software Development Engineer (SDE)", "Frontend Developer", "Backend Developer",
+  "Full Stack Developer", "Mobile App Developer", "Game Developer",
+  "Data Scientist", "Data Analyst", "Machine Learning Engineer",
+  "AI Prompt Engineer",  "DevOps Engineer",
+  "Cloud Architect",
+   "Cybersecurity Analyst",
+  "Product Manager", "UI/UX Designer", "Systems Analyst"
+];
+
+const techSkillsList = [
+  "JavaScript", "TypeScript", "Python", "Java", "C++", "C#", "C","HTML","CSS",
+  "React", "Angular", "Next.js", "Node.js", "Express.js", "Spring Boot", "Django", "Flutter",
+  "SQL", "MySQL", "MongoDB", "Oracle",
+  "Machine Learning", "Deep Learning", "TensorFlow", "Pandas",
+   "Google Cloud (GCP)", "Linux", "Git",
+  "Selenium", "Cybersecurity"
+].sort();
 
   const handleStartInterview = (typeId: number) => {
     setSelectedType(typeId);
     setIsSetupMode(true);
   };
 
-  // 🔥 UPDATED – setup → get question + session_id
   const handleStart = async () => {
     if (!role.trim() || !experience.trim()) {
       alert("Please enter Job Role and Experience.");
       return;
     }
 
-    const skillsArray = techSkills
-      ? techSkills.split(',').map(s => s.trim()).filter(Boolean)
-      : [];
+    // const skillsArray = techSkills
+    //   ? techSkills.split(',').map(s => s.trim()).filter(Boolean)
+    //   : [];
+    const skillsArray = techSkills;
 
     const interviewData = {
       role,
@@ -722,7 +745,7 @@ const Interview = () => {
       const response = await interviewService.setupInterview(interviewData);
 
       setBackendQuestion(response.question);      // 🔥 Q1
-      setSessionId(response.session_id);          // 🔥 STORE SESSION
+      setSessionId(response.session_id);          
       setIsInterviewActive(true);
       setCurrentQuestion(0);
       setStartTime(Date.now());
@@ -952,50 +975,93 @@ const Interview = () => {
               <div className="space-y-6">
                 <div className="space-y-6 mb-8">
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">
-                      Years of Experience 
-                    </label>
-                    <input
-                      type="text"
-                      value={experience} 
-                      onChange={(e) => setExperience(e.target.value)}
-                      placeholder="Ex: Fresher, 2 Years, or Senior Developer..." 
-                      className="w-full bg-[#1d1d2e] border border-gray-700 text-white rounded-lg p-4 outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent placeholder-gray-500 transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">
-                      Interview Difficulty
-                    </label>
-                    <div className="relative">
-                      <select
-                        value={difficulty}
-                        onChange={(e) => setDifficulty(e.target.value)}
-                        className="w-full bg-[#1d1d2e] border border-gray-700 text-white rounded-lg p-4 appearance-none outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent cursor-pointer transition-all"
-                      >
-                        <option value="Easy">Easy</option>
-                        <option value="Medium">Medium</option>
-                        <option value="Hard">Hard</option>
-                      </select>
-                      <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
-                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">
-                      Job Role 
-                    </label>
-                    <input
-                      type="text"
-                      value={role}
-                      onChange={(e) => setRole(e.target.value)}
-                      placeholder="Ex: Frontend Developer, Data Scientist..."
-                      className="w-full bg-[#1d1d2e] border border-gray-700 text-white rounded-lg p-4 outline-none focus:ring-2 focus:ring-red-500 transition-all"
-                    />
-                  </div>
+  <label className="block text-sm font-medium text-gray-400 mb-2">
+    Years of Experience 
+  </label>
+  <div className="relative">
+    <select
+      value={experience}
+      onChange={(e) => setExperience(e.target.value)}
+      className="w-full bg-[#1d1d2e] border border-gray-700 text-white rounded-lg p-4 appearance-none outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent cursor-pointer transition-all"
+    >
+      <option value="" disabled>Select your experience</option>
+      <option value="Fresher (0 Years)">Fresher (0 Years)</option>
+      <option value="0 - 1 Years">0 - 1 Years</option>
+      <option value="1 - 3 Years">1 - 3 Years</option>
+      <option value="3 - 5 Years">3 - 5 Years</option>
+      <option value="5 - 8 Years">5 - 8 Years</option>
+      <option value="8+ Years">8+ Years</option>
+    </select>
+    <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </div>
+  </div>
+</div>
+                  <div className="relative">
+  <label className="block text-sm font-medium text-gray-400 mb-2">
+    Job Role 
+  </label>
+  <input
+    type="text"
+    value={role}
+    onChange={(e) => {
+      setRole(e.target.value);
+      setShowRoleDropdown(true); // Type karte waqt dropdown khulega
+    }}
+    onFocus={() => setShowRoleDropdown(true)}
+    onBlur={() => setTimeout(() => setShowRoleDropdown(false), 200)} // Click hone ka time dene ke liye delay
+    placeholder="Type or select a role (e.g., Data Scientist)..."
+    className="w-full bg-[#1d1d2e] border border-gray-700 text-white rounded-lg p-4 outline-none focus:ring-2 focus:ring-red-500 transition-all"
+  />
+  
+  {/* Custom Scrollable Dropdown */}
+  {showRoleDropdown && (
+    <ul className="absolute z-50 w-full mt-1 bg-[#1d1d2e] border border-gray-700 rounded-lg shadow-2xl max-h-60 overflow-y-auto">
+      {jobRolesList
+        .filter((r) => r.toLowerCase().includes(role.toLowerCase()))
+        .map((r, index) => (
+          <li
+            key={index}
+            onClick={() => {
+              setRole(r);
+              setShowRoleDropdown(false);
+            }}
+            className="p-4 hover:bg-red-600/20 hover:text-red-400 text-gray-300 cursor-pointer border-b border-gray-800/50 transition-colors"
+          >
+            {r}
+          </li>
+        ))}
+      {/* Agar search match na kare */}
+      {jobRolesList.filter((r) => r.toLowerCase().includes(role.toLowerCase())).length === 0 && (
+        <li className="p-4 text-gray-500 italic">No matching roles found...</li>
+      )}
+    </ul>
+  )}
+</div>
+<div>
+  <label className="block text-sm font-medium text-gray-400 mb-2">
+    Interview Difficulty
+  </label>
+  <div className="relative">
+    <select
+      value={difficulty}
+      onChange={(e) => setDifficulty(e.target.value)}
+      className="w-full bg-[#1d1d2e] border border-gray-700 text-white rounded-lg p-4 appearance-none outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent cursor-pointer transition-all"
+    >
+      <option value="Easy">Easy</option>
+      <option value="Medium">Medium</option>
+      <option value="Hard">Hard</option>
+    </select>
+    {/* Ye code side mein chhota sa arrow dikhane ke liye hai */}
+    <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </div>
+  </div>
+</div>
                   <div>
                     <label className="block text-sm font-medium text-gray-400 mb-2">
                       Target Company (Optional)
@@ -1008,18 +1074,94 @@ const Interview = () => {
                       className="w-full bg-[#1d1d2e] border border-gray-700 text-white rounded-lg p-4 outline-none focus:ring-2 focus:ring-red-500 transition-all"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">
-                      Tech Skills (Optional)
-                    </label>
-                    <input
-                      type="text"
-                      value={techSkills}
-                      onChange={(e) => setTechSkills(e.target.value)}
-                      placeholder="Ex: React, Java, Python (Comma separated)"
-                      className="w-full bg-[#1d1d2e] border border-gray-700 text-white rounded-lg p-4 outline-none focus:ring-2 focus:ring-red-500 transition-all"
-                    />
-                  </div>
+                  <div className="relative">
+  <label className="block text-sm font-medium text-gray-400 mb-2">
+    Tech Skills (Optional)
+  </label>
+  
+  {/* Fake Input Box (Jiske andar tags aur real input dono honge) */}
+  <div 
+    className="w-full bg-[#1d1d2e] border border-gray-700 rounded-lg p-3 min-h-[56px] flex flex-wrap gap-2 items-center focus-within:ring-2 focus-within:ring-red-500 transition-all cursor-text"
+    onClick={() => document.getElementById('skill-input')?.focus()}
+  >
+    {/* Ye selected skills ko Badge/Chip ki tarah dikhayega */}
+    {techSkills.map((skill, index) => (
+      <span 
+        key={index} 
+        className="bg-red-600/20 text-red-400 border border-red-500/30 px-3 py-1 rounded-full text-sm flex items-center gap-1 animate-in fade-in zoom-in duration-200"
+      >
+        {skill}
+        <button 
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation(); // Parent div ka click rokne ke liye
+            setTechSkills(techSkills.filter(s => s !== skill)); // Remove tag
+          }}
+          className="hover:text-red-200 focus:outline-none ml-1 font-bold"
+        >
+          &times;
+        </button>
+      </span>
+    ))}
+
+    {/* Asli Input Field jisme typing hogi */}
+    <input
+      id="skill-input"
+      type="text"
+      value={skillInput}
+      onChange={(e) => {
+        setSkillInput(e.target.value);
+        setShowSkillsDropdown(true);
+      }}
+      onFocus={() => setShowSkillsDropdown(true)}
+      onBlur={() => setTimeout(() => setShowSkillsDropdown(false), 200)}
+      onKeyDown={(e) => {
+        // Agar user Backspace dabaye jab input khali ho, toh aakhri tag delete ho jaye
+        if (e.key === 'Backspace' && skillInput === '' && techSkills.length > 0) {
+          setTechSkills(techSkills.slice(0, -1));
+        }
+      }}
+      placeholder={techSkills.length === 0 ? "Ex: React, Java, C++..." : ""}
+      className="flex-1 bg-transparent outline-none min-w-[120px] text-white placeholder-gray-500"
+    />
+  </div>
+
+  {/* Custom Scrollable Dropdown */}
+  {showSkillsDropdown && (
+    <ul className="absolute z-50 w-full mt-1 bg-[#1d1d2e] border border-gray-700 rounded-lg shadow-2xl max-h-60 overflow-y-auto">
+      {techSkillsList
+        // Filter karo jo type kiya hai usse, aur jo pehle se selected hai use hata do
+        .filter((s) => s.toLowerCase().includes(skillInput.toLowerCase()) && !techSkills.includes(s))
+        .map((s, index) => (
+          <li
+            key={index}
+            onClick={() => {
+              setTechSkills([...techSkills, s]); // Naya skill array me add kiya
+              setSkillInput(""); // Input khali kiya
+              document.getElementById('skill-input')?.focus(); // Taki user turant dusra type kar sake
+            }}
+            className="p-4 hover:bg-red-600/20 hover:text-red-400 text-gray-300 cursor-pointer border-b border-gray-800/50 transition-colors"
+          >
+            {s}
+          </li>
+        ))}
+      
+      {/* Agar koi aisi skill type kare jo list me nahi hai, toh "Add Custom" ka option de */}
+      {skillInput.trim() !== '' && !techSkillsList.some(s => s.toLowerCase() === skillInput.toLowerCase()) && !techSkills.includes(skillInput.trim()) && (
+        <li 
+          onClick={() => {
+            setTechSkills([...techSkills, skillInput.trim()]);
+            setSkillInput("");
+            document.getElementById('skill-input')?.focus();
+          }}
+          className="p-4 hover:bg-red-600/20 hover:text-red-400 text-gray-300 cursor-pointer italic"
+        >
+          Add "{skillInput}"...
+        </li>
+      )}
+    </ul>
+  )}
+</div>
 
                   {/* Start Button */}
                   <button
