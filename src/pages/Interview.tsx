@@ -744,7 +744,7 @@ const techSkillsList = [
     try {
       const response = await interviewService.setupInterview(interviewData);
 
-      setBackendQuestion(response.question);      // 🔥 Q1
+      setBackendQuestion(response.question);      
       setSessionId(response.session_id);          
       setIsInterviewActive(true);
       setCurrentQuestion(0);
@@ -999,7 +999,10 @@ const techSkillsList = [
     </div>
   </div>
 </div>
-                  <div className="relative">
+
+          
+
+                   <div className="relative">
   <label className="block text-sm font-medium text-gray-400 mb-2">
     Job Role 
   </label>
@@ -1014,32 +1017,48 @@ const techSkillsList = [
     onBlur={() => setTimeout(() => setShowRoleDropdown(false), 200)} // Click hone ka time dene ke liye delay
     placeholder="Type or select a role (e.g., Data Scientist)..."
     className="w-full bg-[#1d1d2e] border border-gray-700 text-white rounded-lg p-4 outline-none focus:ring-2 focus:ring-red-500 transition-all"
-  />
+  /> 
   
   {/* Custom Scrollable Dropdown */}
-  {showRoleDropdown && (
-    <ul className="absolute z-50 w-full mt-1 bg-[#1d1d2e] border border-gray-700 rounded-lg shadow-2xl max-h-60 overflow-y-auto">
-      {jobRolesList
-        .filter((r) => r.toLowerCase().includes(role.toLowerCase()))
-        .map((r, index) => (
+   {showRoleDropdown && (
+   <ul className="absolute z-50 w-full mt-1 bg-[#1d1d2e] border border-gray-700 rounded-lg shadow-2xl max-h-60 overflow-y-auto">
+      {techSkillsList
+        // Filter karo jo type kiya hai usse, aur jo pehle se selected hai use hata do
+        .filter((s) => s.toLowerCase().includes(skillInput.toLowerCase()) && !techSkills.includes(s))
+        .map((s, index) => (
           <li
             key={index}
-            onClick={() => {
-              setRole(r);
-              setShowRoleDropdown(false);
+            // 🔥 onClick ki jagah onMouseDown aur preventDefault laga diya 🔥
+            onMouseDown={(e) => {
+              e.preventDefault(); // Ye input ka focus hide nahi hone dega!
+              setTechSkills([...techSkills, s]); // Naya skill array me add kiya
+              setSkillInput(""); // Input khali kiya
             }}
             className="p-4 hover:bg-red-600/20 hover:text-red-400 text-gray-300 cursor-pointer border-b border-gray-800/50 transition-colors"
           >
-            {r}
+            {s}
           </li>
         ))}
-      {/* Agar search match na kare */}
-      {jobRolesList.filter((r) => r.toLowerCase().includes(role.toLowerCase())).length === 0 && (
-        <li className="p-4 text-gray-500 italic">No matching roles found...</li>
+     
+      {/* Agar koi aisi skill type kare jo list me nahi hai, toh "Add Custom" ka option de */}
+      {skillInput.trim() !== '' && !techSkillsList.some(s => s.toLowerCase() === skillInput.toLowerCase()) && !techSkills.includes(skillInput.trim()) && (
+        <li 
+          // 🔥 Yahan bhi onMouseDown laga diya 🔥
+          onMouseDown={(e) => {
+            e.preventDefault();
+            setTechSkills([...techSkills, skillInput.trim()]);
+            setSkillInput("");
+          }}
+          className="p-4 hover:bg-red-600/20 hover:text-red-400 text-gray-300 cursor-pointer italic"
+        >
+          Add "{skillInput}"...
+        </li>
       )}
     </ul>
   )}
-</div>
+</div>  
+
+
 <div>
   <label className="block text-sm font-medium text-gray-400 mb-2">
     Interview Difficulty
@@ -1062,6 +1081,7 @@ const techSkillsList = [
     </div>
   </div>
 </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-400 mb-2">
                       Target Company (Optional)
@@ -1074,12 +1094,14 @@ const techSkillsList = [
                       className="w-full bg-[#1d1d2e] border border-gray-700 text-white rounded-lg p-4 outline-none focus:ring-2 focus:ring-red-500 transition-all"
                     />
                   </div>
-                  <div className="relative">
+
+                  {/* ===== TECH SKILLS BLOCK START ===== */}
+<div className="relative">
   <label className="block text-sm font-medium text-gray-400 mb-2">
     Tech Skills (Optional)
   </label>
   
-  {/* Fake Input Box (Jiske andar tags aur real input dono honge) */}
+  {/* Fake Input Box */}
   <div 
     className="w-full bg-[#1d1d2e] border border-gray-700 rounded-lg p-3 min-h-[56px] flex flex-wrap gap-2 items-center focus-within:ring-2 focus-within:ring-red-500 transition-all cursor-text"
     onClick={() => document.getElementById('skill-input')?.focus()}
@@ -1088,14 +1110,15 @@ const techSkillsList = [
     {techSkills.map((skill, index) => (
       <span 
         key={index} 
-        className="bg-red-600/20 text-red-400 border border-red-500/30 px-3 py-1 rounded-full text-sm flex items-center gap-1 animate-in fade-in zoom-in duration-200"
+        className="bg-red-600/20 text-red-400 border border-red-500/30 px-3 py-1 rounded-full text-sm flex items-center gap-1"
       >
         {skill}
         <button 
           type="button"
-          onClick={(e) => {
-            e.stopPropagation(); // Parent div ka click rokne ke liye
-            setTechSkills(techSkills.filter(s => s !== skill)); // Remove tag
+          onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setTechSkills(prev => prev.filter(s => s !== skill)); // Safe remove
           }}
           className="hover:text-red-200 focus:outline-none ml-1 font-bold"
         >
@@ -1104,7 +1127,7 @@ const techSkillsList = [
       </span>
     ))}
 
-    {/* Asli Input Field jisme typing hogi */}
+    {/* Asli Input Field */}
     <input
       id="skill-input"
       type="text"
@@ -1114,11 +1137,10 @@ const techSkillsList = [
         setShowSkillsDropdown(true);
       }}
       onFocus={() => setShowSkillsDropdown(true)}
-      onBlur={() => setTimeout(() => setShowSkillsDropdown(false), 200)}
+      onBlur={() => setTimeout(() => setShowSkillsDropdown(false), 300)} // 👈 Thoda time badha diya taaki click miss na ho
       onKeyDown={(e) => {
-        // Agar user Backspace dabaye jab input khali ho, toh aakhri tag delete ho jaye
         if (e.key === 'Backspace' && skillInput === '' && techSkills.length > 0) {
-          setTechSkills(techSkills.slice(0, -1));
+          setTechSkills(prev => prev.slice(0, -1));
         }
       }}
       placeholder={techSkills.length === 0 ? "Ex: React, Java, C++..." : ""}
@@ -1126,19 +1148,19 @@ const techSkillsList = [
     />
   </div>
 
-  {/* Custom Scrollable Dropdown */}
+  {/* Dropdown List */}
   {showSkillsDropdown && (
     <ul className="absolute z-50 w-full mt-1 bg-[#1d1d2e] border border-gray-700 rounded-lg shadow-2xl max-h-60 overflow-y-auto">
       {techSkillsList
-        // Filter karo jo type kiya hai usse, aur jo pehle se selected hai use hata do
         .filter((s) => s.toLowerCase().includes(skillInput.toLowerCase()) && !techSkills.includes(s))
         .map((s, index) => (
           <li
             key={index}
-            onClick={() => {
-              setTechSkills([...techSkills, s]); // Naya skill array me add kiya
-              setSkillInput(""); // Input khali kiya
-              document.getElementById('skill-input')?.focus(); // Taki user turant dusra type kar sake
+            onMouseDown={(e) => {
+              e.preventDefault(); // Input ka focus lock karega
+              setTechSkills(prev => [...prev, s]); // 👈 'prev' use kiya taaki 100% array update ho
+              setSkillInput(""); 
+              setTimeout(() => document.getElementById('skill-input')?.focus(), 10); // 👈 Wapas turant focus layega
             }}
             className="p-4 hover:bg-red-600/20 hover:text-red-400 text-gray-300 cursor-pointer border-b border-gray-800/50 transition-colors"
           >
@@ -1146,13 +1168,14 @@ const techSkillsList = [
           </li>
         ))}
       
-      {/* Agar koi aisi skill type kare jo list me nahi hai, toh "Add Custom" ka option de */}
+      {/* Agar naya skill type kiya */}
       {skillInput.trim() !== '' && !techSkillsList.some(s => s.toLowerCase() === skillInput.toLowerCase()) && !techSkills.includes(skillInput.trim()) && (
         <li 
-          onClick={() => {
-            setTechSkills([...techSkills, skillInput.trim()]);
+          onMouseDown={(e) => {
+            e.preventDefault();
+            setTechSkills(prev => [...prev, skillInput.trim()]);
             setSkillInput("");
-            document.getElementById('skill-input')?.focus();
+            setTimeout(() => document.getElementById('skill-input')?.focus(), 10);
           }}
           className="p-4 hover:bg-red-600/20 hover:text-red-400 text-gray-300 cursor-pointer italic"
         >
@@ -1162,7 +1185,8 @@ const techSkillsList = [
     </ul>
   )}
 </div>
-
+{/* ===== TECH SKILLS BLOCK END ===== */}
+                 
                   {/* Start Button */}
                   <button
                     onClick={handleStart}
