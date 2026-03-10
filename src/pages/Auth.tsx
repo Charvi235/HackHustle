@@ -88,6 +88,14 @@ const Auth = () => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+
+
+
+  // --- OTP Verification States for Sign Up ---
+  const [signupStep, setSignupStep] = useState(1); // 1: Email, 2: OTP, 3: Full Sign Up Form
+  const [otpEmail, setOtpEmail] = useState('');
+  const [otpValue, setOtpValue] = useState('');
+  const [isOtpLoading, setIsOtpLoading] = useState(false);
   const [signupRole, setSignupRole] = useState<RoleType>('STUDENT');
 
   // Password visibility states
@@ -103,6 +111,8 @@ const Auth = () => {
   //     description: 'Password reset feature is under development.',
   //   });
   // };
+
+
 
   const handleLogin = async (role: RoleType) => {
     if (isEmptyField(loginData)) {
@@ -246,6 +256,7 @@ const Auth = () => {
         description: 'All fields are mandatory',
         variant: 'destructive',
       });
+
       return;
     }
 
@@ -341,7 +352,62 @@ const Auth = () => {
       setIsLoading(false);
     }
   };
+ const handleSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isValidGmail(otpEmail)) {
+      toast({ title: 'Invalid Email', description: 'Please enter a valid @gmail.com address', variant: 'destructive' });
+      return;
+    }
+    setIsOtpLoading(true);
+    try {
+      // Calling your friend's API
+      const response = await fetch("http://localhost:8080/auth/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: otpEmail }),
+      });
 
+      if (response.ok) {
+        toast({ title: 'OTP Sent!', description: `An OTP has been sent to ${otpEmail}` });
+        setSignupStep(2); // Go to OTP input screen
+      } else {
+        toast({ title: 'Error', description: 'Failed to send OTP', variant: 'destructive' });
+      }
+    } catch (error) {
+      toast({ title: 'Server Error', description: 'Could not connect to the server', variant: 'destructive' });
+    }
+    setIsOtpLoading(false);
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otpValue) return;
+
+    setIsOtpLoading(true);
+    try {
+      // Calling your friend's Verify API
+      const response = await fetch("http://localhost:8080/auth/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: otpEmail, otp: otpValue }),
+      });
+
+      if (response.ok) {
+        toast({ title: 'Verified!', description: 'Email verified successfully. Complete your profile.' });
+        
+        // Verified email ko dono forms mein pre-fill kar do
+        setSignupData(prev => ({ ...prev, emailId: otpEmail }));
+        setTeacherSignupData(prev => ({ ...prev, emailId: otpEmail }));
+        
+        setSignupStep(3); // Go to Full Sign Up Form
+      } else {
+        toast({ title: 'Error', description: 'Invalid OTP entered', variant: 'destructive' });
+      }
+    } catch (error) {
+      toast({ title: 'Server Error', description: 'Could not connect to the server', variant: 'destructive' });
+    }
+    setIsOtpLoading(false);
+  };
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
@@ -439,12 +505,69 @@ const Auth = () => {
                 <CardDescription>Sign up to get started</CardDescription>
               </CardHeader>
               <CardContent>
-                <Tabs value={signupRole} onValueChange={(v) => setSignupRole(v as RoleType)}>
-                  <TabsList className="grid grid-cols-2 mb-4">
-                    <TabsTrigger value="STUDENT">Student</TabsTrigger>
-                    <TabsTrigger value="TEACHER">Teacher</TabsTrigger>
-                  </TabsList>
+               
 
+                  {/* ===== STEP 1: SEND OTP ===== */}
+  {signupStep === 1 && (
+    <div className="space-y-4 pt-4">
+      <div className="text-center mb-6">
+        <h3 className="text-xl font-bold text-white mb-2">Verify your Email</h3>
+        <p className="text-sm text-zinc-400">We need to verify your email before registration.</p>
+      </div>
+      <div className="space-y-2">
+        <Input 
+          placeholder="name@gmail.com" 
+          value={otpEmail}
+          onChange={(e) => setOtpEmail(e.target.value)}
+          className={getInputClass(otpEmail !== '' && !isValidGmail(otpEmail))}
+          autoFocus
+        />
+        {renderError(otpEmail !== '' && !isValidGmail(otpEmail), "Must be a valid @gmail.com address")}
+      </div>
+      <Button type="button" className="w-full bg-red-600 hover:bg-red-700" onClick={handleSendOtp} disabled={isOtpLoading || !otpEmail}>
+        {isOtpLoading ? 'Sending OTP...' : 'Send OTP'}
+      </Button>
+    </div>
+  )}
+
+  {/* ===== STEP 2: VERIFY OTP ===== */}
+  {signupStep === 2 && (
+    <div className="space-y-4 pt-4">
+      <div className="text-center mb-6">
+        <h3 className="text-xl font-bold text-white mb-2">Enter OTP</h3>
+        <p className="text-sm text-zinc-400">
+          We've sent a code to <br/><span className="font-semibold text-red-400">{otpEmail}</span>
+        </p>
+      </div>
+      <div className="space-y-2">
+        <Input 
+          placeholder="Enter 6-digit OTP" 
+          value={otpValue}
+          onChange={(e) => setOtpValue(e.target.value)}
+          className="text-center tracking-[0.5em] text-lg font-bold"
+          maxLength={6}
+          autoFocus
+        />
+      </div>
+      <div className="flex gap-2">
+        <Button type="button" variant="outline" className="w-1/3" onClick={() => setSignupStep(1)}>
+          Back
+        </Button>
+        <Button type="button" className="w-2/3 bg-green-600 hover:bg-green-700" onClick={handleVerifyOtp} disabled={isOtpLoading || otpValue.length < 4}>
+          {isOtpLoading ? 'Verifying...' : 'Verify OTP'}
+        </Button>
+      </div>
+    </div>
+  )}
+
+  {/* ===== STEP 3: FULL SIGNUP FORM ===== */}
+  {signupStep === 3 && (
+    <Tabs value={signupRole} onValueChange={(v) => setSignupRole(v as RoleType)}>
+      <TabsList className="grid grid-cols-2 mb-4">
+        <TabsTrigger value="STUDENT">Student</TabsTrigger>
+        <TabsTrigger value="TEACHER">Teacher</TabsTrigger>
+      </TabsList>
+                  
                   {/* STUDENT SIGNUP */}
                   <TabsContent value="STUDENT" className="space-y-4">
                     <div>
@@ -472,13 +595,19 @@ const Auth = () => {
                       {renderError(signupTouched.lastName && signupData.lastName !== '' && !isValidName(signupData.lastName), "Invalid last name (Only letters allowed)")}
                     </div>
                     <div>
-                      <Input
+                      {/* <Input
                         placeholder="Email"
                         value={signupData.emailId}
                         onBlur={() => setSignupTouched({...signupTouched, emailId: true})}
                         onChange={(e) => setSignupData({ ...signupData, emailId: e.target.value })}
                         className={getInputClass(signupTouched.emailId && (signupData.emailId === '' || !isValidGmail(signupData.emailId)))}
-                      />
+                      /> */}
+                      <Input
+  placeholder="Email"
+  value={signupData.emailId}
+  disabled // 👈 YE LAGA DIYA
+  className={`opacity-50 cursor-not-allowed ${getInputClass(signupTouched.emailId && (signupData.emailId === '' || !isValidGmail(signupData.emailId)))}`} // 👈 AUR YE CLASSES ADD KAR DI
+/>
                       {renderError(signupTouched.emailId && signupData.emailId === '', "This field is mandatory")}
                       {renderError(signupTouched.emailId && signupData.emailId !== '' && !isValidGmail(signupData.emailId), "Invalid Email (Must end with @gmail.com)")}
                     </div>
@@ -556,13 +685,18 @@ const Auth = () => {
                       {renderError(teacherTouched.lastName && teacherSignupData.lastName !== '' && !isValidName(teacherSignupData.lastName), "Invalid last name (Only letters allowed)")}
                     </div>
                     <div>
-                        <Input
+                        {/* <Input
                           placeholder="Email"
                           value={teacherSignupData.emailId}
                           onBlur={() => setTeacherTouched({...teacherTouched, emailId: true})}
                           onChange={(e) => setTeacherSignupData({ ...teacherSignupData, emailId: e.target.value })}
                           className={getInputClass(teacherTouched.emailId && (teacherSignupData.emailId === '' || !isValidGmail(teacherSignupData.emailId)))}
-                        />
+                        /> */}<Input
+  placeholder="Email"
+  value={teacherSignupData.emailId}
+  disabled // 👈 YE LAGA DIYA
+  className={`opacity-50 cursor-not-allowed ${getInputClass(teacherTouched.emailId && (teacherSignupData.emailId === '' || !isValidGmail(teacherSignupData.emailId)))}`} // 👈 AUR YE CLASSES ADD KAR DI
+/>
                         {renderError(teacherTouched.emailId && teacherSignupData.emailId === '', "This field is mandatory")}
                         {renderError(teacherTouched.emailId && teacherSignupData.emailId !== '' && !isValidGmail(teacherSignupData.emailId), "Invalid Email (Must end with @gmail.com)")}
                     </div>
@@ -603,14 +737,7 @@ const Auth = () => {
                       {renderError(teacherSignupData.confirmPassword !== '' && teacherSignupData.password !== teacherSignupData.confirmPassword, "Passwords don't match")}
                     </div>
                     <div>
-                      {/* <Input
-                        placeholder="Subject Associated"
-                        value={teacherSignupData.subjectAssociated}
-                        onBlur={() => setTeacherTouched({...teacherTouched, subjectAssociated: true})}
-                        onChange={(e) => setTeacherSignupData({ ...teacherSignupData, subjectAssociated: e.target.value.replace(/\s+/g, ' ')})}
-                        
-                        className={getInputClass(teacherTouched.subjectAssociated && (teacherSignupData.subjectAssociated === '' || !isValidName(teacherSignupData.subjectAssociated)))}
-                      /> */}
+                      
                       <div className="space-y-2">
   {/* <Label htmlFor="subject">Subject Associated</Label> */}
   <Select 
@@ -647,7 +774,8 @@ const Auth = () => {
                     </Button>
                   </TabsContent>
                 </Tabs>
-              </CardContent>
+  )}
+            </CardContent>
             </Card>
           </TabsContent>
         </Tabs>

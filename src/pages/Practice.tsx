@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Card } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -12,7 +12,8 @@ import {
   ChevronLeft,
   Trophy
 } from 'lucide-react';
-
+import { Progress } from '@/components/ui/progress';
+import { CheckCircle2 } from 'lucide-react';
 import PracticeQuiz from '../components/practice/PracticeQuiz';
 import { questionService, QuestionDto } from '@/services/questionsServices';
 
@@ -105,9 +106,71 @@ const Practice = () => {
   };
 
   const [showResult, setShowResult] = useState(false);
+  // --- NAYA:Progress Tracker States ---
+  const [topicProgress, setTopicProgress] = useState<Record<number, { solved: number, total: number }>>({});
+  const [isLoadingProgress, setIsLoadingProgress] = useState(false);
 
+  // Jab bhi koi Subject select hoga, backend se progress fetch hogi
+  useEffect(() => {
+    if (selectedSubject && emailId) {
+      const fetchProgress = async () => {
+        setIsLoadingProgress(true);
+        try {
+          // 🚨 TERI FRIEND KI API YAHA AAYEGI 🚨
+          // Example API: GET http://localhost:8080/api/progress/student@gmail.com/1001 (subjectId)
+          const response = await fetch(`http://localhost:8080/api/progress/${emailId}/${selectedSubject.id}`);
+          
+          if (response.ok) {
+            const data = await response.json();
+            // Data ko dictionary me map kar rahe hain taaki ID se turant mil jaye
+            const progressMap: Record<number, { solved: number, total: number }> = {};
+            data.forEach((item: any) => {
+              progressMap[item.topicId] = { solved: item.solvedQuestions, total: item.totalQuestions };
+            });
+            setTopicProgress(progressMap);
+          }
+        } catch (error) {
+          console.error('Progress load nahi hui:', error);
+        } finally {
+          setIsLoadingProgress(false);
+        }
+      };
 
+      fetchProgress();
+    }
+  }, [selectedSubject, emailId]);
 
+  // --- NAYA: Subject Home Progress Tracker States ---
+  const [subjectProgress, setSubjectProgress] = useState<Record<number, { solved: number, total: number }>>({});
+  const [isLoadingSubjectProgress, setIsLoadingSubjectProgress] = useState(false);
+
+  // Jab user Home Screen pe hoga (koi subject select nahi kiya), tab ye chalega
+  useEffect(() => {
+    if (!selectedSubject && emailId) {
+      const fetchSubjectProgress = async () => {
+        setIsLoadingSubjectProgress(true);
+        try {
+          // 🚨 TERI FRIEND KI EK AUR NAYI API YAHA AAYEGI 🚨
+          const response = await fetch(`http://localhost:8080/api/progress/subjects/${emailId}`);
+          
+          if (response.ok) {
+            const data = await response.json();
+            const progressMap: Record<number, { solved: number, total: number }> = {};
+            data.forEach((item: any) => {
+              progressMap[item.subjectId] = { solved: item.solvedQuestions, total: item.totalQuestions };
+            });
+            setSubjectProgress(progressMap);
+          }
+        } catch (error) {
+          console.error('Subject progress load nahi hui:', error);
+        } finally {
+          setIsLoadingSubjectProgress(false);
+        }
+      };
+
+      fetchSubjectProgress();
+    }
+  }, [selectedSubject, emailId]);
   // const handleSubmitAssessment = async () => {
     
   //   setShowResult(true);
@@ -339,7 +402,46 @@ const Practice = () => {
   }
 
   /* ================= SUBJECT LIST ================= */
-  if (selectedSubject) {
+  // if (selectedSubject) {
+  //   return (
+  //     <div className="min-h-screen bg-background pt-20 pb-16">
+  //       <div className="container mx-auto px-4 max-w-4xl">
+  //         <Button variant="outline" onClick={handleBackToSubjects} className="mb-6">
+  //           <ChevronLeft className="w-4 h-4 mr-2" /> Back to Subjects
+  //         </Button>
+
+  //         <h1 className="text-4xl font-bold mb-6">
+  //           {selectedSubject.name}
+  //         </h1>
+
+  //         <div className="space-y-4">
+  //           {selectedSubject.topics.map(topic => (
+  //             <Card
+  //               key={topic.id}
+  //               className="p-6 cursor-pointer hover:shadow-md"
+  //               onClick={() => handleSelectTopic(topic)}
+  //             >
+  //               <div className="flex justify-between items-center">
+  //                 <h3 className="text-xl font-semibold">{topic.name}</h3>
+  //                 <ChevronRight />
+  //               </div>
+  //             </Card>
+  //           ))}
+  //         </div>
+
+  //         <Button
+  //           className="w-full mt-14"
+  //           variant="secondary"
+  //           onClick={handleSubjectAssessment}
+  //         >
+  //           Start {selectedSubject.name}'s Assessment
+  //         </Button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
+  /* ================= SUBJECT LIST (TUF STYLE PROGRESS) ================= */
+  if (selectedSubject && !selectedTopic && !startQuiz) {
     return (
       <div className="min-h-screen bg-background pt-20 pb-16">
         <div className="container mx-auto px-4 max-w-4xl">
@@ -347,74 +449,220 @@ const Practice = () => {
             <ChevronLeft className="w-4 h-4 mr-2" /> Back to Subjects
           </Button>
 
-          <h1 className="text-4xl font-bold mb-6">
-            {selectedSubject.name}
-          </h1>
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-white mb-2">
+              {selectedSubject.name} Practice
+            </h1>
+            <p className="text-zinc-400">Track your progress and complete all topics.</p>
+          </div>
 
-          <div className="space-y-4">
-            {selectedSubject.topics.map(topic => (
-              <Card
-                key={topic.id}
-                className="p-6 cursor-pointer hover:shadow-md"
-                onClick={() => handleSelectTopic(topic)}
-              >
-                <div className="flex justify-between items-center">
-                  <h3 className="text-xl font-semibold">{topic.name}</h3>
-                  <ChevronRight />
-                </div>
-              </Card>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {selectedSubject.topics.map((topic) => {
+              // API se data lo, warna default 0/10 dikhao
+              const prog = topicProgress[topic.id] || { solved: 0, total: 10 };
+              const progressPercentage = Math.round((prog.solved / Math.max(prog.total, 1)) * 100);
+              const isCompleted = prog.solved > 0 && prog.solved === prog.total;
+
+              return (
+                <Card
+  key={topic.id}
+  className="bg-[#09090b] border-zinc-800/80 hover:border-cyan-500/40 hover:shadow-[0_0_25px_rgba(6,182,214,0.15)] transition-all duration-300 cursor-pointer group rounded-xl relative overflow-hidden"
+  onClick={() => handleSelectTopic(topic)}
+>
+  {/* Hover par ek subtle radiant background gradient aayega */}
+  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-blue-500/0 to-purple-500/0 group-hover:from-cyan-500/5 group-hover:to-blue-500/10 transition-all duration-500 z-0" />
+
+  <CardContent className="p-5 flex flex-col justify-between h-full space-y-6 relative z-10">
+    {/* Top Section: Name & Count */}
+    <div className="flex justify-between items-start">
+      <div className="space-y-1.5">
+        <h3 className="text-xl font-bold text-zinc-100 flex items-center gap-2 group-hover:text-white transition-colors">
+          {topic.name}
+          {/* Completed hone par glowing green tick */}
+          {isCompleted && (
+            <CheckCircle2 className="w-5 h-5 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+          )}
+        </h3>
+        <p className="text-sm text-zinc-500 font-medium group-hover:text-zinc-400 transition-colors">
+          {isLoadingProgress ? (
+            <span className="animate-pulse text-cyan-500/70">Fetching data...</span>
+          ) : (
+            `${prog.solved} / ${prog.total} Problems`
+          )}
+        </p>
+      </div>
+
+      {/* Right Arrow - Hover pe glow karega */}
+      <div className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center group-hover:bg-cyan-500/10 group-hover:border-cyan-500/40 group-hover:shadow-[0_0_10px_rgba(6,182,214,0.2)] transition-all duration-300">
+        <ChevronRight className="w-4 h-4 text-zinc-600 group-hover:text-cyan-400 transition-transform group-hover:translate-x-0.5" />
+      </div>
+    </div>
+
+    {/* Bottom Section: Radiant Progress Bar */}
+    <div className="space-y-2">
+      <div className="flex justify-between text-xs font-bold tracking-wider uppercase">
+        <span className="text-zinc-600">Progress</span>
+        {/* Percentage text neon effect ke sath */}
+        <span className={isCompleted ? "text-emerald-400 drop-shadow-[0_0_5px_rgba(52,211,153,0.5)]" : "text-cyan-400 drop-shadow-[0_0_5px_rgba(6,182,214,0.5)]"}>
+          {progressPercentage}%
+        </span>
+      </div>
+      
+      {/* Magic Here: Shadcn progress bar ko modify karke usme gradient aur glow dala hai!
+        [&>div] likhne se progress bar ke andar ka indicator color change hota hai
+      */}
+      <Progress
+        value={progressPercentage}
+        className="h-2 bg-zinc-900 border border-zinc-800/50 
+        [&>div]:bg-gradient-to-r [&>div]:from-cyan-400 [&>div]:to-blue-600 
+        [&>div]:shadow-[0_0_10px_rgba(6,182,214,0.6)]"
+      />
+    </div>
+  </CardContent>
+</Card>
+
+              );
+            })}
           </div>
 
           <Button
-            className="w-full mt-14"
+            className="w-full mt-10"
             variant="secondary"
             onClick={handleSubjectAssessment}
           >
-            Start {selectedSubject.name}'s Assessment
+            Start {selectedSubject.name}'s Final Assessment
           </Button>
         </div>
       </div>
     );
   }
+  /* ================= SUBJECT HOME ================= */
+  // return (
+  //   <div className="min-h-screen bg-background pt-20 pb-16">
+  //     <div className="container mx-auto px-4">
+  //       <div className="text-center mb-12">
+  //         <Badge variant="secondary" className="mb-4">
+  //           <BookOpen className="w-4 h-4 mr-2" /> Practice Mode
+  //         </Badge>
+  //         <h1 className="text-4xl font-bold">
+  //           Choose Your Subject
+  //         </h1>
+  //       </div>
 
+  //       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+  //         {subjects.map(subject => (
+  //           <Card key={subject.id} className="p-6">
+  //             <div className="flex items-center gap-4 mb-4">
+  //               <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+  //                 {subject.name === 'DBMS' ? (
+  //                   <Database className="text-white" />
+  //                 ) : (
+  //                   <Code className="text-white" />
+  //                 )}
+  //               </div>
+  //               <h3 className="text-xl font-semibold">
+  //                 {subject.name}
+  //               </h3>
+  //             </div>
+
+  //             <Button
+  //               className="w-full"
+  //               onClick={() => handleSelectSubject(subject)}
+  //             >
+  //               <Play className="w-4 h-4 mr-2" /> Start Practice
+  //             </Button>
+  //           </Card>
+  //         ))}
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
+  /* ================= SUBJECT HOME ================= */
   /* ================= SUBJECT HOME ================= */
   return (
     <div className="min-h-screen bg-background pt-20 pb-16">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 max-w-4xl">
         <div className="text-center mb-12">
           <Badge variant="secondary" className="mb-4">
             <BookOpen className="w-4 h-4 mr-2" /> Practice Mode
           </Badge>
-          <h1 className="text-4xl font-bold">
+          <h1 className="text-4xl font-bold text-white">
             Choose Your Subject
           </h1>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {subjects.map(subject => (
-            <Card key={subject.id} className="p-6">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-                  {subject.name === 'DBMS' ? (
-                    <Database className="text-white" />
-                  ) : (
-                    <Code className="text-white" />
-                  )}
-                </div>
-                <h3 className="text-xl font-semibold">
-                  {subject.name}
-                </h3>
-              </div>
+        <div className="grid grid-cols-1 gap-6">
+          {subjects.map((subject) => {
+            const prog = subjectProgress[subject.id] || { solved: 0, total: 50 }; 
+            const progressPercentage = Math.round((prog.solved / Math.max(prog.total, 1)) * 100);
+            const isCompleted = prog.solved > 0 && prog.solved === prog.total;
 
-              <Button
-                className="w-full"
-                onClick={() => handleSelectSubject(subject)}
+            return (
+              <Card
+                key={subject.id}
+                className="bg-zinc-900/50 border-zinc-800 hover:border-zinc-600 hover:bg-zinc-900 transition-colors duration-200"
               >
-                <Play className="w-4 h-4 mr-2" /> Start Practice
-              </Button>
-            </Card>
-          ))}
+                <div className="p-6">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
+                    <div className="flex items-center gap-4">
+                      {/* Clean flat icon container */}
+                      <div className="w-14 h-14 bg-zinc-800 rounded-xl flex items-center justify-center">
+                        {subject.name === 'DBMS' ? (
+                          <Database className="text-red-500 w-6 h-6" />
+                        ) : (
+                          <Code className="text-red-500 w-6 h-6" />
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-bold text-zinc-100 flex items-center gap-2">
+                          {subject.name}
+                          {isCompleted && <CheckCircle2 className="w-5 h-5 text-green-500" />}
+                        </h3>
+                        <p className="text-sm text-zinc-400 mt-1">
+                          {isLoadingSubjectProgress ? (
+                            <span className="animate-pulse">Loading progress...</span>
+                          ) : (
+                            `${prog.solved} / ${prog.total} Total Questions Solved`
+                          )}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Minimal button */}
+                    {/* <Button
+                      variant="outline"
+                      className="w-full md:w-auto bg-transparent border-zinc-700 hover:bg-zinc-800 hover:text-white transition-colors"
+                      onClick={() => handleSelectSubject(subject)}
+                    >
+                      <Play className="w-4 h-4 mr-2" /> Continue Practice
+                    </Button> */}
+                    {/* Right: Start Button (Minimal SOLID RED, NO Flash) */}
+{/* Right: Start Button (Minimal SOLID RED) */}
+<Button
+  className="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white border-0 transition-colors"
+  onClick={() => handleSelectSubject(subject)}
+>
+  <Play className="w-4 h-4 mr-2" /> Continue Practice
+</Button>
+                  </div>
+
+                  {/* Clean flat progress bar */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-xs font-bold tracking-wider uppercase">
+                      <span className="text-zinc-500">Overall Progress</span>
+                      <span className={isCompleted ? "text-green-500" : "text-zinc-300"}>
+                        {progressPercentage}%
+                      </span>
+                    </div>
+                    <Progress
+                      value={progressPercentage}
+                      className="h-2 bg-zinc-950 [&>div]:bg-red-500"
+                    />
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </div>
