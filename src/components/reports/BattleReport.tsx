@@ -27,8 +27,10 @@ interface BattleReportProps {
   timeTaken: number;
   totalQuestions: number;
   winnerId: number | null;
+  playerNames: { [key: string]: string };
   onBack: () => void;
   onPlayAgain: () => void;
+
 }
 
 export const BattleReport = ({ 
@@ -37,6 +39,7 @@ export const BattleReport = ({
   timeTaken, 
   totalQuestions,
   winnerId,
+  playerNames,
   onBack,
   onPlayAgain
 }: BattleReportProps) => {
@@ -44,6 +47,7 @@ export const BattleReport = ({
   const studentId = Number(user?.student_id);
   const currentWinnerId = Number(winnerId);
   const isUserWinner = currentWinnerId === studentId;
+  const winnerName = playerNames[currentWinnerId.toString()] || playerNames[currentWinnerId] || `Player ${currentWinnerId}`;
   console.log("Debug Winner:", { currentWinnerId, studentId, isUserWinner });
   const correctCount = Object.keys(selectedAnswers).filter((qId) => {
     const question = questions.find(q => q.questionID === parseInt(qId));
@@ -85,7 +89,7 @@ export const BattleReport = ({
                 <div className="text-center">
                     <Trophy className={`w-20 h-20 mx-auto mb-4 ${isUserWinner ? 'text-yellow-500' : 'text-primary'}`} />
                     <h1 className="text-4xl font-bold mb-2">
-                        {isUserWinner ? "YOU ARE THE WINNER! 👑" : `Winner: Player ${winnerId?.toString().slice(-3)}`}
+                        {isUserWinner ? "YOU ARE THE WINNER! 👑" : `Winner is: ${winnerName}` }
                     </h1>
                     <p className="text-muted-foreground">The battle has ended. See your performance below.</p>
                 </div>
