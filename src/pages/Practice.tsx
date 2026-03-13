@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   Trophy
 } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle2 } from 'lucide-react';
 import PracticeQuiz from '../components/practice/PracticeQuiz';
@@ -19,6 +20,8 @@ import { questionService, QuestionDto } from '@/services/questionsServices';
 
 const user = JSON.parse(localStorage.getItem('user') || '{}');
 const emailId: string = user?.emailId || '';
+
+
 
 interface TopicConfig {
   id: number;
@@ -75,6 +78,7 @@ const splitIntoSets = (questions: QuestionDto[], size = 10) => {
 };
 
 const Practice = () => {
+  const location = useLocation();
   const [selectedSubject, setSelectedSubject] = useState<SubjectConfig | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<TopicConfig | null>(null);
   const [questionSets, setQuestionSets] = useState<QuestionDto[][]>([]);
@@ -110,19 +114,18 @@ const Practice = () => {
   const [topicProgress, setTopicProgress] = useState<Record<number, { solved: number, total: number }>>({});
   const [isLoadingProgress, setIsLoadingProgress] = useState(false);
 
-  // Jab bhi koi Subject select hoga, backend se progress fetch hogi
+
   useEffect(() => {
     if (selectedSubject && emailId) {
       const fetchProgress = async () => {
         setIsLoadingProgress(true);
         try {
-          // 🚨 TERI FRIEND KI API YAHA AAYEGI 🚨
-          // Example API: GET http://localhost:8080/api/progress/student@gmail.com/1001 (subjectId)
-          const response = await fetch(`http://localhost:8080/api/progress/${emailId}/${selectedSubject.id}`);
-          
+          // 🚨 NAYA: URL ke aage { cache: 'no-store' } add karna hai taaki hamesha fresh data aaye
+          const response = await fetch(`http://localhost:8080/api/subjects/progress/${emailId}/${selectedSubject.id}`, {
+            cache: 'no-store'
+          });
           if (response.ok) {
             const data = await response.json();
-            // Data ko dictionary me map kar rahe hain taaki ID se turant mil jaye
             const progressMap: Record<number, { solved: number, total: number }> = {};
             data.forEach((item: any) => {
               progressMap[item.topicId] = { solved: item.solvedQuestions, total: item.totalQuestions };
@@ -130,15 +133,40 @@ const Practice = () => {
             setTopicProgress(progressMap);
           }
         } catch (error) {
-          console.error('Progress load nahi hui:', error);
+          console.error('Topic progress load nahi hui:', error);
         } finally {
           setIsLoadingProgress(false);
         }
       };
-
       fetchProgress();
     }
-  }, [selectedSubject, emailId]);
+  // 🚨 NAYA: Array ke end mein location.key add karna hai
+  }, [selectedSubject, emailId, location.key]);
+ 
+  // useEffect(() => {
+  //   if (selectedSubject && emailId) {
+  //     const fetchProgress = async () => {
+  //       setIsLoadingProgress(true);
+  //       try {
+  //         // 🚨 YAHAN URL UPDATE HUA HAI 🚨
+  //         const response = await fetch(`http://localhost:8080/api/subjects/progress/${emailId}/${selectedSubject.id}`);
+  //         if (response.ok) {
+  //           const data = await response.json();
+  //           const progressMap: Record<number, { solved: number, total: number }> = {};
+  //           data.forEach((item: any) => {
+  //             progressMap[item.topicId] = { solved: item.solvedQuestions, total: item.totalQuestions };
+  //           });
+  //           setTopicProgress(progressMap);
+  //         }
+  //       } catch (error) {
+  //         console.error('Topic progress load nahi hui:', error);
+  //       } finally {
+  //         setIsLoadingProgress(false);
+  //       }
+  //     };
+  //     fetchProgress();
+  //   }
+  // }, [selectedSubject, emailId]);
 
   // --- NAYA: Subject Home Progress Tracker States ---
   const [subjectProgress, setSubjectProgress] = useState<Record<number, { solved: number, total: number }>>({});
@@ -150,9 +178,10 @@ const Practice = () => {
       const fetchSubjectProgress = async () => {
         setIsLoadingSubjectProgress(true);
         try {
-          // 🚨 TERI FRIEND KI EK AUR NAYI API YAHA AAYEGI 🚨
-          const response = await fetch(`http://localhost:8080/api/progress/subjects/${emailId}`);
-          
+          // 🚨 NAYA: Yahan bhi { cache: 'no-store' } add karna hai taaki Home screen pe fresh data aaye
+          const response = await fetch(`http://localhost:8080/api/subjects/progress/subjects/${emailId}`, {
+            cache: 'no-store'
+          });
           if (response.ok) {
             const data = await response.json();
             const progressMap: Record<number, { solved: number, total: number }> = {};
@@ -167,32 +196,38 @@ const Practice = () => {
           setIsLoadingSubjectProgress(false);
         }
       };
-
       fetchSubjectProgress();
     }
-  }, [selectedSubject, emailId]);
-  // const handleSubmitAssessment = async () => {
-    
-  //   setShowResult(true);
-  //   try {
-  //     await fetch('http://localhost:8080/api/assessments', {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({
-  //         emailId: emailId,
-  //         topicID: selectedTopic?.id || 1015,
-  //     //    subjectID: selectedSubject!.id,
-  //     subjectID: selectedSubject.id,
-  //         assessmentScore 
-  //       })
-  //     });
-  //     console.log("Data saved successfully");
-  //   } catch (err) {
-  //     console.error('Data save nahi hua (Backend Error):', err);
+  // 🚨 NAYA: Array ke end mein location.key add karna hai
+  }, [selectedSubject, emailId, location.key]);
+  // useEffect(() => {
+  //   if (!selectedSubject && emailId) {
+  //     const fetchSubjectProgress = async () => {
+  //       setIsLoadingSubjectProgress(true);
+  //       try {
+  //         // 🚨 YAHAN SUBJECTS WALA URL AAYEGA 🚨
+  //         const response = await fetch(`http://localhost:8080/api/subjects/progress/subjects/${emailId}`);
+  //         if (response.ok) {
+  //           const data = await response.json();
+  //           const progressMap: Record<number, { solved: number, total: number }> = {};
+  //           data.forEach((item: any) => {
+  //             progressMap[item.subjectId] = { solved: item.solvedQuestions, total: item.totalQuestions };
+  //           });
+  //           setSubjectProgress(progressMap);
+  //         }
+  //       } catch (error) {
+  //         console.error('Subject progress load nahi hui:', error);
+  //       } finally {
+  //         setIsLoadingSubjectProgress(false);
+  //       }
+  //     };
+  //     fetchSubjectProgress();
   //   }
-  // };
-
-  //const [showResult, setShowResult] = useState(false);
+  // }, [selectedSubject, emailId]);
+  
+ 
+  
+  
 
 
 
@@ -261,25 +296,7 @@ const Practice = () => {
     setStartQuiz(false);
   };
 
-  // const handleSubmitAssessment = async () => {
-  //   try {
-  //     await fetch('http://localhost:8080/api/assessments', {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({
-  //         emailId,
-  //         topicID: selectedTopic?.id || 1015,
-  //         subjectID: selectedSubject?.id || null,
-  //         assessmentScore
-  //       })
-  //     });
-
-  //     setShowResult(true);
-  //   } catch (err) {
-  //     console.error('Assessment submission failed', err);
-  //   }
-  // };
-
+ 
   /* ================= ASSESSMENT MODE ================= */
   if (startQuiz && selectedSubject) {
     return (
@@ -401,45 +418,7 @@ const Practice = () => {
     );
   }
 
-  /* ================= SUBJECT LIST ================= */
-  // if (selectedSubject) {
-  //   return (
-  //     <div className="min-h-screen bg-background pt-20 pb-16">
-  //       <div className="container mx-auto px-4 max-w-4xl">
-  //         <Button variant="outline" onClick={handleBackToSubjects} className="mb-6">
-  //           <ChevronLeft className="w-4 h-4 mr-2" /> Back to Subjects
-  //         </Button>
-
-  //         <h1 className="text-4xl font-bold mb-6">
-  //           {selectedSubject.name}
-  //         </h1>
-
-  //         <div className="space-y-4">
-  //           {selectedSubject.topics.map(topic => (
-  //             <Card
-  //               key={topic.id}
-  //               className="p-6 cursor-pointer hover:shadow-md"
-  //               onClick={() => handleSelectTopic(topic)}
-  //             >
-  //               <div className="flex justify-between items-center">
-  //                 <h3 className="text-xl font-semibold">{topic.name}</h3>
-  //                 <ChevronRight />
-  //               </div>
-  //             </Card>
-  //           ))}
-  //         </div>
-
-  //         <Button
-  //           className="w-full mt-14"
-  //           variant="secondary"
-  //           onClick={handleSubjectAssessment}
-  //         >
-  //           Start {selectedSubject.name}'s Assessment
-  //         </Button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+ 
   /* ================= SUBJECT LIST (TUF STYLE PROGRESS) ================= */
   if (selectedSubject && !selectedTopic && !startQuiz) {
     return (
@@ -508,9 +487,7 @@ const Practice = () => {
         </span>
       </div>
       
-      {/* Magic Here: Shadcn progress bar ko modify karke usme gradient aur glow dala hai!
-        [&>div] likhne se progress bar ke andar ka indicator color change hota hai
-      */}
+      
       <Progress
         value={progressPercentage}
         className="h-2 bg-zinc-900 border border-zinc-800/50 
@@ -536,48 +513,8 @@ const Practice = () => {
       </div>
     );
   }
-  /* ================= SUBJECT HOME ================= */
-  // return (
-  //   <div className="min-h-screen bg-background pt-20 pb-16">
-  //     <div className="container mx-auto px-4">
-  //       <div className="text-center mb-12">
-  //         <Badge variant="secondary" className="mb-4">
-  //           <BookOpen className="w-4 h-4 mr-2" /> Practice Mode
-  //         </Badge>
-  //         <h1 className="text-4xl font-bold">
-  //           Choose Your Subject
-  //         </h1>
-  //       </div>
-
-  //       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-  //         {subjects.map(subject => (
-  //           <Card key={subject.id} className="p-6">
-  //             <div className="flex items-center gap-4 mb-4">
-  //               <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-  //                 {subject.name === 'DBMS' ? (
-  //                   <Database className="text-white" />
-  //                 ) : (
-  //                   <Code className="text-white" />
-  //                 )}
-  //               </div>
-  //               <h3 className="text-xl font-semibold">
-  //                 {subject.name}
-  //               </h3>
-  //             </div>
-
-  //             <Button
-  //               className="w-full"
-  //               onClick={() => handleSelectSubject(subject)}
-  //             >
-  //               <Play className="w-4 h-4 mr-2" /> Start Practice
-  //             </Button>
-  //           </Card>
-  //         ))}
-  //       </div>
-  //     </div>
-  //   </div>
-  // );
-  /* ================= SUBJECT HOME ================= */
+  
+ 
   /* ================= SUBJECT HOME ================= */
   return (
     <div className="min-h-screen bg-background pt-20 pb-16">

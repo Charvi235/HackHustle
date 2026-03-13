@@ -361,7 +361,7 @@ const Auth = () => {
     setIsOtpLoading(true);
     try {
       // Calling your friend's API
-      const response = await fetch("http://localhost:8080/auth/send-otp", {
+      const response = await fetch("http://localhost:8080/auth/send-signup-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: otpEmail }),
