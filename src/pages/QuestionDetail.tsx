@@ -45,9 +45,39 @@ const QuestionDetail = () => {
     question.option4
   ];
 
-  const handleAnswer = (option: string) => {
+  // const handleAnswer = (option: string) => {
+  //   setSelectedAnswer(option);
+  //   setShowResult(true);
+  // };
+  const handleAnswer = async (option: string) => {
     setSelectedAnswer(option);
     setShowResult(true);
+
+    const isCorrectOption = option === question.correctAnswer;
+
+    // --- NAYA LOGIC: Sahi answer hone par progress DB me save karo ---
+    if (isCorrectOption) {
+      try {
+        const state = location.state as any; 
+        
+        // 🚨 FIX 1: user object se emailId nikal liya
+        const currentEmail = user?.emailId || JSON.parse(localStorage.getItem('user') || '{}')?.emailId;
+        
+        await fetch('http://localhost:8080/api/subjects/progress/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            emailId: currentEmail,
+            // 🚨 FIX 2: (question as any) laga kar TypeScript ki error hata di
+            topicId: (question as any).topicId || state.topicId || 1001,       
+            subjectId: (question as any).subjectId || state.subjectId || 1001  
+          })
+        });
+        console.log("DB updated: Question Solved! Progress +1 🚀");
+      } catch (error) {
+        console.error("Progress save nahi ho payi:", error);
+      }
+    }
   };
 
   const handleNextQuestion = () => {
