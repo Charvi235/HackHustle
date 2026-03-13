@@ -89,7 +89,7 @@ export const BattleReport = ({
                 <div className="text-center">
                     <Trophy className={`w-20 h-20 mx-auto mb-4 ${isUserWinner ? 'text-yellow-500' : 'text-primary'}`} />
                     <h1 className="text-4xl font-bold mb-2">
-                        {isUserWinner ? "YOU ARE THE WINNER! 👑" : `Winner is: ${winnerName}` }
+                        {isUserWinner ? "YOU ARE THE WINNER! 👑" : `Winner: ${winnerName}` }
                     </h1>
                     <p className="text-muted-foreground">The battle has ended. See your performance below.</p>
                 </div>
@@ -114,7 +114,7 @@ export const BattleReport = ({
             </div>
             <div className="text-center p-4 bg-muted/50 rounded-lg">
               <XCircle className="w-6 h-6 mx-auto mb-2 text-red-500" />
-              <div className="text-2xl font-bold">{answeredCount - correctCount}</div>
+              <div className="text-2xl font-bold">{totalQuestions - correctCount}</div>
               <div className="text-sm text-muted-foreground">Wrong</div>
             </div>
             <div className="text-center p-4 bg-muted/50 rounded-lg">
