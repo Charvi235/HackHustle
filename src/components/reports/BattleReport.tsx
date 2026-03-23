@@ -29,6 +29,7 @@ interface BattleReportProps {
   winnerId: number | null;
   onBack: () => void;
   onPlayAgain: () => void;
+  
 }
 
 export const BattleReport = ({ 

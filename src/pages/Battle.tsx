@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,7 +19,7 @@ import {
 } from '@/services/battleSocket';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-
+import { ComputerBattle } from './ComputerBattle';
 const getOptionsArray = (q: Question): string[] => {
   return [q.option1, q.option2, q.option3, q.option4];
 };
@@ -52,9 +50,10 @@ const Battle = () => {
   const studentId = Number(user?.student_id);
   const [winnerId, setWinnerId] = useState<number | null>(null);
   const currentQuestions = dbQuestions.length > 0 ? dbQuestions : battleQuestions;
+  const [isComputerMode, setIsComputerMode] = useState(false);
   const scoresRef = useRef<{ [key: number]: number }>({});
   /* ---------------- API CALLS ---------------- */
-
+  
   const createBattleEntry = async (email: string, status: string = "COMPLETED", score: number = 0) => {
     if (!roomCode) return;
     try {
@@ -252,7 +251,20 @@ const handleFinishGame = () => {
       />
     );
   }
-
+if (isComputerMode && gameMode === 'game') {
+  return (
+    <ComputerBattle 
+      questions={currentQuestions}
+      studentId={studentId}
+      studentEmail={studentEmail}
+      firstName={user?.first_name}
+      onBack={() => {
+        setIsComputerMode(false);
+        setGameMode('menu');
+      }}
+    />
+  );
+}
   if (gameMode === 'game') {
     const question = currentQuestions[currentQuestion];
     if (!question) return null;
@@ -332,7 +344,24 @@ const handleFinishGame = () => {
                       <Button onClick={() => setGameMode('join')} variant="outline" className="w-full">Join Room</Button>
                     </div>
                   ) : (
-                    <Button onClick={() => startBattle(mode.id)} className="w-full">Start Battle</Button>
+                    //<Button onClick={() => startBattle(mode.id)} className="w-full">Start Battle</Button>
+                    // Isse replace karein
+<Button 
+  onClick={async () => {
+    // Backend se questions fetch karo
+    const res = await fetch(`http://localhost:8080/api/battle/create/${studentEmail}`, { method: 'POST' });
+    const code = await res.text();
+    const roomRes = await fetch(`http://localhost:8080/api/battle/join/${code}/${studentEmail}`, { method: 'POST' });
+    const roomData = await roomRes.json();
+    
+    setDbQuestions(roomData.questions);
+    setIsComputerMode(true);
+    setGameMode('game'); // ya koi specific state
+  }} 
+  className="w-full"
+>
+  Start Battle
+</Button>
                   )}
                 </Card>
               ))}
