@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
 import {
   LogOut,
   BookOpen,
@@ -88,8 +89,6 @@ const Profile = () => {
     setLocalUser(user);
   }, [isAuthenticated, user, navigate]);
 
-  
-
   const getUserInitials = () => {
     if (!localUser) return "U";
     return `${localUser.first_name?.[0] || ""}${
@@ -97,44 +96,6 @@ const Profile = () => {
     }`.toUpperCase();
   };
 
-  // ================= UPDATE PROFILE =================
-  // const handleProfileUpdate = async (updatedData: Partial<User>) => {
-  //   if (!student || !localUser) return;
-
-  //   try {
-  //     const updatedStudent = await updateStudent(student.studentId, {
-  //       ...student,
-  //       firstName: updatedData.first_name ?? student.firstName,
-  //       lastName: updatedData.last_name ?? student.lastName,
-  //       emailId: student.emailId,
-  //       password: student.password,
-  //       points: student.points,
-  //       quizAttempted: student.quizAttempted,
-  //     });
-
-  //     setStudent(updatedStudent);
-
-  //     const updatedLocalUser = {
-  //       ...localUser,
-  //       first_name: updatedStudent.firstName,
-  //       last_name: updatedStudent.lastName,
-  //     };
-
-  //     setLocalUser(updatedLocalUser);
-  //     localStorage.setItem("user", JSON.stringify(updatedLocalUser));
-
-  //     toast({
-  //       title: "Success",
-  //       description: "Profile updated successfully",
-  //     });
-  //   } catch (error) {
-  //     toast({
-  //       title: "Error",
-  //       description: "Failed to update profile",
-  //       variant: "destructive",
-  //     });
-  //   }
-  // };
 
   const handleProfileUpdate = async (updatedData: Partial<User>) => {
   if (!student || !localUser) return;
@@ -258,11 +219,11 @@ const Profile = () => {
         <Card>
           <CardHeader className="text-center pb-2">
             <div className="flex justify-center mb-4">
-              <Avatar className="h-24 w-24">
-                <AvatarFallback className="text-2xl">
-                  {getUserInitials()}
-                </AvatarFallback>
-              </Avatar>
+              <Avatar className="h-24 w-24 border-2 border-zinc-700">
+    <AvatarFallback className="bg-zinc-800 text-white text-3xl font-bold tracking-widest">
+      {getUserInitials()}
+    </AvatarFallback>
+  </Avatar>
             </div>
             <CardTitle className="text-2xl">
               {localUser.first_name} {localUser.last_name}
@@ -274,36 +235,7 @@ const Profile = () => {
         </Card>
 
         
-         {/* <Card>
-           <CardHeader>
-             <CardTitle>Profile Information</CardTitle>
-           </CardHeader>
-          <CardContent className="space-y-4">
-
-             <div className="grid grid-cols-2 gap-4">
-               <div>
-                 <Label>First Name</Label>
-                 <p className="text-muted-foreground">
-                   {student.firstName}
-                 </p>
-               </div>
-
-               <div>
-                 <Label>Last Name</Label>
-                 <p className="text-muted-foreground">
-                  {student.lastName}
-                 </p>
-               </div>
-             </div>
-
-             <div>
-              <Label>Email</Label>
-               <p className="text-muted-foreground">
-                 {student.emailId}
-              </p>
-            </div>
-          </CardContent>
-        </Card> */}
+        
 
         {/* ===== PROFILE INFORMATION (Inline Edit) ===== */}
         <Card className="relative border-primary/20 shadow-sm">
@@ -426,15 +358,6 @@ const Profile = () => {
           </CardHeader>
           <CardContent className="space-y-3">
             {isFaculty ? (
-              // <Button
-              //   variant="outline"
-              //   className="w-full justify-start"
-              //   onClick={() => navigate("/faculty-doubts")}
-              // >
-              //   <MessageSquare className="mr-2 h-4 w-4" />
-              //   View Doubts
-              // </Button>
-              /* src/pages/Profile.tsx mein Quick Actions card ke andar */
 
               <Button 
                 variant="outline" 

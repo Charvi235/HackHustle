@@ -51,15 +51,22 @@ export const Header = () => {
   };
   const getUserInitials = () => {
   if (!user) return "U";
-  
-  // Sirf wahi use karo jo tere AuthContext mein define hai
+
   const first = user.first_name || "";
   const last = user.last_name || "";
 
+  // Agar dono hain toh pehla aur pehla uthao
   if (first && last) {
-    return (first[0] + last[0]).toUpperCase();
+    return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
   }
-  return first ? first[0].toUpperCase() : "U";
+  
+  // Agar sirf first name hai
+  if (first) {
+    return first.charAt(0).toUpperCase();
+  }
+
+  // Fallback
+  return "U";
 };
 
   return (
@@ -141,7 +148,7 @@ export const Header = () => {
     </AvatarFallback>
   </Avatar>
   
-  {/* Notification indicator (Subtle Blue Dot) - Agar ye bhi nahi chahiye toh is poore block ko uda dena */}
+ 
   {unreadDoubtsCount > 0 && (
     <span className="absolute top-0 right-0 h-2 w-2 bg-blue-500 rounded-full border border-zinc-950" />
   )}
@@ -150,32 +157,17 @@ export const Header = () => {
                 
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 bg-background border border-border">
-                  {/* <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    View Profile
-                  </DropdownMenuItem> */}
-                  {/* ✅ View Profile Logic Updated */}
-<DropdownMenuItem 
-  onClick={() => navigate(isFaculty ? '/teacher-profile' : '/profile')} 
-  className="cursor-pointer"
->
-  <User className="mr-2 h-4 w-4" />
-  View Profile
-</DropdownMenuItem>
+                 
+                <DropdownMenuItem 
+                  onClick={() => navigate(isFaculty ? '/teacher-profile' : '/profile')} 
+                  className="cursor-pointer"
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  View Profile
+                </DropdownMenuItem>
 
-{/* ✅ Edit Profile Logic Updated */}
-{/* <DropdownMenuItem 
-  // 👇 Maine yahan '?edit=true' add kar diya hai
-  onClick={() => navigate(isFaculty ? '/teacher-profile?edit=true' : '/profile?edit=true')} 
-  className="cursor-pointer"
->
-  <Pencil className="mr-2 h-4 w-4" />
-  Edit Profile
-</DropdownMenuItem> */}
-                  {/* <DropdownMenuItem onClick={() => navigate('/profile?edit=true')} className="cursor-pointer">
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Edit Profile
-                  </DropdownMenuItem> */}
+
+              
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive">
                     <LogOut className="mr-2 h-4 w-4" />
