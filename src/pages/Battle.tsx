@@ -50,6 +50,7 @@ const Battle = () => {
   const navigate = useNavigate();
   const studentEmail = user?.emailId; 
   const studentId = Number(user?.student_id);
+  console.log("🔍 User Info:", { studentEmail, studentId, user });
   const [winnerId, setWinnerId] = useState<number | null>(null);
   const currentQuestions = dbQuestions.length > 0 ? dbQuestions : battleQuestions;
   const [isComputerMode, setIsComputerMode] = useState(false);
