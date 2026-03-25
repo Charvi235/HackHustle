@@ -89,13 +89,6 @@ const Profile = () => {
     setLocalUser(user);
   }, [isAuthenticated, user, navigate]);
 
-  const getUserInitials = () => {
-    if (!localUser) return "U";
-    return `${localUser.first_name?.[0] || ""}${
-      localUser.last_name?.[0] || ""
-    }`.toUpperCase();
-  };
-
 
   const handleProfileUpdate = async (updatedData: Partial<User>) => {
   if (!student || !localUser) return;
@@ -202,6 +195,10 @@ const Profile = () => {
   };
 
 
+  const getUserInitials = () => {
+    if (!student) return "U";
+    return `${student.firstName?.[0] || ""}${student.lastName?.[0] || ""}`.toUpperCase();
+  };
 
   const handleLogout = () => {
     logout();
