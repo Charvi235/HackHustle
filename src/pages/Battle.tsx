@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,7 @@ import {
 } from '@/services/battleSocket';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+
 import { ComputerBattle } from './ComputerBattle';
 const getOptionsArray = (q: Question): string[] => {
   return [q.option1, q.option2, q.option3, q.option4];
@@ -53,6 +55,7 @@ const Battle = () => {
   const [isComputerMode, setIsComputerMode] = useState(false);
   const scoresRef = useRef<{ [key: number]: number }>({});
   /* ---------------- API CALLS ---------------- */
+
   
   const createBattleEntry = async (email: string, status: string = "COMPLETED", score: number = 0) => {
     if (!roomCode) return;
@@ -248,9 +251,11 @@ const handleFinishGame = () => {
           setMasterAnswers({});
           setShowResults({});
         }}
+        players={players}
       />
     );
   }
+
 if (isComputerMode && gameMode === 'game') {
   return (
     <ComputerBattle 
@@ -344,6 +349,7 @@ if (isComputerMode && gameMode === 'game') {
                       <Button onClick={() => setGameMode('join')} variant="outline" className="w-full">Join Room</Button>
                     </div>
                   ) : (
+                    //<Button onClick={() => startBattle(mode.id)} className="w-full">Start Battle</Button>
                     //<Button onClick={() => startBattle(mode.id)} className="w-full">Start Battle</Button>
                     // Isse replace karein
 <Button 

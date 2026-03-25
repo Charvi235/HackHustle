@@ -29,7 +29,7 @@ interface BattleReportProps {
   winnerId: number | null;
   onBack: () => void;
   onPlayAgain: () => void;
-  
+  players: number[];
 }
 
 export const BattleReport = ({ 
