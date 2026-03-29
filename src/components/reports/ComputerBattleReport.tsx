@@ -14,8 +14,6 @@ interface ComputerBattleReportProps {
   onBack: () => void;
   onPlayAgain: () => void;
 }
-// ... (imports same rahenge)
-
 export const ComputerBattleReport = ({ 
   questions, 
   selectedAnswers, 
@@ -27,15 +25,11 @@ export const ComputerBattleReport = ({
   onPlayAgain 
 }: ComputerBattleReportProps) => {
 
-  // 1. Calculate User's Score
   const userScore = questions.reduce((acc, q) => {
     const selectedIdx = selectedAnswers[q.questionID];
     const options = [q.option1, q.option2, q.option3, q.option4];
     return options[selectedIdx] === q.correctAnswer ? acc + 10 : acc;
   }, 0);
-
-  // 🔥 FIX: Check strictly for null/undefined instead of just 'winnerId'
-  // Kyunki ID agar 0 hui toh purana logic usey Tie bol dega
   const winnerName = (winnerId !== null && winnerId !== undefined) 
     ? (playerNames[String(winnerId)] || `Player ${winnerId}`) 
     : "It's a Tie! 🤝";
@@ -44,15 +38,11 @@ export const ComputerBattleReport = ({
     <div className="min-h-screen bg-background pt-20 pb-16">
       <div className="container mx-auto px-4 max-w-3xl">
         <Card className="p-8 bg-gradient-to-b from-primary/10 to-background border-2 border-primary/20">
-          
-          {/* Winner Section */}
           <div className="text-center mb-10">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-yellow-500/20 rounded-full mb-4">
               <Trophy className={`w-10 h-10 ${winnerId !== null ? 'text-yellow-500' : 'text-muted-foreground'}`} />
             </div>
             <h1 className="text-4xl font-bold mb-2">Battle Results</h1>
-            
-            {/* 🔥 Color badlo agar winner mil gaya ho */}
             <Badge 
               variant={winnerId !== null ? "default" : "outline"} 
               className={`text-lg px-4 py-1 ${winnerId !== null ? 'bg-yellow-500 text-black hover:bg-yellow-600' : 'border-primary/50 text-primary'}`}
@@ -60,9 +50,6 @@ export const ComputerBattleReport = ({
               Winner: {winnerName}
             </Badge>
           </div>
-
-          {/* ... baki grid aur review same rahega ... */}
-          {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <Card className="p-4 flex flex-col items-center bg-background/50">
               <Target className="w-6 h-6 text-blue-500 mb-2" />
@@ -80,15 +67,12 @@ export const ComputerBattleReport = ({
               <span className="text-2xl font-bold">{Math.round((userScore / (totalQuestions * 10)) * 100)}%</span>
             </Card>
           </div>
-
-          {/* Question Review */}
           <div className="space-y-4 mb-8">
             <h3 className="font-semibold text-xl px-2">Question Review</h3>
             {questions.map((q, idx) => {
               const options = [q.option1, q.option2, q.option3, q.option4];
               const userAnsIdx = selectedAnswers[q.questionID];
               const isCorrect = options[userAnsIdx] === q.correctAnswer;
-
               return (
                 <div key={idx} className={`p-4 rounded-lg border-l-4 ${isCorrect ? 'bg-green-500/5 border-green-500' : 'bg-red-500/5 border-red-500'}`}>
                   <div className="flex justify-between items-start gap-4">
@@ -111,8 +95,6 @@ export const ComputerBattleReport = ({
               );
             })}
           </div>
-
-          {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t">
             <Button onClick={onBack} variant="outline" className="flex-1">
               <ArrowLeft className="w-4 h-4 mr-2" /> Back to Arena

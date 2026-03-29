@@ -43,8 +43,6 @@ const Profile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
-
-  // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [localUser, setLocalUser] = useState<User | null>(null);
   const [student, setStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
@@ -52,7 +50,6 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<any>(null);
 
-  // ================= FETCH PROFILE =================
   useEffect(() => {
     const fetchData = async () => {
       if (!isAuthenticated || !user?.emailId) {
@@ -80,7 +77,6 @@ const Profile = () => {
     fetchData();
   }, [isAuthenticated, user, navigate]);
 
-  // Sync AuthContext user
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/auth");
@@ -94,7 +90,6 @@ const Profile = () => {
   if (!student || !localUser) return;
 
   try {
-    // Determine final first & last names separately
     const finalFirstName =
       updatedData.first_name !== undefined &&
       updatedData.first_name.trim() !== ""
@@ -106,23 +101,16 @@ const Profile = () => {
       updatedData.last_name.trim() !== ""
         ? updatedData.last_name
         : student.lastName;
-
-    //  Call backend WITHOUT email modification
     const updatedStudent = await updateStudent(student.studentId, {
       ...student,
       firstName: finalFirstName,
       lastName: finalLastName,
-      //  emailId NOT taken from updatedData
       emailId: student.emailId,
       password: student.password,
       points: student.points,
       quizAttempted: student.quizAttempted,
     });
-
-    // Update student state
     setStudent(updatedStudent);
-
-    // Update localUser state
     const updatedLocalUser = {
       ...localUser,
       first_name: updatedStudent.firstName,
@@ -145,30 +133,21 @@ const Profile = () => {
     });
   }
 };
-
-// ================= UPDATE PROFILE (Inline Edit Logic) =================
   const handleSaveProfile = async () => {
     if (!student || !localUser) return;
 
     try {
-      // 1. Naya payload banaya (sirf naam change hoga, baaki purana rahega)
       const payload = {
         ...student,
         firstName: editData?.firstName || student.firstName,
         lastName: editData?.lastName || student.lastName,
-        emailId: student.emailId,       // Email readonly hai
-        password: student.password,     // Password backend ko wapas bhejna zaroori hai
+        emailId: student.emailId,     
+        password: student.password,     
         points: student.points,
         quizAttempted: student.quizAttempted,
       };
-
-      // 2. Backend API call 
       const updatedStudent = await updateStudent(student.studentId, payload);
-
-      // 3. Student State Update
       setStudent(updatedStudent);
-
-      // 4. LocalAuth (Navbar/Sidebar) ke liye Update
       const updatedLocalUser = {
         ...localUser,
         first_name: updatedStudent.firstName,
@@ -176,8 +155,6 @@ const Profile = () => {
       };
       setLocalUser(updatedLocalUser);
       localStorage.setItem("user", JSON.stringify(updatedLocalUser));
-
-      // 5. Success UI
       setIsEditing(false);
       toast({
         title: "Success",
@@ -212,15 +189,14 @@ const Profile = () => {
   return (
     <div className="container mx-auto px-4 py-8 pt-24">
       <div className="max-w-2xl mx-auto space-y-6">
-        {/* ===== PROFILE HEADER ===== */}
         <Card>
           <CardHeader className="text-center pb-2">
             <div className="flex justify-center mb-4">
               <Avatar className="h-24 w-24 border-2 border-zinc-700">
-    <AvatarFallback className="bg-zinc-800 text-white text-3xl font-bold tracking-widest">
-      {getUserInitials()}
-    </AvatarFallback>
-  </Avatar>
+                <AvatarFallback className="bg-zinc-800 text-white text-3xl font-bold tracking-widest">
+                  {getUserInitials()}
+                </AvatarFallback>
+              </Avatar>
             </div>
             <CardTitle className="text-2xl">
               {localUser.first_name} {localUser.last_name}
@@ -230,16 +206,9 @@ const Profile = () => {
             </Badge>
           </CardHeader>
         </Card>
-
-        
-        
-
-        {/* ===== PROFILE INFORMATION (Inline Edit) ===== */}
         <Card className="relative border-primary/20 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xl">Profile Information</CardTitle>
-            
-            {/* Edit Toggle Buttons */}
             {!isEditing ? (
               <Button 
                 variant="ghost" 
@@ -265,8 +234,6 @@ const Profile = () => {
 
           <CardContent className="space-y-4 mt-2">
             <div className="grid grid-cols-2 gap-4">
-              
-              {/* First Name */}
               <div>
                 <Label>First Name</Label>
                 {isEditing ? (
@@ -279,8 +246,6 @@ const Profile = () => {
                   <p className="text-muted-foreground mt-1">{student.firstName}</p>
                 )}
               </div>
-
-              {/* Last Name */}
               <div>
                 <Label>Last Name</Label>
                 {isEditing ? (
@@ -294,8 +259,6 @@ const Profile = () => {
                 )}
               </div>
             </div>
-
-            {/* Email (Read Only - Email change nahi kar sakte) */}
             <div>
               <Label>Email</Label>
               <p className="text-muted-foreground mt-1">{student.emailId}</p>
@@ -303,16 +266,12 @@ const Profile = () => {
             </div>
           </CardContent>
         </Card>
-
-         {/* ===== STATS ===== */}
          <Card>
            <CardHeader>
              <CardTitle>Your Stats</CardTitle>
            </CardHeader>
            <CardContent>
              <div className="grid grid-cols-3 gap-4">
-
-               {/* Points */}
                <div className="text-center p-4 bg-muted rounded-lg">
                  <Star className="h-8 w-8 mx-auto mb-2 text-blue-500" />
                  <p className="text-3xl font-bold">
@@ -322,7 +281,6 @@ const Profile = () => {
                    Total Points
                  </p>
                </div>
-               {/* Quiz Attempted */}
                <div className="text-center p-4 bg-muted rounded-lg">
                  <Trophy className="h-8 w-8 mx-auto mb-2 text-yellow-500" />
                  <p className="text-3xl font-bold">
@@ -332,8 +290,6 @@ const Profile = () => {
                    Quiz Attempted
                  </p>
                </div>
-
-               {/* Questions Solved (from QuestionStatus table) */}
               <div className="text-center p-4 bg-muted rounded-lg">
                  <CheckCircle className="h-8 w-8 mx-auto mb-2 text-green-500" />
                  <p className="text-3xl font-bold">
@@ -343,23 +299,18 @@ const Profile = () => {
                    Total Questions Solved
                  </p>
                </div>
-
              </div>
            </CardContent>
          </Card>
-
-        {/* ===== QUICK ACTIONS ===== */}
         <Card>
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {isFaculty ? (
-
               <Button 
                 variant="outline" 
                 className="w-full justify-start"
-                
                 onClick={() => navigate("/doubts")} 
               >
                 <BookOpen className="mr-2 h-4 w-4" />
@@ -375,7 +326,6 @@ const Profile = () => {
                 My Doubts
               </Button>
             )}
-
             <Button
               variant="destructive"
               className="w-full justify-start"
@@ -387,8 +337,6 @@ const Profile = () => {
           </CardContent>
         </Card>
       </div>
-
-     
     </div>
   );
 };

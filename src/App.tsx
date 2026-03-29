@@ -34,7 +34,7 @@ const AppContent = () => {
 return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        {/* Render sidebar only if user is logged in and not on public page */}
+        {/* sidebar only if user is logged in and not on public page */}
         {isAuthenticated && !isPublicPage && <AppSidebar />}
         <div className="flex-1 flex flex-col">
           <Header />
@@ -63,7 +63,6 @@ return (
                   <Battle />
                 </ProtectedRoute>
               } />
-              {/* Student Routes ke beech mein kahin bhi daal do */}
                 <Route 
                   path="/doubts" 
                   element={
@@ -112,7 +111,6 @@ return (
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
-          {/* Render footer only if user is logged in and not on public page */}
           {!isPublicPage && <Footer />}
         </div>
       </div>

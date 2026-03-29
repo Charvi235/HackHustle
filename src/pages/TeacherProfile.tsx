@@ -22,7 +22,6 @@ import { Input } from '@/components/ui/input';
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-// import { EditProfileModal } from "@/components/profile/EditProfileModal";
 
 
 import {
@@ -58,17 +57,12 @@ const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState<any>(null); 
   const [editData, setEditData] = useState<any>(null);
 
-
-  
-  // 🔐 Redirect if not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/auth");
     }
   }, [isAuthenticated, navigate]);
 
-  //  Fetch teacher by email
- 
   useEffect(() => {
     const fetchTeacherData = async () => {
       if (!user?.emailId) return;
@@ -76,7 +70,7 @@ const [isEditing, setIsEditing] = useState(false);
       try {
         const data = await getTeacherByEmail(user.emailId);
         setTeacherData(data);
-        setProfileData(data); // 🟢 NAYI LINE: Ye zaroori hai taaki form khali na dikhe
+        setProfileData(data); 
       } catch (error) {
         console.error("Fetch error:", error);
         toast({
@@ -93,13 +87,8 @@ const [isEditing, setIsEditing] = useState(false);
       fetchTeacherData();
     }
   }, [user?.emailId, isAuthenticated]);
-
-  
- // 🟢 NAYA SAVE FUNCTION (Null issue fix + Original Service API)
-const handleSaveProfile = async () => {
+  const handleSaveProfile = async () => {
     try {
-      // 🚨 FIX: Purana saara data (including experience) + tera edit kiya hua data
-      // Isse Spring Boot ko har field mil jayegi aur wo 500 error nahi dega
       const payload = {
         ...profileData,
         ...editData
@@ -111,11 +100,7 @@ const handleSaveProfile = async () => {
         toast({ title: 'Error', description: 'Teacher ID not found!', variant: 'destructive' });
         return;
       }
-
-      // 🚨 FIX: Tera original function use kar rahe hain with perfect payload!
       const savedData = await updateTeacher(tId, payload);
-      
-      // Update hone ke baad UI refresh
       setProfileData(savedData);
       setTeacherData(savedData); 
       setIsEditing(false);
@@ -181,18 +166,12 @@ const handleSaveProfile = async () => {
             </div>
           </CardHeader>
         </Card>
-
-
-
-        {/* Profile Details (Inline Edit Version) */}
         <Card className="bg-zinc-900 border-zinc-800 relative">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xl flex items-center gap-2">
               <UserIcon className="h-5 w-5 text-primary" />
               Personal Information
             </CardTitle>
-            
-            {/* Edit Toggle Buttons */}
             {!isEditing ? (
               <Button variant="ghost" size="icon" onClick={() => { setEditData(profileData); setIsEditing(true); }}>
                 <Pencil className="h-4 w-4 text-zinc-400 hover:text-white" />
@@ -210,8 +189,6 @@ const handleSaveProfile = async () => {
           </CardHeader>
 
           <CardContent className="grid grid-cols-2 gap-6 mt-4 text-sm">
-            
-            {/* First Name */}
             <div>
               <p className="text-zinc-500 font-semibold mb-1">First Name</p>
               {isEditing ? (
@@ -224,8 +201,6 @@ const handleSaveProfile = async () => {
                 <p className="text-zinc-200">{profileData?.firstName}</p>
               )}
             </div>
-
-            {/* Last Name */}
             <div>
               <p className="text-zinc-500 font-semibold mb-1">Last Name</p>
               {isEditing ? (
@@ -238,8 +213,6 @@ const handleSaveProfile = async () => {
                 <p className="text-zinc-200">{profileData?.lastName}</p>
               )}
             </div>
-
-            {/* Subject */}
             <div>
               <p className="text-zinc-500 font-semibold mb-1">Subject</p>
               {isEditing ? (
@@ -252,8 +225,6 @@ const handleSaveProfile = async () => {
                 <p className="text-zinc-200">{profileData?.subjectAssociated}</p>
               )}
             </div>
-
-            {/* Institute */}
             <div>
               <p className="text-zinc-500 font-semibold mb-1">Institute</p>
               {isEditing ? (
@@ -266,8 +237,6 @@ const handleSaveProfile = async () => {
                 <p className="text-zinc-200">{profileData?.institute}</p>
               )}
             </div>
-
-            {/* Designation */}
             <div>
               <p className="text-zinc-500 font-semibold mb-1">Designation</p>
               {isEditing ? (
@@ -280,8 +249,6 @@ const handleSaveProfile = async () => {
                 <p className="text-zinc-200">{profileData?.designation || 'N/A'}</p>
               )}
             </div>
-
-            {/* Department */}
             <div>
               <p className="text-zinc-500 font-semibold mb-1">Department</p>
               {isEditing ? (
@@ -297,9 +264,6 @@ const handleSaveProfile = async () => {
 
           </CardContent>
         </Card>
-       
-
-        {/* Actions */}
         <Card>
           <CardContent className="pt-6 space-y-3">
             <Button
@@ -322,8 +286,6 @@ const handleSaveProfile = async () => {
           </CardContent>
         </Card>
       </div>
-
-     
     </div>
   );
 };

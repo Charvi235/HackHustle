@@ -19,7 +19,6 @@ export const ProfileDialog = ({ open, onOpenChange }: ProfileDialogProps) => {
   const [email, setEmail] = useState(user?.emailId || '');
 
   const handleSave = () => {
-    // TODO: Connect to MySQL backend to update user profile
     toast({ title: 'Profile updated successfully!' });
     onOpenChange(false);
   };

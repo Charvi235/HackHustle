@@ -16,7 +16,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Question } from '@/data/questions';
 
-// Helper to get options as array
+
 const getOptionsArray = (q: Question): string[] => {
   return [q.option1, q.option2, q.option3, q.option4];
 };
@@ -74,8 +74,6 @@ export const BattleReport = ({
           <ChevronLeft className="w-4 h-4 mr-2" />
           Back to Battle Menu
         </Button>
-
-        {/* Overall Score */}
         <Card className="p-8 bg-gradient-card mb-8">
           <div className="text-center mb-6">
             <Badge variant="secondary" className="mb-4">
@@ -101,8 +99,6 @@ export const BattleReport = ({
               You got {correctCount} out of {totalQuestions} questions correct
             </p>
           </div>
-
-          {/* Stats Grid */}
           <div className="grid grid-cols-4 gap-4">
             <div className="text-center p-4 bg-muted/50 rounded-lg">
               <CheckCircle2 className="w-6 h-6 mx-auto mb-2 text-green-500" />
@@ -126,8 +122,6 @@ export const BattleReport = ({
             </div>
           </div>
         </Card>
-
-        {/* Question Review */}
         <h2 className="text-2xl font-bold mb-4">Question Review</h2>
         <div className="space-y-4">
           {questions.map((question, index) => {
@@ -174,8 +168,6 @@ export const BattleReport = ({
             );
           })}
         </div>
-
-        {/* Action Buttons */}
         <div className="flex gap-4 mt-8">
           <Button variant="outline" className="flex-1" onClick={onBack}>
             Back to Menu

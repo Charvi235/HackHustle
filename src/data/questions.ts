@@ -21,8 +21,6 @@ export interface Subject {
   name: string;
   topics: Topic[];
 }
-
-// will do it later
 const dummyQuestions: Question[] = [];
 
 export const interviewQuestions: Question[] = dummyQuestions;

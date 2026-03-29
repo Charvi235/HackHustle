@@ -1,5 +1,3 @@
-
-
 export const API_CONFIG = {
   BASE_URL: 'http://localhost:8080',
   ENDPOINTS: {
@@ -85,9 +83,6 @@ export const apiClient = {
     return text ? JSON.parse(text) : null;
   },
 
-  /* ======================
-     PUT
-     ====================== */
   put: async <T>(endpoint: string, data: any): Promise<T | null> => {
     const token = localStorage.getItem('authToken');
 
