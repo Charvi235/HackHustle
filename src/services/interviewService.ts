@@ -1,5 +1,4 @@
 
-//const API_BASE = "http://localhost:8000";
 const API_BASE = "http://127.0.0.1:8000";
 
 export const interviewService = {
@@ -17,7 +16,7 @@ export const interviewService = {
       body: JSON.stringify(data),
     });
 
-    return res.json(); // { question: string }
+    return res.json(); 
   },
 
   evaluateAnswer: async (question: string, answer: string) => {
@@ -27,7 +26,7 @@ export const interviewService = {
       body: JSON.stringify({ question, answer }),
     });
 
-    return res.json(); // OBJECT from backend
+    return res.json(); 
   },
 
   speechToText: async (audioBlob: Blob) => {
@@ -39,7 +38,7 @@ export const interviewService = {
       body: formData,
     });
 
-    return res.json(); // { text: "recognized speech" }
+    return res.json(); 
   },
   getNextQuestion: async (sessionId: string) => {
     const res = await fetch(

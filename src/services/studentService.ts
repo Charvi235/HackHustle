@@ -27,5 +27,5 @@ export const getVisitedQuestions = async (emailId: string) => {
       params: { emailId }
     }
   );
-  return response.data; // returns List<Long>
+  return response.data;
 };

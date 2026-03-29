@@ -60,7 +60,6 @@ export const EditProfileModal = ({ open, onOpenChange, user, onSave }: EditProfi
   };
 
   const handleSave = () => {
-    // For students, only save basic fields
     if (!isFaculty) {
       const updatedUser: Partial<User> = {
         first_name: formData.first_name,
@@ -69,7 +68,6 @@ export const EditProfileModal = ({ open, onOpenChange, user, onSave }: EditProfi
       };
       onSave(updatedUser);
     } else {
-      // For faculty, saving all fields
       const updatedUser: Partial<User> = {
         first_name: formData.first_name,
         last_name: formData.last_name,
@@ -103,7 +101,6 @@ export const EditProfileModal = ({ open, onOpenChange, user, onSave }: EditProfi
         </DialogHeader>
         
         <div className="space-y-6 py-4">
-          {/* Basic Info Section */}
           <div>
             <h3 className="text-sm font-semibold text-muted-foreground mb-3">Basic Information</h3>
             <div className="grid grid-cols-2 gap-4">
@@ -124,23 +121,10 @@ export const EditProfileModal = ({ open, onOpenChange, user, onSave }: EditProfi
                 />
               </div>
             </div>
-          {/*   <div className="space-y-2 mt-4">
-              <Label htmlFor="emailId">Email</Label>
-              <Input
-                id="emailId"
-                type="email"
-                value={formData.emailId}
-                onChange={(e) => handleChange('emailId', e.target.value)}
-              />
-            </div> */}
           </div>
-
-          {/* Faculty-only sections */}
           {isFaculty && (
             <>
               <Separator />
-
-              {/* Professional Info Section */}
               <div>
                 <h3 className="text-sm font-semibold text-muted-foreground mb-3">Professional Details</h3>
                 <div className="grid grid-cols-2 gap-4">
@@ -203,53 +187,10 @@ export const EditProfileModal = ({ open, onOpenChange, user, onSave }: EditProfi
                   />
                 </div>
               </div>
-
               <Separator />
-
-              {/* Socials & Availability Section */}
-              {/* <div>
-                <h3 className="text-sm font-semibold text-muted-foreground mb-3">Socials & Availability</h3>
-                <div className="space-y-2">
-                  <Label htmlFor="officeHours">Office Hours</Label>
-                  <Input
-                    id="officeHours"
-                    value={formData.officeHours}
-                    onChange={(e) => handleChange('officeHours', e.target.value)}
-                    placeholder="e.g., Mon-Fri, 5 PM - 7 PM"
-                  />
-                </div>
-                <div className="space-y-2 mt-4">
-                  <Label htmlFor="linkedin">LinkedIn URL</Label>
-                  <Input
-                    id="linkedin"
-                    value={formData.linkedin}
-                    onChange={(e) => handleChange('linkedin', e.target.value)}
-                    placeholder="https://linkedin.com/in/yourprofile"
-                  />
-                </div>
-                <div className="space-y-2 mt-4">
-                  <Label htmlFor="github">GitHub URL</Label>
-                  <Input
-                    id="github"
-                    value={formData.github}
-                    onChange={(e) => handleChange('github', e.target.value)}
-                    placeholder="https://github.com/yourusername"
-                  />
-                </div>
-                <div className="space-y-2 mt-4">
-                  <Label htmlFor="website">Personal Website</Label>
-                  <Input
-                    id="website"
-                    value={formData.website}
-                    onChange={(e) => handleChange('website', e.target.value)}
-                    placeholder="https://yourwebsite.com"
-                  />
-                </div>
-              </div> */}
             </>
           )}
         </div>
-
         <div className="flex gap-3 pt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
             Cancel
