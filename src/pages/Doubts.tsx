@@ -25,7 +25,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 
-// --- Interfaces matching Java Backend ---
 interface SubjectDto {
   subjectID: number;     
   subjectName: string;
@@ -64,7 +63,7 @@ const Doubts = () => {
 
   const [subjects, setSubjects] = useState<SubjectDto[]>([]);
   const [topics, setTopics] = useState<TopicDto[]>([]);
-  const [teachers, setTeachers] = useState<TeacherDto[]>([]); // Dynamic list for dropdown
+  const [teachers, setTeachers] = useState<TeacherDto[]>([]);
   
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>("");
   const [selectedTopicName, setSelectedTopicName] = useState("");
@@ -74,7 +73,6 @@ const Doubts = () => {
   const [studentId, setStudentId] = useState<number | null>(null);
   const [doubts, setDoubts] = useState<DoubtDto[]>([]);
 
-  // 1. Initial Data Fetch (Student Info & Subjects)
   useEffect(() => {
     const fetchInitialData = async () => {
       const email = localStorage.getItem("emailId");
@@ -100,7 +98,6 @@ const Doubts = () => {
     fetchInitialData();
   }, []);
 
-  // 2. Fetch Topics AND Specific Teachers when Subject changes
   useEffect(() => {
     const fetchSubjectContext = async () => {
       if (!selectedSubjectId) { 
@@ -113,11 +110,9 @@ const Doubts = () => {
       if (!selectedSub) return;
 
       try {
-        // Fetch Topics for the subject
         const topicRes = await axios.get(`http://localhost:8080/api/topics/subject/${selectedSubjectId}`);
         setTopics(Array.isArray(topicRes.data) ? topicRes.data : []);
 
-        // Fetch ALL teachers handling this specific subject (as per your requirement)
         const teacherRes = await axios.get(`http://localhost:8080/api/teachers/subject/${selectedSub.subjectName}`);
         setTeachers(Array.isArray(teacherRes.data) ? teacherRes.data : []);
       } catch (error) { 
@@ -134,7 +129,6 @@ const Doubts = () => {
     const handleAskSubmit = async () => {
     const selectedSubObj = subjects.find(s => s.subjectID.toString() === selectedSubjectId);
 
-    // Validate that we have all required data
     if (!studentId || !selectedSubObj || !description || !selectedTeacherId) {
       toast({ 
         title: "Error", 
@@ -143,30 +137,26 @@ const Doubts = () => {
       });
       return;
     }
-
-    // Match your DoubtDto.java EXACTLY
     const payload = {
       queryAsked: selectedTopicName ? `[${selectedTopicName}] ${description}` : description,
       selectedSubject: selectedSubObj.subjectName,
       studentId: studentId,
-      teacherID: Number(selectedTeacherId), // Changed 'teacherId' to 'teacherID'
+      teacherID: Number(selectedTeacherId),
       doubtStatus: "Pending" 
     };
 
     try {
-      console.log("Sending payload:", payload); // Debugging line
+      console.log("Sending payload:", payload);
       const response = await axios.post("http://localhost:8080/api/doubts", payload);
       
       if (response.status === 201 || response.status === 200) {
         toast({ title: "Success!", description: "Doubt sent successfully!" });
         setIsAskOpen(false);
-        // Reset form
         setSelectedSubjectId("");
         setSelectedTopicName("");
         setSelectedTeacherId("");
         setDescription("");
         
-        // Refresh List
         const updated = await axios.get(`http://localhost:8080/api/doubts/student/${studentId}`);
         setDoubts(Array.isArray(updated.data) ? updated.data : []);
       }
@@ -183,12 +173,10 @@ const Doubts = () => {
 
 
   const handleRateSubmit = async () => {
-    const tId = viewDoubt?.teacherID; // Using consistent ID naming
+    const tId = viewDoubt?.teacherID; 
     if (!tId) return;
 
     try {
-      // We pass an empty object {} as the body to satisfy Axios, 
-      // but the data is sent in the 'params' (the URL)
       await axios.put(`http://localhost:8080/api/teachers/${tId}/rate`, {}, {
         params: { 
           rating: rating 
@@ -199,7 +187,6 @@ const Doubts = () => {
       setViewDoubt(null);
       setRating(0);
       
-      // Optional: Refresh doubts if rating changes local state
     } catch (error) {
       console.error("Rating Error:", error);
       toast({ 

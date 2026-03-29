@@ -55,8 +55,6 @@ const Battle = () => {
   const currentQuestions = dbQuestions.length > 0 ? dbQuestions : battleQuestions;
   const [isComputerMode, setIsComputerMode] = useState(false);
   const scoresRef = useRef<{ [key: number]: number }>({});
-  /* ---------------- API CALLS ---------------- */
-
   
   const createBattleEntry = async (email: string, status: string = "COMPLETED", score: number = 0) => {
     if (!roomCode) return;
@@ -94,9 +92,6 @@ const Battle = () => {
     setStartTime(Date.now());
   };
 
-
-  /* ---------------- TIMER & HANDLERS ---------------- */
-
   useEffect(() => {
     if (isGameActive && timeLeft > 0) {
       const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
@@ -113,11 +108,9 @@ useEffect(() => {
             if (data === 'START' || data.status === 'START') {
                 startBattle(selectedMode);
             } else if (data.battleCode) {
-                // Room update logic
                 setPlayers(data.players || []);
                 if (data.questions) setDbQuestions(data.questions);
 
-                // 🔥 LIVE SCORE FIX: Update scores state from server data
                 if (data.scores) {
                     console.log("🔥 Updated Scores from Server:", data.scores);
                     console.log("Full Scores Map:", JSON.stringify(data.scores)); 
@@ -143,7 +136,7 @@ useEffect(() => {
             disconnectBattleSocket();
         }
     };
-}, [gameMode, roomCode, currentQuestion]); // 🔥 added currentQuestion here to ensure index sync
+}, [gameMode, roomCode, currentQuestion]); 
   const handleInvite = async () => {
     try {
       const response = await fetch(`http://localhost:8080/api/battle/create/${studentEmail}`, { method: 'POST' }); 
@@ -167,7 +160,7 @@ const handleAnswer = (answerIndex: number) => {
     const questionId = question.questionID;
     const options = getOptionsArray(question);
     const selectedOptionText = options[answerIndex];
-    // 1. Update states for UI
+    
     setSelectedAnswers(prev => ({ ...prev, [questionId]: answerIndex }));
     setShowResults(prev => ({ ...prev, [questionId]: true }));
     setMasterAnswers(prev => ({ ...prev, [questionId]: answerIndex }));
@@ -183,13 +176,6 @@ const handleFinishGame = () => {
     
     console.log("🏆 Final Sync Scores:", currentScores);
     console.log("Calculating Winner from Scores:", scoreEntries);
-    // Object.entries(liveScores).forEach(([pId, score]) => {
-    //   console.log(`Player ${pId} scored ${score} highest is ${highestScore}`);
-    //     if (score > highestScore) {
-    //         highestScore = score;
-    //         currentWinner = Number(pId);
-    //     }
-    // });
     if (scoreEntries.length > 0) {
         scoreEntries.forEach(([pId, score]) => {
             const numericScore = Number(score);
@@ -214,13 +200,11 @@ const handleFinishGame = () => {
       if (studentEmail) {
         createBattleEntry(studentEmail, "COMPLETED", finalScore);
       }
-      return finalAnswers; // Important to return state
+      return finalAnswers;
     });
   };
 
   const formatTime = (seconds: number) => `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, '0')}`;
-
-  /* ---------------- RENDERING ---------------- */
 
   if (gameMode === 'lobby') {
     return (
@@ -246,7 +230,7 @@ const handleFinishGame = () => {
         winnerId={winnerId}
         onBack={() => setGameMode('menu')} 
         onPlayAgain={() => {
-          setGameMode('menu'); // Go back to menu to select mode
+          setGameMode('menu'); 
           setCurrentQuestion(0);
           setSelectedAnswers({});
           setMasterAnswers({});
@@ -281,7 +265,7 @@ if (isComputerMode && gameMode === 'game') {
     return (
       <div className="min-h-screen bg-background pt-20 pb-16">
         <div className="container mx-auto px-4 max-w-4xl">
-          {/* Battle Header */}
+       
           <div className="flex justify-between items-center mb-4">
             <div>
               <Badge variant="secondary" className="mb-2"><Swords className="w-4 h-4 mr-2" />Quiz Battle</Badge>
@@ -298,7 +282,6 @@ if (isComputerMode && gameMode === 'game') {
                           <div className="flex justify-between items-center">
                               <span className="text-xs font-bold truncate">Player {pId.toString().slice(-3)}</span>
                               <Badge variant="secondary" className="bg-primary/10 text-primary">
-                  {/* 🔥 Change: Key string mein ho sakti hai, isliye toString() use karo */}
                   {liveScores[pId.toString()] ?? liveScores[pId] ?? 0}
               </Badge>
             </div>
@@ -350,12 +333,8 @@ if (isComputerMode && gameMode === 'game') {
                       <Button onClick={() => setGameMode('join')} variant="outline" className="w-full">Join Room</Button>
                     </div>
                   ) : (
-                    //<Button onClick={() => startBattle(mode.id)} className="w-full">Start Battle</Button>
-                    //<Button onClick={() => startBattle(mode.id)} className="w-full">Start Battle</Button>
-                    // Isse replace karein
 <Button 
   onClick={async () => {
-    // Backend se questions fetch karo
     const res = await fetch(`http://localhost:8080/api/battle/create/${studentEmail}`, { method: 'POST' });
     const code = await res.text();
     const roomRes = await fetch(`http://localhost:8080/api/battle/join/${code}/${studentEmail}`, { method: 'POST' });
@@ -363,7 +342,7 @@ if (isComputerMode && gameMode === 'game') {
     
     setDbQuestions(roomData.questions);
     setIsComputerMode(true);
-    setGameMode('game'); // ya koi specific state
+    setGameMode('game'); 
   }} 
   className="w-full"
 >
