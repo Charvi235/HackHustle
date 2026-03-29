@@ -877,7 +877,7 @@ const techSkillsList = [
               <Card className="p-6 text-center bg-gradient-card">
                 <Video className="w-8 h-8 text-blue-500 mx-auto mb-2" />
                 <div className="font-semibold">Video Analysis</div>
-                <div className="text-sm text-muted-foreground">Body language & eye contact</div>
+                <div className="text-sm text-muted-foreground">Real Interview feel</div>
               </Card>
               <Card className="p-6 text-center bg-gradient-card">
                 <Mic className="w-8 h-8 text-green-500 mx-auto mb-2" />

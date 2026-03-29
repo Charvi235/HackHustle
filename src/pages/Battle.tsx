@@ -27,8 +27,8 @@ const getOptionsArray = (q: Question): string[] => {
 };
 
 const battleModes = [
-  { id: 1, title: 'Quick Battle', description: 'Jump into a match with random players', icon: Zap, color: 'bg-yellow-500', maxPlayers: 5, duration: '5 minutes', questions: 20 },
-  { id: 2, title: 'Private Room', description: 'Create or join a room with friends', icon: Users, color: 'bg-blue-500', maxPlayers: 8, duration: '10 minutes', questions: 30 },
+  { id: 1, title: 'Play with Computer', description: 'Jump into a match with random players', icon: Zap, color: 'bg-yellow-500', maxPlayers: 5, duration: '5 minutes', questions: 20 },
+  { id: 2, title: 'Play with Friends', description: 'Create or join a room with friends', icon: Users, color: 'bg-blue-500', maxPlayers: 8, duration: '10 minutes', questions: 30 },
 ];
 
 const Battle = () => {
