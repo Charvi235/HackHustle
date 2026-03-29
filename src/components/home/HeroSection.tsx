@@ -8,7 +8,7 @@ import heroDarkBg from '@/assets/hero-bg-dark.jpg';
 export const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Images */}
+
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-hero z-10" />
         <img 
@@ -23,16 +23,9 @@ export const HeroSection = () => {
         />
       </div>
 
-      {/* Content */}
       <div className="relative z-10 container mx-auto px-4 py-15">
         <div className="max-w-4xl mx-auto text-center">
-          {/* Badge
-          <Badge variant="secondary" className="mb-6 text-sm font-medium px-4 py-2">
-            <Sparkles className="w-4 h-4 mr-2" />
-            AI-Powered Learning Platform
-          </Badge> */}
-
-          {/* Main Headline */}
+         
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
             HackHustle{' '}
             <span className="text-4xl md:text-6xl sm:text-7xl font-bold mb-6 leading-tight">
@@ -40,13 +33,13 @@ export const HeroSection = () => {
             </span>
           </h1>
 
-          {/* Subheadline */}
+       
           <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
             Transform your learning journey with AI-powered mock interviews, competitive quizzes, 
             and personalized skill assessments. Join thousands of students already leveling up.
           </p>
 
-          {/* CTA Buttons */}
+        
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button asChild variant="hero" size="lg" className="px-8 py-3 text-lg font-semibold">
               <Link to="/practice">

@@ -12,7 +12,7 @@ interface BattleLobbyProps {
   onStart: () => void;
   onCancel: () => void;
   isHost: boolean;
-  players: number[]; // 🔥 Added to receive the live list
+  players: number[]; 
 }
 
 export const BattleLobby = ({ roomCode, onStart, onCancel, isHost, players }: BattleLobbyProps) => {
@@ -74,7 +74,7 @@ export const BattleLobby = ({ roomCode, onStart, onCancel, isHost, players }: Ba
               </div>
             </div>
 
-            {/* Players List (Now Dynamic) */}
+            {/* Players List  */}
             <div>
               <Label className="text-sm text-muted-foreground mb-3 block">Players in Lobby</Label>
               <div className="space-y-2">

@@ -20,7 +20,6 @@ const FacultyStudents = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Mock data for students
   const students: Student[] = [
     { id: '1', name: 'Charvi', email: 'charvi@gmail.com', points: 1500, doubtsAsked: 5 },
     { id: '2', name: 'Rahul Kumar', email: 'rahul@gmail.com', points: 1200, doubtsAsked: 8 },

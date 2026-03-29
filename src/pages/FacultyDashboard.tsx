@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Star, CheckCircle, Users, History } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-// Interface matching your backend DoubtDto exactly
+
 interface Doubt {
   doubtID: number;
   doubtStatus: string; // "Pending" or "Resolved"
@@ -33,32 +33,20 @@ const FacultyDashboard = () => {
     try {
       const email = localStorage.getItem('emailId'); 
       if (!email) return;
-
-      // 1. Get Teacher Details to get the ID (Matches TeacherDto.java -> teacherId)
       const teacherRes = await fetch(`http://localhost:8080/api/teachers/email/${email}`);
       if (!teacherRes.ok) throw new Error("Teacher not found");
       const teacherData = await teacherRes.json();
       const tId = teacherData.teacherId; 
-
-      // 2. Fetch only Resolved doubts from your backend
-      // Note: Ensure your backend has this endpoint, or use the general teacher endpoint and filter
-      const response = await fetch(`http://localhost:8080/api/doubts/teacher/${tId}/resolved`);
-      
+      const response = await fetch(`http://localhost:8080/api/doubts/teacher/${tId}/resolved`);     
       if (response.ok) {
         const allDoubts: Doubt[] = await response.json();
-        
-        // 3. Filter for 'Resolved' status only
         const resolvedOnly = allDoubts.filter(d => d.doubtStatus === "Resolved");
-
-        // 4. Calculate stats based on actual resolved data
         const uniqueStudents = new Set(resolvedOnly.map(d => d.studentId));
-        
         setDashboardStats({
           rating: teacherData.rating || 0.0,
           doubtsSolved: resolvedOnly.length,
           studentsMentored: uniqueStudents.size
         });
-
         setSolvedDoubtsList(resolvedOnly);
       }
     } catch (error) {
@@ -122,8 +110,6 @@ const FacultyDashboard = () => {
           </CardContent>
         </Card>
       </div>
-
-      {/* Recently Solved Doubts - Main Focus */}
       <Card className="shadow-lg">
         <CardHeader className="border-b bg-muted/10">
           <div className="flex items-center gap-2">

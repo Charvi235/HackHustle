@@ -7,12 +7,12 @@ import { Progress } from '@/components/ui/progress';
 import { ChevronLeft, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { Question } from '@/data/questions';
 
-// Helper to get options as array
+
 const getOptionsArray = (q: Question): string[] => {
   return [q.option1, q.option2, q.option3, q.option4];
 };
 
-const TOTAL_TIME = 1800; // 30 minutes
+const TOTAL_TIME = 1800; 
 
 const Assessment = () => {
   const location = useLocation();
@@ -30,7 +30,7 @@ const Assessment = () => {
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
   const [isActive, setIsActive] = useState(true);
 
-  /* ---------------- TIMER ---------------- */
+  //timer
   useEffect(() => {
     if (!isActive || showResults) return;
 
@@ -46,7 +46,7 @@ const Assessment = () => {
     return () => clearInterval(timer);
   }, [timeLeft, isActive, showResults]);
 
-  /* ---------------- HANDLERS ---------------- */
+  // HANDLERS 
   const handleAnswer = (optionIndex: number) => {
     const qid = questions[currentQuestion].questionID;
     setSelectedAnswers((prev) => ({
@@ -66,9 +66,9 @@ const Assessment = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  /* ===========================
-     RESULT SCREEN (ONLY AFTER SUBMIT)
-     =========================== */
+  
+  //   RESULT SCREEN 
+     
   if (showResults) {
     const correctCount = Object.keys(selectedAnswers).filter((qId) => {
       const question = questions.find(q => q.questionID === Number(qId));
@@ -139,9 +139,9 @@ const Assessment = () => {
     );
   }
 
-  /* ===========================
-     TEST SCREEN (NO SCORE ANYWHERE)
-     =========================== */
+ 
+ // TEST SCREEN 
+    
   const question = questions[currentQuestion];
   const options = getOptionsArray(question);
   const selectedAnswer = selectedAnswers[question.questionID];

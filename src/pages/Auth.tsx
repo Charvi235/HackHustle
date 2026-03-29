@@ -1,16 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -104,8 +91,8 @@ const Auth = () => {
 
 
 
-  // --- OTP Verification States for Sign Up ---
-  const [signupStep, setSignupStep] = useState(1); // 1: Email, 2: OTP, 3: Full Sign Up Form
+  // OTP Verification States for Sign Up 
+  const [signupStep, setSignupStep] = useState(1); 
   const [otpEmail, setOtpEmail] = useState('');
   const [otpValue, setOtpValue] = useState('');
   const [isOtpLoading, setIsOtpLoading] = useState(false);
@@ -117,7 +104,7 @@ const Auth = () => {
   const [showTeacherSignupPassword, setShowTeacherSignupPassword] = useState(false);
   const [showTeacherConfirmPassword, setShowTeacherConfirmPassword] = useState(false);
 
-  // --- Dynamic Subject Fetching (Matching Doubts Connection) ---
+  // Dynamic Subject Fetching 
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
@@ -274,7 +261,7 @@ const Auth = () => {
     }
     setIsOtpLoading(true);
     try {
-      // Calling your friend's API
+      
       const response = await fetch("http://localhost:8080/auth/send-signup-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -283,7 +270,7 @@ const Auth = () => {
 
       if (response.ok) {
         toast({ title: 'OTP Sent!', description: `An OTP has been sent to ${otpEmail}` });
-        setSignupStep(2); // Go to OTP input screen
+        setSignupStep(2); 
       } else {
         toast({ title: 'Error', description: 'Failed to send OTP', variant: 'destructive' });
       }
@@ -299,7 +286,7 @@ const Auth = () => {
 
     setIsOtpLoading(true);
     try {
-      // Calling your friend's Verify API
+      
       const response = await fetch("http://localhost:8080/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -309,11 +296,11 @@ const Auth = () => {
       if (response.ok) {
         toast({ title: 'Verified!', description: 'Email verified successfully. Complete your profile.' });
         
-        // Verified email ko dono forms mein pre-fill kar do
+        
         setSignupData(prev => ({ ...prev, emailId: otpEmail }));
         setTeacherSignupData(prev => ({ ...prev, emailId: otpEmail }));
         
-        setSignupStep(3); // Go to Full Sign Up Form
+        setSignupStep(3); 
       } else {
         toast({ title: 'Error', description: 'Invalid OTP entered', variant: 'destructive' });
       }
@@ -342,7 +329,7 @@ const Auth = () => {
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
           </TabsList>
 
-          {/* ===== LOGIN TAB ===== */}
+          {/* LOGIN TAB*/}
           <TabsContent value="login">
             <Card>
               <CardHeader>
@@ -392,7 +379,7 @@ const Auth = () => {
             </Card>
           </TabsContent>
 
-          {/* ===== SIGNUP TAB ===== */}
+          {/* SIGNUP TAB*/}
           <TabsContent value="signup">
             <Card>
               <CardHeader>
@@ -400,68 +387,66 @@ const Auth = () => {
                 <CardDescription>Sign up to get started</CardDescription>
               </CardHeader>
               <CardContent>
-               
+                {/*  STEP 1: SEND OTP */}
+                {signupStep === 1 && (
+                  <div className="space-y-4 pt-4">
+                    <div className="text-center mb-6">
+                      <h3 className="text-xl font-bold text-white mb-2">Verify your Email</h3>
+                      <p className="text-sm text-zinc-400">We need to verify your email before registration.</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Input 
+                        placeholder="name@gmail.com" 
+                        value={otpEmail}
+                        onChange={(e) => setOtpEmail(e.target.value)}
+                        className={getInputClass(otpEmail !== '' && !isValidGmail(otpEmail))}
+                        autoFocus
+                      />
+                      {renderError(otpEmail !== '' && !isValidGmail(otpEmail), "Must be a valid @gmail.com address")}
+                    </div>
+                    <Button type="button" className="w-full bg-red-600 hover:bg-red-700" onClick={handleSendOtp} disabled={isOtpLoading || !otpEmail}>
+                      {isOtpLoading ? 'Sending OTP...' : 'Send OTP'}
+                    </Button>
+                  </div>
+                )}
 
-                  {/* ===== STEP 1: SEND OTP ===== */}
-  {signupStep === 1 && (
-    <div className="space-y-4 pt-4">
-      <div className="text-center mb-6">
-        <h3 className="text-xl font-bold text-white mb-2">Verify your Email</h3>
-        <p className="text-sm text-zinc-400">We need to verify your email before registration.</p>
-      </div>
-      <div className="space-y-2">
-        <Input 
-          placeholder="name@gmail.com" 
-          value={otpEmail}
-          onChange={(e) => setOtpEmail(e.target.value)}
-          className={getInputClass(otpEmail !== '' && !isValidGmail(otpEmail))}
-          autoFocus
-        />
-        {renderError(otpEmail !== '' && !isValidGmail(otpEmail), "Must be a valid @gmail.com address")}
-      </div>
-      <Button type="button" className="w-full bg-red-600 hover:bg-red-700" onClick={handleSendOtp} disabled={isOtpLoading || !otpEmail}>
-        {isOtpLoading ? 'Sending OTP...' : 'Send OTP'}
-      </Button>
-    </div>
-  )}
+              {/* STEP 2: VERIFY OTP */}
+              {signupStep === 2 && (
+                <div className="space-y-4 pt-4">
+                  <div className="text-center mb-6">
+                    <h3 className="text-xl font-bold text-white mb-2">Enter OTP</h3>
+                    <p className="text-sm text-zinc-400">
+                      We've sent a code to <br/><span className="font-semibold text-red-400">{otpEmail}</span>
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Input 
+                      placeholder="Enter 6-digit OTP" 
+                      value={otpValue}
+                      onChange={(e) => setOtpValue(e.target.value)}
+                      className="text-center tracking-[0.5em] text-lg font-bold"
+                      maxLength={6}
+                      autoFocus
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button type="button" variant="outline" className="w-1/3" onClick={() => setSignupStep(1)}>
+                      Back
+                    </Button>
+                    <Button type="button" className="w-2/3 bg-green-600 hover:bg-green-700" onClick={handleVerifyOtp} disabled={isOtpLoading || otpValue.length < 4}>
+                      {isOtpLoading ? 'Verifying...' : 'Verify OTP'}
+                    </Button>
+                  </div>
+                </div>
+              )}
 
-  {/* ===== STEP 2: VERIFY OTP ===== */}
-  {signupStep === 2 && (
-    <div className="space-y-4 pt-4">
-      <div className="text-center mb-6">
-        <h3 className="text-xl font-bold text-white mb-2">Enter OTP</h3>
-        <p className="text-sm text-zinc-400">
-          We've sent a code to <br/><span className="font-semibold text-red-400">{otpEmail}</span>
-        </p>
-      </div>
-      <div className="space-y-2">
-        <Input 
-          placeholder="Enter 6-digit OTP" 
-          value={otpValue}
-          onChange={(e) => setOtpValue(e.target.value)}
-          className="text-center tracking-[0.5em] text-lg font-bold"
-          maxLength={6}
-          autoFocus
-        />
-      </div>
-      <div className="flex gap-2">
-        <Button type="button" variant="outline" className="w-1/3" onClick={() => setSignupStep(1)}>
-          Back
-        </Button>
-        <Button type="button" className="w-2/3 bg-green-600 hover:bg-green-700" onClick={handleVerifyOtp} disabled={isOtpLoading || otpValue.length < 4}>
-          {isOtpLoading ? 'Verifying...' : 'Verify OTP'}
-        </Button>
-      </div>
-    </div>
-  )}
-
-  {/* ===== STEP 3: FULL SIGNUP FORM ===== */}
-  {signupStep === 3 && (
-    <Tabs value={signupRole} onValueChange={(v) => setSignupRole(v as RoleType)}>
-      <TabsList className="grid grid-cols-2 mb-4">
-        <TabsTrigger value="STUDENT">Student</TabsTrigger>
-        <TabsTrigger value="TEACHER">Teacher</TabsTrigger>
-      </TabsList>
+              {/* STEP 3: FULL SIGNUP FORM*/}
+              {signupStep === 3 && (
+                <Tabs value={signupRole} onValueChange={(v) => setSignupRole(v as RoleType)}>
+                  <TabsList className="grid grid-cols-2 mb-4">
+                    <TabsTrigger value="STUDENT">Student</TabsTrigger>
+                    <TabsTrigger value="TEACHER">Teacher</TabsTrigger>
+                  </TabsList>
                   
                   {/* STUDENT SIGNUP */}
                   <TabsContent value="STUDENT" className="space-y-4">
@@ -498,19 +483,13 @@ const Auth = () => {
                       {renderError(signupTouched.lastName && signupData.lastName !== '' && !isValidName(signupData.lastName), "Invalid last name (Only letters allowed)")}
                     </div>
                     <div>
-                      {/* <Input
-                        placeholder="Email"
-                        value={signupData.emailId}
-                        onBlur={() => setSignupTouched({...signupTouched, emailId: true})}
-                        onChange={(e) => setSignupData({ ...signupData, emailId: e.target.value })}
-                        className={getInputClass(signupTouched.emailId && (signupData.emailId === '' || !isValidGmail(signupData.emailId)))}
-                      /> */}
+                     
                       <Input
-  placeholder="Email"
-  value={signupData.emailId}
-  disabled // 👈 YE LAGA DIYA
-  className={`opacity-50 cursor-not-allowed ${getInputClass(signupTouched.emailId && (signupData.emailId === '' || !isValidGmail(signupData.emailId)))}`} // 👈 AUR YE CLASSES ADD KAR DI
-/>
+                          placeholder="Email"
+                          value={signupData.emailId}
+                          disabled 
+                          className={`opacity-50 cursor-not-allowed ${getInputClass(signupTouched.emailId && (signupData.emailId === '' || !isValidGmail(signupData.emailId)))}`} 
+                        />
                       {renderError(signupTouched.emailId && signupData.emailId === '', "This field is mandatory")}
                       {renderError(signupTouched.emailId && signupData.emailId !== '' && !isValidGmail(signupData.emailId), "Invalid Email (Must end with @gmail.com)")}
                     </div>
@@ -531,9 +510,7 @@ const Auth = () => {
                       {renderError(signupTouched.password && signupData.password === '', "This field is mandatory")}
 
                       {renderError(signupTouched.password && signupData.password !== '' && !isValidPassword(signupData.password), "Password must be atleast 8 chars and It should have 1 uppercase and  1 special char")}
-                    </div>
-
-                    
+                    </div>  
                     <div className="relative">
                       <Input type={showStudentSignupPassword ? 'text' : 'password'} placeholder="Password" value={signupData.password} onBlur={() => setSignupTouched({...signupTouched, password: true})} onChange={(e) => setSignupData({ ...signupData, password: e.target.value })} className={`pr-10 ${getInputClass(signupTouched.password && (signupData.password === '' || !isValidPassword(signupData.password)))}`} />
                       <button type="button" onClick={() => setShowStudentSignupPassword(!showStudentSignupPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">{showStudentSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
@@ -585,28 +562,20 @@ const Auth = () => {
                       {renderError(teacherTouched.lastName && teacherSignupData.lastName !== '' && !isValidName(teacherSignupData.lastName), "Invalid last name (Only letters allowed)")}
                     </div>
                     <div>
-                        {/* <Input
+                       <Input
                           placeholder="Email"
                           value={teacherSignupData.emailId}
-                          onBlur={() => setTeacherTouched({...teacherTouched, emailId: true})}
-                          onChange={(e) => setTeacherSignupData({ ...teacherSignupData, emailId: e.target.value })}
-                          className={getInputClass(teacherTouched.emailId && (teacherSignupData.emailId === '' || !isValidGmail(teacherSignupData.emailId)))}
-                        /> */}<Input
-  placeholder="Email"
-  value={teacherSignupData.emailId}
-  disabled // 👈 YE LAGA DIYA
-  className={`opacity-50 cursor-not-allowed ${getInputClass(teacherTouched.emailId && (teacherSignupData.emailId === '' || !isValidGmail(teacherSignupData.emailId)))}`} // 👈 AUR YE CLASSES ADD KAR DI
-/>
+                          disabled 
+                          className={`opacity-50 cursor-not-allowed ${getInputClass(teacherTouched.emailId && (teacherSignupData.emailId === '' || !isValidGmail(teacherSignupData.emailId)))}`}  
+                        />
                         {renderError(teacherTouched.emailId && teacherSignupData.emailId === '', "This field is mandatory")}
                         {renderError(teacherTouched.emailId && teacherSignupData.emailId !== '' && !isValidGmail(teacherSignupData.emailId), "Invalid Email (Must end with @gmail.com)")}
                     </div>
                    {/* Teacher Password */}
-
                     <div className="relative">
                       <Input type={showTeacherSignupPassword ? 'text' : 'password'} placeholder="Password" value={teacherSignupData.password} onBlur={() => setTeacherTouched({...teacherTouched, password: true})} onChange={(e) => setTeacherSignupData({ ...teacherSignupData, password: e.target.value })} className={`pr-10 ${getInputClass(teacherTouched.password && (teacherSignupData.password === '' || !isValidPassword(teacherSignupData.password)))}`} />
                       <button type="button" onClick={() => setShowTeacherSignupPassword(!showTeacherSignupPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">{showTeacherSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
                     </div>
-
                     {renderError(teacherTouched.password && teacherSignupData.password === '')}
 
                     {/* Teacher Confirm Password */}
@@ -632,29 +601,25 @@ const Auth = () => {
                     
                       
                       <div className="space-y-2">
-  {/* <Label htmlFor="subject">Subject Associated</Label> */}
-  <Select 
-    onValueChange={(value) => setTeacherSignupData({ ...teacherSignupData, subjectAssociated: value })}
-    value={teacherSignupData.subjectAssociated}
-  >
-    <SelectTrigger className="w-full bg-zinc-950 border-zinc-800 text-zinc-300">
-      <SelectValue placeholder="Select Subject" />
-    </SelectTrigger>
-    <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-300">
-      <SelectItem value="OOPS">OOPS</SelectItem>
-      <SelectItem value="Data Structures">Data Structures</SelectItem>
-      <SelectItem value="DBMS">DBMS</SelectItem>
-    </SelectContent>
-  </Select>
-</div>
+                        <Select 
+                          onValueChange={(value) => setTeacherSignupData({ ...teacherSignupData, subjectAssociated: value })}
+                          value={teacherSignupData.subjectAssociated}
+                        >
+                          <SelectTrigger className="w-full bg-zinc-950 border-zinc-800 text-zinc-300">
+                            <SelectValue placeholder="Select Subject" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-300">
+                            <SelectItem value="OOPS">OOPS</SelectItem>
+                            <SelectItem value="Data Structures">Data Structures</SelectItem>
+                            <SelectItem value="DBMS">DBMS</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                       {renderError(teacherTouched.subjectAssociated && teacherSignupData.subjectAssociated === '', "This field is mandatory")}
-
-
                     <div className="relative">
                       <Input type={showTeacherConfirmPassword ? 'text' : 'password'} placeholder="Confirm Password" value={teacherSignupData.confirmPassword} onBlur={() => setTeacherTouched({...teacherTouched, confirmPassword: true})} onChange={(e) => setTeacherSignupData({ ...teacherSignupData, confirmPassword: e.target.value })} className={`pr-10 ${getInputClass(teacherTouched.confirmPassword && (teacherSignupData.confirmPassword === '' || teacherSignupData.password !== teacherSignupData.confirmPassword))}`} />
                       <button type="button" onClick={() => setShowTeacherConfirmPassword(!showTeacherConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">{showTeacherConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
                     </div>
-
                     <div className="space-y-2">
                       <Select 
                         onValueChange={(value) => setTeacherSignupData({ ...teacherSignupData, subjectAssociated: value })}
@@ -675,16 +640,14 @@ const Auth = () => {
                       </Select>
                       {renderError(teacherTouched.subjectAssociated && teacherSignupData.subjectAssociated === '')}
                     </div>
-
                     <Input placeholder="Institute" value={teacherSignupData.institute} onBlur={() => setTeacherTouched({...teacherTouched, institute: true})} onChange={(e) => setTeacherSignupData({ ...teacherSignupData, institute: e.target.value })} className={getInputClass(teacherTouched.institute && (teacherSignupData.institute === '' || !isValidName(teacherSignupData.institute)))} />
                     {renderError(teacherTouched.institute && teacherSignupData.institute === '')}
-
                     <Button className="w-full" onClick={handleTeacherSignup} disabled={isLoading}>
                       {isLoading ? 'Signing up...' : 'Sign Up as Teacher'}
                     </Button>
                   </TabsContent>
                 </Tabs>
-  )}
+                 )}
             </CardContent>
             </Card>
           </TabsContent>
