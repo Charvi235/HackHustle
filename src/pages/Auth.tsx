@@ -375,6 +375,16 @@ const Auth = () => {
                 <Button className="w-full" variant="secondary" onClick={() => handleLogin('TEACHER')} disabled={isLoading}>
                   {isLoading ? 'Logging in...' : 'Login as Teacher'}
                 </Button>
+               <Button 
+  type="button"
+  onClick={() => {
+    console.log("Dummy Admin Logged In!");
+    navigate('/admin-dashboard'); // Seedha naye dashboard pe bhej dega
+  }}
+  className="w-full py-6 mt-3 bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 transition-colors"
+>
+  Login as Admin
+</Button>
               </CardContent>
             </Card>
           </TabsContent>

@@ -25,6 +25,15 @@ import Profile from "@/pages/Profile";
 import NotFound from "@/pages/NotFound";
 import TeacherProfile from "./pages/TeacherProfile";
 import Doubts from "./pages/Doubts";
+import { AdminDashboard } from './pages/admin/AdminDashboard';
+import { ManageSubjects } from './pages/admin/ManageSubjects';
+
+import { ManageTopics } from './pages/admin/ManageTopics';
+import { ManageQuestions } from './pages/admin/ManageQuestions';
+import { ManageStudents } from './pages/admin/ManageStudents';
+
+import { ManageTeachers } from './pages/admin/ManageTeachers';
+
 const queryClient = new QueryClient();
 
 const AppContent = () => {
@@ -108,6 +117,24 @@ return (
                 </ProtectedRoute>
 
               } />
+              <Route path="/admin-dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/subjects" element={<ManageSubjects />} />
+              <Route path="/admin/subjects" element={<ManageSubjects />} />
+  <Route path="/admin/topics" element={<ManageTopics />} />
+  <Route path="/admin/questions" element={<ManageQuestions />} />
+  <Route path="/admin/students" element={<ManageStudents />} />
+  //<Route path="/admin/teachers" element={<ManageTeachers />} />
+              {/* <Route path="/admin-dashboard" element={
+  <ProtectedRoute allowAdmin={true} allowFaculty={false} allowStudent={false}>
+    <AdminDashboard />
+  </ProtectedRoute>
+} />
+
+<Route path="/admin/subjects" element={
+  <ProtectedRoute allowAdmin={true} allowFaculty={false} allowStudent={false}>
+    <ManageSubjects />
+  </ProtectedRoute>
+} /> */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
