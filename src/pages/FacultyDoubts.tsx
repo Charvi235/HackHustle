@@ -40,10 +40,7 @@ const FacultyDoubts = () => {
       }
 
       try {
-        // 1. Fetch Teacher Profile
         const teacherRes = await axios.get(`http://localhost:8080/api/teachers/email/${email}`);
-        
-        // 2. Extract ID (Checking all possible naming variants)
         const tId = teacherRes.data.teacherID || teacherRes.data.teacherId;
         
         if (!tId) {
@@ -51,11 +48,7 @@ const FacultyDoubts = () => {
           setLoading(false);
           return;
         }
-
-        // 3. Fetch Doubts for this ID
-        // Note: Your backend DoubtRepository.findByTeacher_TeacherIDAndDoubtStatus uses "Pending"
         const doubtRes = await axios.get(`http://localhost:8080/api/doubts/teacher/${tId}`);
-        
         if (Array.isArray(doubtRes.data)) {
           setDoubts(doubtRes.data);
           if (doubtRes.data.length === 0) {
@@ -69,25 +62,20 @@ const FacultyDoubts = () => {
         setLoading(false);
       }
     };
-
     fetchInitialData();
   }, []);
 
   const handleSendAnswer = async () => {
     if (!answer.trim() || !selectedDoubt) return;
 
-    try {
-      // 🚨 FIX: selectedDoubt ka saara data wapas bhejenge (... spread operator se)
-      // Taaki teacherID, studentId, date wagera null na ho jaye backend me.
+    try {  
       const payload = {
-        ...selectedDoubt,             // Purani saari details attach kar di
-        answerProvided: answer,       // Naya answer add kar diya
-        doubtStatus: "Resolved"       // Status update kar diya
+        ...selectedDoubt,             
+        answerProvided: answer,      
+        doubtStatus: "Resolved"       
       };
-
       await axios.put(`http://localhost:8080/api/doubts/update`, payload);
-      toast({ title: 'Success', description: 'Answer submitted!' });
-      
+      toast({ title: 'Success', description: 'Answer submitted!' }); 
       setDoubts(prev => prev.filter(d => d.doubtID !== selectedDoubt.doubtID));
       setSelectedDoubt(null);
       setAnswer('');
@@ -95,33 +83,11 @@ const FacultyDoubts = () => {
       toast({ title: 'Error', description: 'Failed to update doubt.', variant: 'destructive' });
     }
   };
-  // const handleSendAnswer = async () => {
-  //   if (!answer.trim() || !selectedDoubt) return;
-
-  //   try {
-  //     const payload = {
-  //       doubtID: selectedDoubt.doubtID,
-  //       answerProvided: answer,
-  //       doubtStatus: "Resolved" 
-  //     };
-
-  //     await axios.put(`http://localhost:8080/api/doubts/update`, payload);
-  //     toast({ title: 'Success', description: 'Answer submitted!' });
-      
-  //     setDoubts(prev => prev.filter(d => d.doubtID !== selectedDoubt.doubtID));
-  //     setSelectedDoubt(null);
-  //     setAnswer('');
-  //   } catch (error) {
-  //     toast({ title: 'Error', description: 'Failed to update doubt.', variant: 'destructive' });
-  //   }
-  // };
-
   if (loading) return (
     <div className="flex justify-center items-center min-h-screen bg-black">
         <Loader2 className="animate-spin text-red-500 h-10 w-10" />
     </div>
   );
-
   return (
     <div className="container mx-auto px-4 py-8 pt-24 min-h-screen bg-black text-white">
       <div className="max-w-4xl mx-auto">
@@ -132,15 +98,12 @@ const FacultyDoubts = () => {
           </div>
           {doubts.length > 0 && <Badge className="bg-red-600">{doubts.length} New</Badge>}
         </div>
-
-        {/* DEBUG ALERT: Only shows if no doubts are found */}
         {doubts.length === 0 && debugInfo && (
           <div className="mb-6 p-4 bg-zinc-900 border border-yellow-700/50 rounded-lg flex items-start gap-3 text-yellow-500/80 text-sm">
             <AlertCircle className="h-5 w-5 flex-shrink-0" />
             <p>{debugInfo}</p>
           </div>
         )}
-
         <div className="grid gap-4">
           {doubts.length === 0 ? (
             <Card className="bg-zinc-900 border-zinc-800">
@@ -169,8 +132,6 @@ const FacultyDoubts = () => {
             ))
           )}
         </div>
-
-        {/* Answer Modal */}
         <Dialog open={!!selectedDoubt} onOpenChange={() => setSelectedDoubt(null)}>
           <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-lg">
             <DialogHeader>

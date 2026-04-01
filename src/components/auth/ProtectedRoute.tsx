@@ -50,7 +50,7 @@ export const ProtectedRoute = ({
     }
   }, [isLoading, isAuthenticated, isFaculty, allowFaculty, allowStudent, navigate, redirectTo, toast]); // <--- added isLoading
 
-  if (isLoading) return null; // <--- minimal: don't render until loaded
+  if (isLoading) return null;
 
   if (!isAuthenticated) return null;
   if (isFaculty && !allowFaculty) return null;

@@ -56,7 +56,6 @@ export function AppSidebar() {
     }
   };
 
-  // Student navigation items - NO Dashboard, NO About Us, NO Contact Us
   const studentItems = [
     { title: 'Practice', url: '/practice', icon: BookOpen },
     { title: 'Mock Interview', url: '/interview', icon: Brain },
@@ -65,13 +64,11 @@ export function AppSidebar() {
     { title: 'Doubts', url: '/doubts', icon: MessageCircle },
   ];
 
-  // Profile only
   const facultyItems = [
     { title: 'Dashboard', url: '/faculty-dashboard', icon: LayoutDashboard },
     { title: 'Student Doubts', url: '/faculty-doubts', icon: MessageSquare },
-    { title: 'Profile', url: '/teacher-profile', icon: User }, // ✅ Ab ye Teacher Profile kholega
+    { title: 'Profile', url: '/teacher-profile', icon: User }, 
   ];
-  // Public navigation items (Home only - About/Contact handled specially)
   const publicItems = [
     { title: 'Home', url: '/', icon: Home },
   ];
@@ -117,7 +114,6 @@ export function AppSidebar() {
                 );
               })}
               
-              {/* About Us - smooth scroll (only for public) */}
               {!isAuthenticated && (
                 <SidebarMenuItem>
                   <SidebarMenuButton 
@@ -130,7 +126,6 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               )}
               
-              {/* Contact Us - Collapsible Dropdown (only for public pages) */}
               {!isAuthenticated && (
                 <SidebarMenuItem>
                   <Collapsible open={contactOpen} onOpenChange={setContactOpen}>
@@ -170,7 +165,6 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* Sidebar trigger inside for collapsed state */}
       <div className="absolute bottom-4 left-0 right-0 flex justify-center">
         <SidebarTrigger />
       </div>

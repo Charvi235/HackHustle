@@ -25,7 +25,6 @@ interface DoubtsDialogProps {
 }
 
 export const DoubtsDialog = ({ open, onOpenChange, onMarkAsRead, onRateTeacher }: DoubtsDialogProps) => {
-  // Mock doubts data : will later connect to MySQL backend
   const [doubts] = useState<Doubt[]>([
     {
       id: '1',

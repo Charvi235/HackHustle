@@ -36,31 +36,20 @@ const QuestionDetail = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [showDoubtPanel, setShowDoubtPanel] = useState(false);
-
-  /* Convert option1–4 into iterable array */
   const options = [
     question.option1,
     question.option2,
     question.option3,
     question.option4
   ];
-
-  // const handleAnswer = (option: string) => {
-  //   setSelectedAnswer(option);
-  //   setShowResult(true);
-  // };
   const handleAnswer = async (option: string) => {
     setSelectedAnswer(option);
     setShowResult(true);
 
     const isCorrectOption = option === question.correctAnswer;
-
-    // --- NAYA LOGIC: Sahi answer hone par progress DB me save karo ---
     if (isCorrectOption) {
       try {
         const state = location.state as any; 
-        
-        // 🚨 FIX 1: user object se emailId nikal liya
         const currentEmail = user?.emailId || JSON.parse(localStorage.getItem('user') || '{}')?.emailId;
         
         await fetch('http://localhost:8080/api/subjects/progress/save', {
@@ -68,7 +57,6 @@ const QuestionDetail = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             emailId: currentEmail,
-            // 🚨 FIX 2: (question as any) laga kar TypeScript ki error hata di
             topicId: (question as any).topicId || state.topicId || 1001,       
             subjectId: (question as any).subjectId || state.subjectId || 1001  
           })
@@ -121,8 +109,6 @@ const QuestionDetail = () => {
           <ChevronLeft className="w-4 h-4 mr-2" />
           Back to Questions
         </Button>
-
-        {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
             <Badge variant="secondary" className="mb-2">
@@ -143,8 +129,6 @@ const QuestionDetail = () => {
             </Button>
           )}
         </div>
-
-        {/* Question */}
         <Card className="p-8 bg-gradient-card">
           <div className="flex items-start gap-4 mb-6">
             <div className="flex-1">
@@ -160,8 +144,6 @@ const QuestionDetail = () => {
                 <XCircle className="w-10 h-10 text-red-500" />
               ))}
           </div>
-
-          {/* Options */}
           <div className="space-y-4">
             {options.map((option, index) => {
               const isSelected = selectedAnswer === option;
@@ -196,8 +178,6 @@ const QuestionDetail = () => {
               );
             })}
           </div>
-
-          {/* Navigation */}
           {showResult && (
             <div className="mt-6 flex gap-4 justify-center">
               <Button
@@ -223,8 +203,6 @@ const QuestionDetail = () => {
             </div>
           )}
         </Card>
-
-        {/* Ask Doubt Panel */}
         <AskDoubtPanel
           open={showDoubtPanel}
           onOpenChange={setShowDoubtPanel}

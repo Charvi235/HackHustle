@@ -55,17 +55,13 @@ export const Header = () => {
   const first = user.first_name || "";
   const last = user.last_name || "";
 
-  // Agar dono hain toh pehla aur pehla uthao
   if (first && last) {
     return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
   }
-  
-  // Agar sirf first name hai
+
   if (first) {
     return first.charAt(0).toUpperCase();
   }
-
-  // Fallback
   return "U";
 };
 
@@ -75,10 +71,10 @@ export const Header = () => {
         <div className="flex items-center justify-between h-16">
           
           <div className="flex items-center space-x-4">
-            {/* Sidebar Trigger waisa ka waisa hi rahega */}
+           
             {isAuthenticated && <SidebarTrigger />}
             
-            {/* Logo Section ko Link bana diya */}
+        
             <Link to="/" className="flex items-center space-x-2 font-bold text-xl cursor-pointer hover:opacity-80 transition-opacity">
               <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
                 <Zap className="h-5 w-5 text-white" />
@@ -88,8 +84,6 @@ export const Header = () => {
               </span>
             </Link>
           </div>
-
-          {/* Center - About Us & Contact Us (always visible) */}
           <div className="hidden md:flex items-center space-x-6 relative">
             <Button variant="ghost" onClick={handleAboutClick}>
               <Info className="h-4 w-4 mr-2" />
@@ -110,8 +104,6 @@ export const Header = () => {
                   <ChevronDown className="h-4 w-4 ml-1" />
                 )}
               </Button>
-              
-              {/* Contact Dropdown */}
               <div 
                 className={`absolute top-full left-0 mt-2 bg-card border border-border rounded-lg shadow-lg p-4 min-w-[280px] z-50 transition-all duration-200 ease-in-out ${
                   isContactOpen 
@@ -131,30 +123,25 @@ export const Header = () => {
               </div>
             </div>
           </div>
-
-          {/* Right Side - User Profile or Auth buttons */}
           <div className="flex items-center space-x-4">
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                 <Button
-  variant="ghost"
-  size="icon"
-  className="relative rounded-full hover:bg-zinc-800 transition-all duration-300 p-0"
->
-  <Avatar className="h-9 w-9 border border-zinc-800">
-    <AvatarFallback className="bg-zinc-900 text-zinc-400 font-bold text-xs tracking-widest border border-zinc-800">
-      {getUserInitials()}
-    </AvatarFallback>
-  </Avatar>
-  
+                  variant="ghost"
+                  size="icon"
+                  className="relative rounded-full hover:bg-zinc-800 transition-all duration-300 p-0"
+                >
+                  <Avatar className="h-9 w-9 border border-zinc-800">
+                    <AvatarFallback className="bg-zinc-900 text-zinc-400 font-bold text-xs tracking-widest border border-zinc-800">
+                      {getUserInitials()}
+                    </AvatarFallback>
+                  </Avatar>
+                {unreadDoubtsCount > 0 && (
+                  <span className="absolute top-0 right-0 h-2 w-2 bg-blue-500 rounded-full border border-zinc-950" />
+                )}
+              </Button>
  
-  {unreadDoubtsCount > 0 && (
-    <span className="absolute top-0 right-0 h-2 w-2 bg-blue-500 rounded-full border border-zinc-950" />
-  )}
-</Button>
-                
-                
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 bg-background border border-border">
                  

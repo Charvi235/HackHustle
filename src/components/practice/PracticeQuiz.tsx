@@ -30,7 +30,7 @@ const PracticeQuiz = ({
   onBack,
   totalQuestionsInTopic,
   onScoreCalculated,
-  isAssessment = false // ✅ FIX 1
+  isAssessment = false 
 }: PracticeQuizProps) => {
 
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>({});
@@ -72,7 +72,6 @@ const PracticeQuiz = ({
       return newScore;
     });
 
-    // ✅ FIX 2
     if (!isAssessment && isCorrect) {
       await updateQuestionStatus(qid);
     }
@@ -142,8 +141,6 @@ const PracticeQuiz = ({
               <p className="font-medium mb-4">
                 {index + 1}. {q.questionText}
               </p>
-
-              {/* ✅ FIX 3 */}
               {!isAssessment && isCorrectQuestion && (
                 <CheckCircle2 className="w-6 h-6 text-green-500 absolute top-6 right-6" />
               )}
@@ -180,7 +177,6 @@ const PracticeQuiz = ({
       </div>
         )}
     </div>
-      
   );
 };
 

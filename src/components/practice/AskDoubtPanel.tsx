@@ -21,7 +21,6 @@ interface AskDoubtPanelProps {
   subject: string;
 }
 
-// Mock teachers data - TODO: fetch from database
 const mockTeachers: Teacher[] = [
   { id: '1', name: 'Dr. Sarah Smith', subject: 'Object Oriented Programming', rating: 4.5 },
   { id: '2', name: 'Prof. John Davis', subject: 'Object Oriented Programming', rating: 4.3 },
@@ -34,7 +33,6 @@ export const AskDoubtPanel = ({ open, onOpenChange, question, subject }: AskDoub
   const [selectedTeacher, setSelectedTeacher] = useState<string>('');
   const [doubtQuery, setDoubtQuery] = useState('');
 
-  // Faculty cannot send doubts
   if (isFaculty) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
@@ -65,10 +63,7 @@ export const AskDoubtPanel = ({ open, onOpenChange, question, subject }: AskDoub
       return;
     }
 
-    // TODO: Send doubt to database
     toast({ title: 'Doubt sent successfully!', description: 'The teacher will respond soon.' });
-    
-    // Reset form
     setSelectedTeacher('');
     setDoubtQuery('');
     onOpenChange(false);
@@ -91,7 +86,6 @@ export const AskDoubtPanel = ({ open, onOpenChange, question, subject }: AskDoub
         </SheetHeader>
 
         <div className="space-y-6 mt-6">
-          {/* Teacher Selection */}
           <div className="space-y-2">
             <Label>Select Teacher</Label>
             <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
@@ -107,16 +101,12 @@ export const AskDoubtPanel = ({ open, onOpenChange, question, subject }: AskDoub
               </SelectContent>
             </Select>
           </div>
-
-          {/* Question Display */}
           <div className="space-y-2">
             <Label>Question</Label>
             <div className="p-4 bg-muted rounded-lg">
               <p className="text-sm">{question}</p>
             </div>
           </div>
-
-          {/* Doubt Query */}
           <div className="space-y-2">
             <Label htmlFor="doubt-query">Your Query</Label>
             <Textarea
@@ -127,8 +117,6 @@ export const AskDoubtPanel = ({ open, onOpenChange, question, subject }: AskDoub
               className="min-h-[150px]"
             />
           </div>
-
-          {/* Send Button */}
           <Button 
             onClick={handleSendDoubt} 
             className="w-full"

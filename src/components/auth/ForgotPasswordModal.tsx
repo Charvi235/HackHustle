@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-// File ke top par ye update kar de
+
 import { X, Mail, ArrowRight, Loader2, KeyRound, CheckCircle, Eye, EyeOff } from 'lucide-react';
 
 interface ForgotPasswordModalProps {
@@ -9,12 +9,12 @@ interface ForgotPasswordModalProps {
 }
 
 const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ isOpen, onClose }) => {
-  const [step, setStep] = useState(1); // Step 1: Email, Step 2: OTP
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isOtpVerified, setIsOtpVerified] = useState(false); // OTP verify hua ya nahi track karne ke liye
-  const [newPassword, setNewPassword] = useState("");        // Naya password store karne ke liye
+  const [isOtpVerified, setIsOtpVerified] = useState(false); 
+  const [newPassword, setNewPassword] = useState("");  
 
 const [confirmPassword, setConfirmPassword] = useState("");
 const [passwordError, setPasswordError] = useState("");
@@ -55,148 +55,89 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!otp) return;
+    e.preventDefault();
+    if (!otp) return;
 
-  setIsLoading(true);
+    setIsLoading(true);
 
-  try {
-    const response = await fetch("http://localhost:8080/auth/verify-otp", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, otp }),
-    });
+    try {
+      const response = await fetch("http://localhost:8080/auth/verify-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, otp }),
+      });
 
-    if (response.ok) {
-      setStep(3);
-    } else {
-      alert("Invalid OTP");
+      if (response.ok) {
+        setStep(3);
+      } else {
+        alert("Invalid OTP");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Server error");
     }
-  } catch (error) {
-    console.error("Error:", error);
-    alert("Server error");
-  }
 
-  setIsLoading(false);
-};
-
-
-const handleSaveNewPassword = async (e: React.FormEvent) => {
-  e.preventDefault();
-  
-  // --- NAYA LOGIC START ---
-  // Har baar button dabne pe purana error clear kar do
-  setPasswordError(""); 
-
-  // Check karo ki dono box me kuch likha hai ya nahi
-  if (!newPassword.trim() || !confirmPassword.trim()) {
-    setPasswordError("Please fill both password fields.");
-    return;
-  }
-
-  // 1. Check karo ki dono password same hain ya nahi
-  if (newPassword !== confirmPassword) {
-    setPasswordError("Passwords do not match!");
-    return;
-  }
-
-  // 2. Strong Password Validation (8 chars, 1 Upper, 1 Lower, 1 Num, 1 Special)
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
-  if (!passwordRegex.test(newPassword)) {
-    setPasswordError("Password must be 8+ chars and include a capital letter, a small letter, a number, and a special symbol.");
-    return;
-  }
-  // --- NAYA LOGIC END ---
-
-
-  // --- TERA PURANA LOGIC YAHAN SE START HOTA HAI ---
-  setIsLoading(true);
-
-  try {
-    const response = await fetch("http://localhost:8080/auth/reset-password",  {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        newPassword,
-      }),
-    });
-
-    if (response.ok) {
-      alert("Password Reset Successful! Please Login.");
-      onClose();
-      setStep(1);
-      setEmail("");
-      setOtp("");
-      setNewPassword("");
-      
-      // Naya: Success hone pe naye states ko bhi khali kar do
-      setConfirmPassword(""); 
-      setPasswordError("");
-    } else {
-      alert("Failed to reset password");
+    setIsLoading(false);
+  };
+  const handleSaveNewPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError(""); 
+    if (!newPassword.trim() || !confirmPassword.trim()) {
+      setPasswordError("Please fill both password fields.");
+      return;
     }
-  } catch (error) {
-    console.error("Error:", error);
-    alert("Server error");
-  }
+    if (newPassword !== confirmPassword) {
+      setPasswordError("Passwords do not match!");
+      return;
+    }
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+      setPasswordError("Password must be 8+ chars and include a capital letter, a small letter, a number, and a special symbol.");
+      return;
+    }
+    setIsLoading(true);
 
-  setIsLoading(false);
-};
-// const handleSaveNewPassword = async (e: React.FormEvent) => {
-//   e.preventDefault();
-//   if (!newPassword.trim()) return;
+    try {
+      const response = await fetch("http://localhost:8080/auth/reset-password",  {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          newPassword,
+        }),
+      });
 
-//   setIsLoading(true);
+      if (response.ok) {
+        alert("Password Reset Successful! Please Login.");
+        onClose();
+        setStep(1);
+        setEmail("");
+        setOtp("");
+        setNewPassword("");
+        setConfirmPassword(""); 
+        setPasswordError("");
+      } else {
+        alert("Failed to reset password");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Server error");
+    }
 
-//   try {
-//     const response = await fetch("http://localhost:8080/auth/reset-password",  {
-
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify({
-//         email,
-//         newPassword,
-//       }),
-//     });
-
-//     if (response.ok) {
-//       alert("Password Reset Successful! Please Login.");
-//       onClose();
-//       setStep(1);
-//       setEmail("");
-//       setOtp("");
-//       setNewPassword("");
-//     } else {
-//       alert("Failed to reset password");
-//     }
-//   } catch (error) {
-//     console.error("Error:", error);
-//     alert("Server error");
-//   }
-
-//   setIsLoading(false);
-// };
-
+    setIsLoading(false);
+  };
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      
       <div className="relative w-full max-w-md bg-[#1a1a2e] border border-gray-700 rounded-2xl shadow-2xl p-8">
-        
-        {/* Close Button */}
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white">
           <X size={24} />
         </button>
-
-        {/* --- STEP 1: EMAIL ENTER KARO --- */}
         {step === 1 && (
           <>
             <div className="text-center mb-6">
@@ -206,7 +147,6 @@ const handleSaveNewPassword = async (e: React.FormEvent) => {
               <h2 className="text-2xl font-bold text-white mb-2">Reset Password</h2>
               <p className="text-gray-400 text-sm">Enter your email to receive an OTP.</p>
             </div>
-
             <form onSubmit={handleSendOtp} className="space-y-4">
               <input 
                 type="email" 
@@ -227,8 +167,6 @@ const handleSaveNewPassword = async (e: React.FormEvent) => {
             </form>
           </>
         )}
-
-        {/* --- STEP 2: OTP ENTER KARO (Ye naya hai) --- */}
         {step === 2 && (
           <>
             <div className="text-center mb-6">
@@ -240,7 +178,6 @@ const handleSaveNewPassword = async (e: React.FormEvent) => {
                 We've sent a code to <span className="text-white font-semibold">{email}</span>
               </p>
             </div>
-
             <form onSubmit={handleVerifyOtp} className="space-y-4">
               <input 
                 type="text" 
@@ -251,7 +188,6 @@ const handleSaveNewPassword = async (e: React.FormEvent) => {
                 className="w-full bg-[#0f0f1a] border border-gray-700 text-white rounded-lg p-3 text-center text-2xl tracking-[0.5em] outline-none focus:ring-2 focus:ring-green-500 transition-all"
                 autoFocus
               />
-              
               <button 
                 type="submit"
                 disabled={isLoading || otp.length < 4}
@@ -260,8 +196,6 @@ const handleSaveNewPassword = async (e: React.FormEvent) => {
                 {isLoading ? <Loader2 className="animate-spin" /> : "Verify OTP"}
                 {!isLoading && <CheckCircle size={18} />}
               </button>
-
-              {/* Back Option */}
               <button 
                 type="button"
                 onClick={() => setStep(1)}
@@ -272,13 +206,10 @@ const handleSaveNewPassword = async (e: React.FormEvent) => {
             </form>
           </>
         )}
-      
-        {/* --- STEP 3: NEW PASSWORD SCREEN --- */}
         {step === 3 && (
           <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
             <div className="text-center mb-6">
               <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                {/* Lock Icon */}
                 <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
@@ -286,10 +217,7 @@ const handleSaveNewPassword = async (e: React.FormEvent) => {
               <h3 className="text-xl font-bold text-white">Set New Password</h3>
               <p className="text-gray-400 text-sm">Create a strong password for your account</p>
             </div>
-
             <form onSubmit={handleSaveNewPassword} className="space-y-4">
-              
-              {/* Naya Password Input with Eye */}
               <div className="relative">
                 <input
                   type={showNewPassword ? "text" : "password"}
@@ -310,8 +238,6 @@ const handleSaveNewPassword = async (e: React.FormEvent) => {
                   {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
-
-              {/* Confirm Password Input with Eye */}
               <div className="relative mt-4">
                 <input
                   type={showConfirmPassword ? "text" : "password"}
@@ -332,8 +258,6 @@ const handleSaveNewPassword = async (e: React.FormEvent) => {
                   {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
-
-              {/* Validation Error Message */}
               {passwordError && (
                 <div className="text-red-500 text-xs font-medium text-center bg-red-500/10 py-2 px-3 rounded-md mb-4 mt-2">
                   {passwordError}
@@ -350,60 +274,6 @@ const handleSaveNewPassword = async (e: React.FormEvent) => {
             </form>
           </div>
         )}
-          {/* {step === 3 && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-              <div className="text-center mb-6">
-                <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  Lock Icon */}
-                  {/* <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold text-white">Set New Password</h3>
-                <p className="text-gray-400 text-sm">Create a strong password for your account</p>
-              </div> */}
-
-              {/* <form onSubmit={handleSaveNewPassword} className="space-y-4">
-                <div>
-                  <input
-                    type="password"
-                    placeholder="Enter new password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full bg-[#1a1a2e] border border-gray-700 rounded-lg px-4 py-3 text-white outline-none focus:ring-2 focus:ring-green-500 transition-all placeholder:text-gray-600"
-                    required
-                  /> */}
-                  {/* Confirm Password Input */}
-                  {/* <div>
-                    <input
-                      type="password"
-                      placeholder="Confirm new password"
-                      value={confirmPassword}
-                      onChange={(e) => {
-                        setConfirmPassword(e.target.value);
-                        setPasswordError(""); // Type karte waqt error message hata do
-                      }}
-                      className="w-full bg-[#1a1a2e] border border-gray-700 rounded-lg px-4 py-3 text-white outline-none focus:ring-2 focus:ring-green-500 transition-all placeholder:text-gray-600 mt-4"
-                      required
-                    />
-                  </div>
-                </div> */}
-                {/* Validation Error Message */}
-                  {/* {passwordError && (
-                    <div className="text-red-500 text-xs font-medium text-center bg-red-500/10 py-2 px-3 rounded-md mb-4">
-                      {passwordError}
-                    </div>
-                  )}
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold py-3 rounded-lg transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isLoading ? "Saving..." : "Save Password"}
-                </button>
-              </form>
-            </div>
-          )} */}
       </div>
     </div>
   );

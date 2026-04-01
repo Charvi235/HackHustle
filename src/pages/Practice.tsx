@@ -110,7 +110,7 @@ const Practice = () => {
   };
 
   const [showResult, setShowResult] = useState(false);
-  // --- NAYA:Progress Tracker States ---
+  
   const [topicProgress, setTopicProgress] = useState<Record<number, { solved: number, total: number }>>({});
   const [isLoadingProgress, setIsLoadingProgress] = useState(false);
 
@@ -120,7 +120,7 @@ const Practice = () => {
       const fetchProgress = async () => {
         setIsLoadingProgress(true);
         try {
-          // 🚨 NAYA: URL ke aage { cache: 'no-store' } add karna hai taaki hamesha fresh data aaye
+          
           const response = await fetch(`http://localhost:8080/api/subjects/progress/${emailId}/${selectedSubject.id}`, {
             cache: 'no-store'
           });
@@ -140,45 +140,19 @@ const Practice = () => {
       };
       fetchProgress();
     }
-  // 🚨 NAYA: Array ke end mein location.key add karna hai
+ 
   }, [selectedSubject, emailId, location.key]);
  
-  // useEffect(() => {
-  //   if (selectedSubject && emailId) {
-  //     const fetchProgress = async () => {
-  //       setIsLoadingProgress(true);
-  //       try {
-  //         // 🚨 YAHAN URL UPDATE HUA HAI 🚨
-  //         const response = await fetch(`http://localhost:8080/api/subjects/progress/${emailId}/${selectedSubject.id}`);
-  //         if (response.ok) {
-  //           const data = await response.json();
-  //           const progressMap: Record<number, { solved: number, total: number }> = {};
-  //           data.forEach((item: any) => {
-  //             progressMap[item.topicId] = { solved: item.solvedQuestions, total: item.totalQuestions };
-  //           });
-  //           setTopicProgress(progressMap);
-  //         }
-  //       } catch (error) {
-  //         console.error('Topic progress load nahi hui:', error);
-  //       } finally {
-  //         setIsLoadingProgress(false);
-  //       }
-  //     };
-  //     fetchProgress();
-  //   }
-  // }, [selectedSubject, emailId]);
-
-  // --- NAYA: Subject Home Progress Tracker States ---
+  
   const [subjectProgress, setSubjectProgress] = useState<Record<number, { solved: number, total: number }>>({});
   const [isLoadingSubjectProgress, setIsLoadingSubjectProgress] = useState(false);
 
-  // Jab user Home Screen pe hoga (koi subject select nahi kiya), tab ye chalega
   useEffect(() => {
     if (!selectedSubject && emailId) {
       const fetchSubjectProgress = async () => {
         setIsLoadingSubjectProgress(true);
         try {
-          // 🚨 NAYA: Yahan bhi { cache: 'no-store' } add karna hai taaki Home screen pe fresh data aaye
+          
           const response = await fetch(`http://localhost:8080/api/subjects/progress/subjects/${emailId}`, {
             cache: 'no-store'
           });
@@ -198,38 +172,7 @@ const Practice = () => {
       };
       fetchSubjectProgress();
     }
-  // 🚨 NAYA: Array ke end mein location.key add karna hai
   }, [selectedSubject, emailId, location.key]);
-  // useEffect(() => {
-  //   if (!selectedSubject && emailId) {
-  //     const fetchSubjectProgress = async () => {
-  //       setIsLoadingSubjectProgress(true);
-  //       try {
-  //         // 🚨 YAHAN SUBJECTS WALA URL AAYEGA 🚨
-  //         const response = await fetch(`http://localhost:8080/api/subjects/progress/subjects/${emailId}`);
-  //         if (response.ok) {
-  //           const data = await response.json();
-  //           const progressMap: Record<number, { solved: number, total: number }> = {};
-  //           data.forEach((item: any) => {
-  //             progressMap[item.subjectId] = { solved: item.solvedQuestions, total: item.totalQuestions };
-  //           });
-  //           setSubjectProgress(progressMap);
-  //         }
-  //       } catch (error) {
-  //         console.error('Subject progress load nahi hui:', error);
-  //       } finally {
-  //         setIsLoadingSubjectProgress(false);
-  //       }
-  //     };
-  //     fetchSubjectProgress();
-  //   }
-  // }, [selectedSubject, emailId]);
-  
- 
-  
-  
-
-
 
   const handleSelectSubject = (subject: SubjectConfig) => {
     setSelectedSubject(subject);
@@ -312,10 +255,6 @@ const Practice = () => {
           subjectId={selectedSubject.id}
 
           topicId={selectedTopic?.id || 1015}
-
-
-   
-
         />
 
         <div className="p-4 flex justify-center">
@@ -419,7 +358,7 @@ const Practice = () => {
   }
 
  
-  /* ================= SUBJECT LIST (TUF STYLE PROGRESS) ================= */
+  /* ================= SUBJECT LIST ================= */
   if (selectedSubject && !selectedTopic && !startQuiz) {
     return (
       <div className="min-h-screen bg-background pt-20 pb-16">
@@ -448,16 +387,14 @@ const Practice = () => {
   className="bg-[#09090b] border-zinc-800/80 hover:border-cyan-500/40 hover:shadow-[0_0_25px_rgba(6,182,214,0.15)] transition-all duration-300 cursor-pointer group rounded-xl relative overflow-hidden"
   onClick={() => handleSelectTopic(topic)}
 >
-  {/* Hover par ek subtle radiant background gradient aayega */}
   <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-blue-500/0 to-purple-500/0 group-hover:from-cyan-500/5 group-hover:to-blue-500/10 transition-all duration-500 z-0" />
 
   <CardContent className="p-5 flex flex-col justify-between h-full space-y-6 relative z-10">
-    {/* Top Section: Name & Count */}
+   
     <div className="flex justify-between items-start">
       <div className="space-y-1.5">
         <h3 className="text-xl font-bold text-zinc-100 flex items-center gap-2 group-hover:text-white transition-colors">
           {topic.name}
-          {/* Completed hone par glowing green tick */}
           {isCompleted && (
             <CheckCircle2 className="w-5 h-5 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
           )}
@@ -471,17 +408,13 @@ const Practice = () => {
         </p>
       </div>
 
-      {/* Right Arrow - Hover pe glow karega */}
       <div className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center group-hover:bg-cyan-500/10 group-hover:border-cyan-500/40 group-hover:shadow-[0_0_10px_rgba(6,182,214,0.2)] transition-all duration-300">
         <ChevronRight className="w-4 h-4 text-zinc-600 group-hover:text-cyan-400 transition-transform group-hover:translate-x-0.5" />
       </div>
     </div>
-
-    {/* Bottom Section: Radiant Progress Bar */}
     <div className="space-y-2">
       <div className="flex justify-between text-xs font-bold tracking-wider uppercase">
         <span className="text-zinc-600">Progress</span>
-        {/* Percentage text neon effect ke sath */}
         <span className={isCompleted ? "text-emerald-400 drop-shadow-[0_0_5px_rgba(52,211,153,0.5)]" : "text-cyan-400 drop-shadow-[0_0_5px_rgba(6,182,214,0.5)]"}>
           {progressPercentage}%
         </span>
@@ -542,7 +475,7 @@ const Practice = () => {
                 <div className="p-6">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
                     <div className="flex items-center gap-4">
-                      {/* Clean flat icon container */}
+                     
                       <div className="w-14 h-14 bg-zinc-800 rounded-xl flex items-center justify-center">
                         {subject.name === 'DBMS' ? (
                           <Database className="text-red-500 w-6 h-6" />
@@ -564,17 +497,6 @@ const Practice = () => {
                         </p>
                       </div>
                     </div>
-
-                    {/* Minimal button */}
-                    {/* <Button
-                      variant="outline"
-                      className="w-full md:w-auto bg-transparent border-zinc-700 hover:bg-zinc-800 hover:text-white transition-colors"
-                      onClick={() => handleSelectSubject(subject)}
-                    >
-                      <Play className="w-4 h-4 mr-2" /> Continue Practice
-                    </Button> */}
-                    {/* Right: Start Button (Minimal SOLID RED, NO Flash) */}
-{/* Right: Start Button (Minimal SOLID RED) */}
 <Button
   className="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white border-0 transition-colors"
   onClick={() => handleSelectSubject(subject)}
@@ -582,8 +504,6 @@ const Practice = () => {
   <Play className="w-4 h-4 mr-2" /> Continue Practice
 </Button>
                   </div>
-
-                  {/* Clean flat progress bar */}
                   <div className="space-y-2">
                     <div className="flex justify-between text-xs font-bold tracking-wider uppercase">
                       <span className="text-zinc-500">Overall Progress</span>

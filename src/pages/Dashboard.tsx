@@ -9,22 +9,16 @@ import { BookOpen, Brain, Trophy, MessageSquare, Star } from 'lucide-react';
 const Dashboard = () => {
   const { user, isAuthenticated, isFaculty } = useAuth();
   const navigate = useNavigate();
-
-  
   const [battleStats, setBattleStats] = useState({ won: 0, totalPlayed: 0 });
-
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/auth');
-    } else if (user && !isFaculty) {
-      
-      const studentId = user.student_id || 101; 
-      
+    } else if (user && !isFaculty) {   
+      const studentId = user.student_id || 101;     
       fetch(`http://localhost:8080/api/quiz-battles/student/${studentId}`)
         .then((res) => res.json())
         .then((data) => {
-          if (Array.isArray(data)) {
-           
+          if (Array.isArray(data)) {       
             const wonCount = data.filter((b: any) => b.quizScore >= 50).length;
             setBattleStats({
               won: wonCount,
@@ -39,8 +33,6 @@ const Dashboard = () => {
   if (!isAuthenticated || !user) {
     return null;
   }
-
-  // Student features
   const studentFeatures = [
     {
       title: 'Practice Questions',
@@ -64,8 +56,6 @@ const Dashboard = () => {
       color: 'bg-orange-500',
     },
   ];
-
-  // Faculty features - no quick actions, just an empty array
   const facultyFeatures: typeof studentFeatures = [];
 
   const features = isFaculty ? facultyFeatures : studentFeatures;
@@ -103,7 +93,7 @@ const Dashboard = () => {
                 <Trophy className="h-4 w-4 text-orange-500" />
               </CardHeader>
               <CardContent>
-                {/* 🔥 Updated with real win count */}
+           
                 <div className="text-2xl font-bold">{battleStats.won}</div>
               </CardContent>
             </Card>
@@ -113,7 +103,7 @@ const Dashboard = () => {
                 <BookOpen className="h-4 w-4 text-blue-500" />
               </CardHeader>
               <CardContent>
-                {/* 🔥 Updated with total battles/questions played */}
+              
                 <div className="text-2xl font-bold">{battleStats.totalPlayed}</div>
               </CardContent>
             </Card>
