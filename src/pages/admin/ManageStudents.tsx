@@ -4,17 +4,19 @@ import { Button } from '@/components/ui/button';
 import { Trash2, ArrowLeft, Loader2, Search, User, ShieldAlert } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-// Student Interface
+// 🔥 Interface updated with Exact JSON keys from Fiza's API
 interface Student {
   id?: number;
   studentId?: number;
   student_id?: number;
+  firstName?: string; // Exact match from backend
+  lastName?: string;  // Exact match from backend
   first_name?: string;
-  lastName?: string;
   name?: string;
   emailId?: string;
   email?: string;
   points?: number;
+  quizAttempted?: number;
 }
 
 export const ManageStudents = () => {
@@ -24,11 +26,9 @@ export const ManageStudents = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Delete Modal States
   const [isDeleting, setIsDeleting] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
 
-  // 1. Fetch Students (View Only)
   const fetchStudents = async () => {
     setIsLoading(true);
     try {
@@ -51,7 +51,6 @@ export const ManageStudents = () => {
     fetchStudents();
   }, []);
 
-  // 2. Delete Student Logic
   const confirmDelete = async () => {
     if (!studentToDelete) return;
     setIsDeleting(true);
@@ -63,8 +62,8 @@ export const ManageStudents = () => {
         method: 'DELETE' 
       });
       
-      setStudentToDelete(null); // Modal band karo
-      await fetchStudents();    // List refresh karo
+      setStudentToDelete(null); 
+      await fetchStudents();    
     } catch (error) {
       console.error(error); 
       alert("Failed to delete student.");
@@ -73,19 +72,21 @@ export const ManageStudents = () => {
     }
   };
 
-  // Filter students based on search
   const filteredStudents = students.filter(s => {
-    const name = (s.first_name || s.name || '').toLowerCase();
+    // 🔥 Search bhi ab firstName aur lastName ke basis pe chalega
+    const fullName = `${s.firstName || ''} ${s.lastName || ''}`.trim().toLowerCase();
+    const fallbackName = (s.name || s.first_name || '').toLowerCase();
+    const finalName = fullName || fallbackName;
+    
     const email = (s.emailId || s.email || '').toLowerCase();
     const query = searchQuery.toLowerCase();
-    return name.includes(query) || email.includes(query);
+    return finalName.includes(query) || email.includes(query);
   });
 
   return (
     <div className="min-h-screen bg-background p-8 pt-24 relative">
       <div className="max-w-6xl mx-auto">
         
-        {/* Header Section */}
         <div className="flex items-center gap-4 mb-8">
           <Button variant="ghost" size="icon" onClick={() => navigate('/admin-dashboard')}>
             <ArrowLeft className="w-6 h-6 text-zinc-400 hover:text-white" />
@@ -96,7 +97,6 @@ export const ManageStudents = () => {
           </div>
         </div>
 
-        {/* Top Action Bar (Search Only) */}
         <div className="mb-8">
           <div className="relative w-full md:max-w-md">
             <Search className="absolute left-3 top-3 h-5 w-5 text-zinc-500" />
@@ -110,11 +110,9 @@ export const ManageStudents = () => {
           </div>
         </div>
 
-        {/* Loading State */}
         {isLoading ? (
           <div className="flex justify-center py-20"><Loader2 className="w-10 h-10 text-blue-500 animate-spin" /></div>
         ) : (
-          /* Data Table */
           <Card className="bg-zinc-950 border border-zinc-800 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm text-zinc-400">
@@ -137,7 +135,15 @@ export const ManageStudents = () => {
                   ) : (
                     filteredStudents.map((s, idx) => {
                       const sId = s.id || s.studentId || s.student_id;
-                      const sName = s.first_name || s.name || "Unknown";
+                      
+                      // 🔥 MAIN FIX: First Name + Last Name jodne ka logic
+                      let sName = "Unknown";
+                      if (s.firstName) {
+                        sName = `${s.firstName} ${s.lastName || ''}`.trim();
+                      } else if (s.name || s.first_name) {
+                        sName = s.name || s.first_name || "Unknown";
+                      }
+
                       const sEmail = s.emailId || s.email || "No Email";
                       
                       return (
@@ -160,7 +166,6 @@ export const ManageStudents = () => {
                             </span>
                           </td>
                           <td className="px-6 py-4 text-right">
-                            {/* ONLY DELETE BUTTON NOW */}
                             <Button 
                               variant="ghost" 
                               size="icon" 
@@ -181,7 +186,6 @@ export const ManageStudents = () => {
         )}
       </div>
 
-      {/* DEDICATED DELETE CONFIRMATION MODAL */}
       {studentToDelete && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
           <Card className="w-full max-w-md p-6 bg-zinc-950 border-2 border-zinc-800 shadow-2xl">
@@ -192,7 +196,12 @@ export const ManageStudents = () => {
               <p className="text-zinc-300">Are you sure you want to delete this student account? All their progress and data will be permanently lost.</p>
               
               <div className="mt-6 p-4 bg-zinc-900 border border-zinc-800 rounded-lg">
-                <p className="text-white font-semibold text-lg">{studentToDelete.first_name || studentToDelete.name}</p>
+                <p className="text-white font-semibold text-lg">
+                  {/* Modal me bhi Pura Naam dikhega */}
+                  {studentToDelete.firstName 
+                    ? `${studentToDelete.firstName} ${studentToDelete.lastName || ''}`.trim() 
+                    : studentToDelete.name || studentToDelete.first_name}
+                </p>
                 <p className="text-zinc-500 text-sm">{studentToDelete.emailId || studentToDelete.email}</p>
               </div>
             </div>

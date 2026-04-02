@@ -4,17 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Trash2, ArrowLeft, Loader2, Search, GraduationCap, ShieldAlert } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-// Teacher Interface (Backend ke hisaab se adjust kar lena)
+// 🔥 Interface strictly matched with Fiza's JSON response
 interface Teacher {
-  id?: number;
-  teacherId?: number;
-  teacher_id?: number;
-  name?: string;
-  first_name?: string;
-  lastName?: string;
-  email?: string;
-  emailId?: string;
-  department?: string; // Optional, agar API bhejti h toh
+  teacherId: number;
+  firstName: string;
+  lastName: string;
+  emailId: string;
+  department: string;
+  designation?: string;
+  institute?: string;
 }
 
 export const ManageTeachers = () => {
@@ -32,7 +30,6 @@ export const ManageTeachers = () => {
   const fetchTeachers = async () => {
     setIsLoading(true);
     try {
-      // 🚨 FIZA KI API YAHAN AAYEGI (Assuming standard path)
       const response = await fetch('http://localhost:8080/api/teachers');
       if (response.ok) {
         const data = await response.json();
@@ -56,17 +53,15 @@ export const ManageTeachers = () => {
   const confirmDelete = async () => {
     if (!teacherToDelete) return;
     setIsDeleting(true);
-    
-    const tId = teacherToDelete.id || teacherToDelete.teacherId || teacherToDelete.teacher_id;
 
     try {
-      // 🚨 FIZA KI DELETE API YAHAN AAYEGI
-      await fetch(`http://localhost:8080/api/teachers/${tId}`, { 
+      // 🚨 Exact JSON Key 'teacherId' used here
+      await fetch(`http://localhost:8080/api/teachers/${teacherToDelete.teacherId}`, { 
         method: 'DELETE' 
       });
       
-      setTeacherToDelete(null); // Modal band karo
-      await fetchTeachers();    // List refresh karo
+      setTeacherToDelete(null); 
+      await fetchTeachers();    
     } catch (error) {
       console.error(error); 
       alert("Failed to delete teacher.");
@@ -77,10 +72,10 @@ export const ManageTeachers = () => {
 
   // Filter teachers based on search
   const filteredTeachers = teachers.filter(t => {
-    const name = (t.name || t.first_name || '').toLowerCase();
-    const email = (t.email || t.emailId || '').toLowerCase();
+    const fullName = `${t.firstName || ''} ${t.lastName || ''}`.toLowerCase();
+    const email = (t.emailId || '').toLowerCase();
     const query = searchQuery.toLowerCase();
-    return name.includes(query) || email.includes(query);
+    return fullName.includes(query) || email.includes(query);
   });
 
   return (
@@ -137,13 +132,13 @@ export const ManageTeachers = () => {
                       </td>
                     </tr>
                   ) : (
-                    filteredTeachers.map((t, idx) => {
-                      const tId = t.id || t.teacherId || t.teacher_id;
-                      const tName = t.name || t.first_name || "Unknown";
-                      const tEmail = t.email || t.emailId || "No Email";
+                    filteredTeachers.map((t) => {
+                      // 🔥 Exact Match with JSON
+                      const tName = `${t.firstName} ${t.lastName}`.trim();
+                      const tEmail = t.emailId || "No Email";
                       
                       return (
-                        <tr key={idx} className="border-b border-zinc-800 hover:bg-zinc-900/50 transition-colors">
+                        <tr key={t.teacherId} className="border-b border-zinc-800 hover:bg-zinc-900/50 transition-colors">
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
@@ -155,14 +150,13 @@ export const ManageTeachers = () => {
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 font-mono text-zinc-300">#{tId || 'N/A'}</td>
+                          <td className="px-6 py-4 font-mono text-zinc-300">#{t.teacherId}</td>
                           <td className="px-6 py-4">
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-800 text-zinc-300 border border-zinc-700">
                               {t.department || "Faculty"}
                             </span>
                           </td>
                           <td className="px-6 py-4 text-right">
-                            {/* ONLY DELETE BUTTON */}
                             <Button 
                               variant="ghost" 
                               size="icon" 
@@ -194,8 +188,8 @@ export const ManageTeachers = () => {
               <p className="text-zinc-300">Are you sure you want to remove this teacher? Their account access will be revoked permanently.</p>
               
               <div className="mt-6 p-4 bg-zinc-900 border border-zinc-800 rounded-lg">
-                <p className="text-white font-semibold text-lg">{teacherToDelete.name || teacherToDelete.first_name}</p>
-                <p className="text-zinc-500 text-sm">{teacherToDelete.email || teacherToDelete.emailId}</p>
+                <p className="text-white font-semibold text-lg">{`${teacherToDelete.firstName} ${teacherToDelete.lastName}`.trim()}</p>
+                <p className="text-zinc-500 text-sm">{teacherToDelete.emailId}</p>
               </div>
             </div>
 
