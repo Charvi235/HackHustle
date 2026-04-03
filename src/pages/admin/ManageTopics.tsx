@@ -53,53 +53,12 @@ export const ManageTopics = () => {
     fetchSubjects();
   }, []);
 
-  // 2. Fetch Topics directly by Subject ID (🔥 FIZA KI NAYI API YAHAN LAGI HAI 🔥)
-//   const handleSubjectClick = async (subject: Subject) => {
-//     setSelectedSubject(subject);
-//     setIsLoading(true);
-//     try {
-//       const subId = subject.id || subject.subjectId;
-      
-//       // Seedha specific subject ke topics fetch kar rahe hain!
-//       const response = await fetch(`http://localhost:8080/api/topics/subject/${subId}`);
-//       if (!response.ok) {
-//         // Agar backend 404 deta h (no topics found) toh empty array set kardo
-//         setTopics([]); 
-//         return;
-//       }
-      
-//       const data: Topic[] = await response.json();
-//       setTopics(data); // Ab filter karne ki zaroorat nahi!
-//     } catch (error) {
-//       console.error("Error fetching topics:", error);
-//       setTopics([]); // Error aane pe empty dikhao
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   // Re-fetch topics after Add/Rename/Delete
-//   const refreshTopics = async () => {
-//     if (!selectedSubject) return;
-//     try {
-//       const subId = selectedSubject.id || selectedSubject.subjectId;
-//       const response = await fetch(`http://localhost:8080/api/topics/subject/${subId}`);
-//       if (response.ok) {
-//         const data: Topic[] = await response.json();
-//         setTopics(data);
-//       } else {
-//         setTopics([]);
-//       }
-//     } catch (error) {
-//       console.error("Error refreshing topics:", error);
-//     }
-//   };
-    // 2. Fetch Topics directly by Subject ID 
+  
   const handleSubjectClick = async (subject: Subject) => {
     setSelectedSubject(subject);
     setIsLoading(true);
     try {
-      // ID proper fetch karna
+      
       const subId = subject.id || subject.subjectId || subject.subjectID;
       
       const response = await fetch(`http://localhost:8080/api/topics/subject/${subId}`);
@@ -110,7 +69,7 @@ export const ManageTopics = () => {
       
       const data = await response.json();
       
-      // 🔥 SCREENSHOT WALA LOGIC: Array check lagaya taaki crash na ho
+     
       setTopics(Array.isArray(data) ? data : []); 
       
     } catch (error) {
@@ -121,7 +80,7 @@ export const ManageTopics = () => {
     }
   };
 
-  // Re-fetch topics after Add/Rename/Delete
+ 
   const refreshTopics = async () => {
     if (!selectedSubject) return;
     try {
@@ -130,7 +89,7 @@ export const ManageTopics = () => {
       
       if (response.ok) {
         const data = await response.json();
-        // 🔥 Yahan bhi array check
+       
         setTopics(Array.isArray(data) ? data : []);
       } else {
         setTopics([]);

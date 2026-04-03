@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Trash2, ArrowLeft, Loader2, Search, GraduationCap, ShieldAlert } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-// 🔥 Interface strictly matched with Fiza's JSON response
+
 interface Teacher {
   teacherId: number;
   firstName: string;
@@ -55,7 +55,7 @@ export const ManageTeachers = () => {
     setIsDeleting(true);
 
     try {
-      // 🚨 Exact JSON Key 'teacherId' used here
+    
       await fetch(`http://localhost:8080/api/teachers/${teacherToDelete.teacherId}`, { 
         method: 'DELETE' 
       });
@@ -70,7 +70,7 @@ export const ManageTeachers = () => {
     }
   };
 
-  // Filter teachers based on search
+  
   const filteredTeachers = teachers.filter(t => {
     const fullName = `${t.firstName || ''} ${t.lastName || ''}`.toLowerCase();
     const email = (t.emailId || '').toLowerCase();
@@ -93,7 +93,7 @@ export const ManageTeachers = () => {
           </div>
         </div>
 
-        {/* Top Action Bar (Search Only) */}
+        {/* */}
         <div className="mb-8">
           <div className="relative w-full md:max-w-md">
             <Search className="absolute left-3 top-3 h-5 w-5 text-zinc-500" />
@@ -133,7 +133,7 @@ export const ManageTeachers = () => {
                     </tr>
                   ) : (
                     filteredTeachers.map((t) => {
-                      // 🔥 Exact Match with JSON
+                   
                       const tName = `${t.firstName} ${t.lastName}`.trim();
                       const tEmail = t.emailId || "No Email";
                       
