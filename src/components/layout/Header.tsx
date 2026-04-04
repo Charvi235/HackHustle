@@ -62,6 +62,7 @@ export const Header = () => {
   if (first) {
     return first.charAt(0).toUpperCase();
   }
+  if (location.pathname.includes('/admin-dashboard')) return null;
   return "U";
 };
 
