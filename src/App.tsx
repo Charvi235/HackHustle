@@ -201,7 +201,7 @@ import { ManageTopics } from './pages/admin/ManageTopics';
 import { ManageQuestions } from './pages/admin/ManageQuestions';
 import { ManageStudents } from './pages/admin/ManageStudents';
 import { ManageTeachers } from './pages/admin/ManageTeachers';
-
+import { AdminLogin } from './pages/admin/AdminLogin';
 const queryClient = new QueryClient();
 
 const AppContent = () => {
@@ -295,7 +295,7 @@ const AppContent = () => {
               <Route path="/admin/questions" element={<ManageQuestions />} />
               <Route path="/admin/students" element={<ManageStudents />} />
               <Route path="/admin/teachers" element={<ManageTeachers />} />
-
+              <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
