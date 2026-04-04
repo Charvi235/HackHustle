@@ -48,7 +48,7 @@ export const ManageSubjects = () => {
   const openModal = (type: 'add' | 'rename' | 'delete') => {
     setModalType(type);
     setInputValue('');
-    setTotalQuestions(''); // Reset karo open hone pe
+    setTotalQuestions(''); 
     setSelectedSubjectId('');
   };
 
@@ -59,14 +59,14 @@ export const ManageSubjects = () => {
     setSelectedSubjectId('');
   };
 
-  // 🔥 MAIN ACTION HANDLER (FIZA KI NAYI APIS YAHAN HAIN) 🔥
+  
   const handleActionSubmit = async () => {
     setIsProcessing(true);
     try {
       if (modalType === 'add') {
         if (!inputValue.trim() || totalQuestions === '') return alert("Please enter subject name and total questions.");
         
-        // Fiza ki POST API: { "subjectName": "...", "totalQuestions": 150 }
+      
         await fetch('http://localhost:8080/api/subjects', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -79,7 +79,7 @@ export const ManageSubjects = () => {
       } else if (modalType === 'rename') {
         if (!selectedSubjectId || !inputValue.trim()) return alert("Select a subject and enter a new name.");
         
-        // Fiza ki PATCH API:
+       
         await fetch(`http://localhost:8080/api/subjects/${selectedSubjectId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
@@ -95,13 +95,13 @@ export const ManageSubjects = () => {
           return;
         }
 
-        // Fiza ki DELETE API (Path me /delete/ laga hua hai):
+       
         await fetch(`http://localhost:8080/api/subjects/delete/${selectedSubjectId}`, {
           method: 'DELETE'
         });
       }
 
-      // Action successful hone pe modal band karo aur list update karo
+      
       closeModal();
       await fetchSubjects();
 

@@ -377,10 +377,11 @@ const Auth = () => {
                 </Button>
                <Button 
   type="button"
-  onClick={() => {
-    console.log("Dummy Admin Logged In!");
-    navigate('/admin-dashboard'); // Seedha naye dashboard pe bhej dega
-  }}
+  // onClick={() => {
+  //   console.log("Dummy Admin Logged In!");
+  //   navigate('/admin-dashboard'); // Seedha naye dashboard pe bhej dega
+  // }}
+  onClick={() => navigate('/admin-login')}
   className="w-full py-6 mt-3 bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 transition-colors"
 >
   Login as Admin

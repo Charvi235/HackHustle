@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 export const AdminDashboard = () => {
   const navigate = useNavigate();
 
-  // Ye tere 5 options ka data hai
+  
   const menuItems = [
     { title: 'Manage Student', icon: Users, path: '/admin/students', color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'hover:border-blue-500' },
     { title: 'Manage Teacher', icon: GraduationCap, path: '/admin/teachers', color: 'text-green-500', bg: 'bg-green-500/10', border: 'hover:border-green-500' },
@@ -29,7 +29,7 @@ export const AdminDashboard = () => {
               key={index}
               onClick={() => {
                 console.log(`Navigating to ${item.path}`);
-                // navigate(item.path); // Abhi ke liye comment kiya h, jab inke pages ban jayenge tab uncomment kar dena
+                
               }}
               className={`p-6 bg-zinc-950 border-2 border-zinc-800 transition-all duration-300 cursor-pointer group ${item.border}`}
             >

@@ -4,13 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Trash2, ArrowLeft, Loader2, Search, User, ShieldAlert } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-// 🔥 Interface updated with Exact JSON keys from Fiza's API
+
 interface Student {
   id?: number;
   studentId?: number;
   student_id?: number;
-  firstName?: string; // Exact match from backend
-  lastName?: string;  // Exact match from backend
+  firstName?: string; 
+  lastName?: string; 
   first_name?: string;
   name?: string;
   emailId?: string;
@@ -73,7 +73,7 @@ export const ManageStudents = () => {
   };
 
   const filteredStudents = students.filter(s => {
-    // 🔥 Search bhi ab firstName aur lastName ke basis pe chalega
+  
     const fullName = `${s.firstName || ''} ${s.lastName || ''}`.trim().toLowerCase();
     const fallbackName = (s.name || s.first_name || '').toLowerCase();
     const finalName = fullName || fallbackName;
@@ -136,7 +136,7 @@ export const ManageStudents = () => {
                     filteredStudents.map((s, idx) => {
                       const sId = s.id || s.studentId || s.student_id;
                       
-                      // 🔥 MAIN FIX: First Name + Last Name jodne ka logic
+                     
                       let sName = "Unknown";
                       if (s.firstName) {
                         sName = `${s.firstName} ${s.lastName || ''}`.trim();
