@@ -29,7 +29,7 @@ export const HeroSection = () => {
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
             HackHustle{' '}
             <span className="text-4xl md:text-6xl sm:text-7xl font-bold mb-6 leading-tight">
-              Practise.Prepare.Ace
+              Practice.Prepare.Ace
             </span>
           </h1>
 
