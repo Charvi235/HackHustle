@@ -20,8 +20,9 @@ import {
 } from '@/services/battleSocket';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-
+import { useToast } from "@/components/ui/use-toast"; 
 import { ComputerBattle } from './ComputerBattle';
+import { toast } from '@/components/ui/sonner';
 const getOptionsArray = (q: Question): string[] => {
   return [q.option1, q.option2, q.option3, q.option4];
 };
@@ -210,7 +211,12 @@ const handleFinishGame = () => {
     return (
       <BattleLobby 
         roomCode={roomCode} 
-        onStart={() => fetch(`http://localhost:8080/api/battle/start/${roomCode}/${studentEmail}`, { method: 'POST' })} 
+        onStart={() => {
+          if (players.length < 2) {
+            toast("At least 1 friend must join to start the battle!");
+            return;
+          }
+          fetch(`http://localhost:8080/api/battle/start/${roomCode}/${studentEmail}`, { method: 'POST' })}}
         onCancel={() => setGameMode('menu')} 
         isHost={isHost} 
         players={players} 
