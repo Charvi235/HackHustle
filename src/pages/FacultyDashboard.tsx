@@ -21,13 +21,40 @@ const FacultyDashboard = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [solvedDoubtsList, setSolvedDoubtsList] = useState<Doubt[]>([]);
-  
+  const [studentNames, setStudentNames] = useState<Record<number, string>>({});
   const [dashboardStats, setDashboardStats] = useState({
     rating: 0,
     doubtsSolved: 0,
     studentsMentored: 0
   });
-
+  // 🔥 NAYA FUNCTION: Bulk Fetch All Students
+  const fetchAllStudentNames = async () => {
+    try {
+      const res = await fetch('http://localhost:8080/api/students');
+      if (res.ok) {
+        const studentsArray = await res.json();
+        const namesMap: Record<number, string> = {};
+        
+        // Loop through all students and save their names against their IDs
+        studentsArray.forEach((student: any) => {
+          const id = student.studentId || student.id;
+          
+          // Fiza ne jo bhi field name rakha ho (firstName ya name), ye usko handle kar lega
+          const fullName = student.firstName 
+            ? `${student.firstName} ${student.lastName || ''}`.trim() 
+            : student.studentName || student.name || `Student #${id}`;
+            
+          if (id) {
+            namesMap[id] = fullName;
+          }
+        });
+        
+        setStudentNames(namesMap);
+      }
+    } catch (e) {
+      console.error("Failed to load student names", e);
+    }
+  };
   const fetchResolvedData = async () => {
     setIsLoading(true);
     try {
@@ -48,6 +75,7 @@ const FacultyDashboard = () => {
           studentsMentored: uniqueStudents.size
         });
         setSolvedDoubtsList(resolvedOnly);
+        
       }
     } catch (error) {
       console.error("Error fetching resolved doubts:", error);
@@ -56,9 +84,10 @@ const FacultyDashboard = () => {
       setIsLoading(false);
     }
   };
-
+  
   useEffect(() => {
     fetchResolvedData();
+    fetchAllStudentNames();
   }, []);
 
   return (
@@ -152,12 +181,22 @@ const FacultyDashboard = () => {
                       <span className="font-medium not-italic text-primary">Ans: </span> 
                       {doubt.answerProvided}
                     </p>
-                    <div className="flex items-center gap-2 pt-2">
+                    {/* <div className="flex items-center gap-2 pt-2">
                       <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
                         S
                       </div>
                       <span className="text-xs text-muted-foreground">Student ID: {doubt.studentId}</span>
-                    </div>
+                    </div> */}
+                    <div className="flex items-center gap-2 pt-2">
+  <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary uppercase">
+    {/* Ye student ke naam ka pehla letter nikalega */}
+    {(studentNames[doubt.studentId] || 'S')[0]}
+  </div>
+  <span className="text-xs text-muted-foreground font-medium">
+    {/* Ye ID ki jagah naam print karega */}
+    {studentNames[doubt.studentId] || `Loading Name... (ID: ${doubt.studentId})`}
+  </span>
+</div>
                   </div>
 
                   <div className="mt-4 md:mt-0">

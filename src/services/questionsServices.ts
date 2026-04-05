@@ -36,7 +36,7 @@ export const questionService = {
     topicName: string
   ): Promise<QuestionDto[]> => {
     return apiClient.get(
-      `/api/question/topicassesment/${encodeURIComponent(topicName)}`
+      `/api/question/topic/assessment/${encodeURIComponent(topicName)}`
     );
   }
 };

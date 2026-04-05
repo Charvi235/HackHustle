@@ -80,7 +80,7 @@ export const ManageSubjects = () => {
         if (!selectedSubjectId || !inputValue.trim()) return alert("Select a subject and enter a new name.");
         
        
-        await fetch(`http://localhost:8080/api/subjects/${selectedSubjectId}`, {
+        await fetch(`http://localhost:8080/api/subjects/rename/${selectedSubjectId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ subjectName: inputValue })
