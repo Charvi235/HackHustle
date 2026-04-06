@@ -34,40 +34,41 @@ interface SubjectConfig {
   topics: TopicConfig[];
 }
 
-const subjects: SubjectConfig[] = [
-  {
-    id: 1001,
-    name: 'DBMS',
-    topics: [
-      { id: 1001, name: 'Normalization' },
-      { id: 1002, name: 'Concurrency Control' },
-      { id: 1003, name: 'Deadlock' },
-      { id: 1004, name: 'Keys in DBMS' }
-    ]
-  },
-  {
-    id: 1002,
-    name: 'OOPS',
-    topics: [
-      { id: 1005, name: 'Concepts of OOPS' },
-      { id: 1006, name: 'Inheritance' },
-      { id: 1007, name: 'Abstraction' },
-      { id: 1008, name: 'Polymorphism' }
-    ]
-  },
-  {
-    id: 1003,
-    name: 'Data Structures',
-    topics: [
-      { id: 1009, name: 'Stack' },
-      { id: 1010, name: 'Linked List' },
-      { id: 1011, name: 'Queue' },
-      { id: 1012, name: 'Tree' },
-      { id: 1013, name: 'Heap' },
-      { id: 1014, name: 'Graphs' }
-    ]
-  }
-];
+// const subjects: SubjectConfig[] = [
+//   {
+//     id: 1001,
+//     name: 'DBMS',
+//     topics: [
+//       { id: 1001, name: 'Normalization' },
+//       { id: 1002, name: 'Concurrency Control' },
+//       { id: 1003, name: 'Deadlock' },
+//       { id: 1004, name: 'Keys in DBMS' }
+//     ]
+//   },
+//   {
+//     id: 1002,
+//     name: 'OOPS',
+//     topics: [
+//       { id: 1005, name: 'Concepts of OOPS' },
+//       { id: 1006, name: 'Inheritance' },
+//       { id: 1007, name: 'Abstraction' },
+//       { id: 1008, name: 'Polymorphism' }
+//     ]
+//   },
+//   {
+//     id: 1003,
+//     name: 'Data Structures',
+//     topics: [
+//       { id: 1009, name: 'Stack' },
+//       { id: 1010, name: 'Linked List' },
+//       { id: 1011, name: 'Queue' },
+//       { id: 1012, name: 'Tree' },
+//       { id: 1013, name: 'Heap' },
+//       { id: 1014, name: 'Graphs' }
+//     ]
+//   }
+// ];
+
 
 const splitIntoSets = (questions: QuestionDto[], size = 10) => {
   const sets: QuestionDto[][] = [];
@@ -87,6 +88,8 @@ const Practice = () => {
   const [loading, setLoading] = useState(false);
   const [assessmentScore, setAssessmentScore] = useState(0);
   const navigate=useNavigate();
+  const [subjects, setSubjects] = useState<SubjectConfig[]>([]);
+
 
 
 const handleSubmitAssessment = async () => {
@@ -115,6 +118,33 @@ const handleSubmitAssessment = async () => {
   const [topicProgress, setTopicProgress] = useState<Record<number, { solved: number, total: number }>>({});
   const [isLoadingProgress, setIsLoadingProgress] = useState(false);
 
+  useEffect(() => {
+  const fetchSubjects = async () => {
+    try {
+      const res = await fetch("http://localhost:8080/api/subjects/with-topics");
+      const data = await res.json();
+
+      const formatted: SubjectConfig[] = data
+        .map((sub: any) => ({
+          id: sub.subjectID,
+          name: sub.subjectName,
+          topics: (sub.topics || []).map((t: any) => ({
+            id: t.topicID,
+            name: t.topicName
+          }))
+        }))
+        // 🔥 "na" filter
+        .filter((sub: SubjectConfig) => sub.name?.trim().toLowerCase() !== "na");
+
+      setSubjects(formatted);
+
+    } catch (err) {
+      console.error("Error fetching subjects:", err);
+    }
+  };
+
+  fetchSubjects();
+}, []);
 
   useEffect(() => {
     if (selectedSubject && emailId) {
