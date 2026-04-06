@@ -128,8 +128,8 @@ export const ManageTopics = () => {
       } else if (modalType === 'rename') {
         if (!selectedTopicId || !inputValue.trim()) return alert("Select a topic and enter a new name.");
         
-        await fetch(`http://localhost:8080/api/topics/${selectedTopicId}`, {
-          method: 'PUT',
+        await fetch(`http://localhost:8080/api/topics/rename/${selectedTopicId}`, {
+          method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ topicName: inputValue, subjectId: subId })
         });
@@ -299,6 +299,7 @@ export const ManageTopics = () => {
                     <option value="">-- Choose a topic --</option>
                     {topics.map(t => {
                       const tId = t.id || t.topicId;
+                     
                       return (
                         <option key={tId} value={tId}>
                           {t.topicName || t.name} (ID: {tId})

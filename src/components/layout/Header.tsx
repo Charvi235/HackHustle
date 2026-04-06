@@ -13,6 +13,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useEffect } from "react";
+import { getStudentByEmail } from "@/services/studentService";
 
 export const Header = () => {
   const { isAuthenticated, user, isFaculty, logout } = useAuth();
@@ -26,7 +28,7 @@ export const Header = () => {
     navigate('/');
   };
 
- 
+ const [student, setStudent] = useState<any>(null);
   const handleAboutClick = () => {
     
     if (location.pathname !== '/') {
@@ -49,23 +51,42 @@ export const Header = () => {
       }
     }
   };
-  const getUserInitials = () => {
-  if (!user) return "U";
+  useEffect(() => {
+  const fetchStudent = async () => {
+    if (user?.emailId) {
+      try {
+        const data = await getStudentByEmail(user.emailId);
+        setStudent(data);
+      } catch (err) {
+        console.error("Header student fetch failed", err);
+      }
+    }
+  };
 
-  const first = user.first_name || "";
-  const last = user.last_name || "";
+  fetchStudent();
+}, [user]);
+//   const getUserInitials = () => {
+//   if (!user) return "U";
 
-  if (first && last) {
-    return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
-  }
+//   const first = user.first_name || "";
+//   const last = user.last_name || "";
 
-  if (first) {
-    return first.charAt(0).toUpperCase();
-  }
+//   if (first && last) {
+//     return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
+//   }
+
+//   if (first) {
+//     return first.charAt(0).toUpperCase();
+//   }
   
-  return "U";
-};
+//   return "U";
+// };
 
+
+const getUserInitials = () => {
+  if (!student) return "U";
+  return `${student.firstName?.[0] || ""}${student.lastName?.[0] || ""}`.toUpperCase();
+};
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
       <div className="container mx-auto px-4">
