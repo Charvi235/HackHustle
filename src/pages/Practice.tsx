@@ -17,10 +17,10 @@ import { Progress } from '@/components/ui/progress';
 import { CheckCircle2 } from 'lucide-react';
 import PracticeQuiz from '../components/practice/PracticeQuiz';
 import { questionService, QuestionDto } from '@/services/questionsServices';
-
+import { useNavigate } from 'react-router-dom';
 const user = JSON.parse(localStorage.getItem('user') || '{}');
 const emailId: string = user?.emailId || '';
-
+import { DialogTitle } from '@/components/ui/dialog';
 
 
 interface TopicConfig {
@@ -76,7 +76,7 @@ const splitIntoSets = (questions: QuestionDto[], size = 10) => {
   }
   return sets;
 };
-
+// const navigate=useNavigate;
 const Practice = () => {
   const location = useLocation();
   const [selectedSubject, setSelectedSubject] = useState<SubjectConfig | null>(null);
@@ -86,29 +86,30 @@ const Practice = () => {
   const [startQuiz, setStartQuiz] = useState(false);
   const [loading, setLoading] = useState(false);
   const [assessmentScore, setAssessmentScore] = useState(0);
+  const navigate=useNavigate();
 
 
-  const handleSubmitAssessment = async () => {
-    
-    setShowResult(true);
-    try {
-      await fetch('http://localhost:8080/api/assessments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          emailId: emailId,
-          topicID: selectedTopic?.id || 1015,
-      //    subjectID: selectedSubject!.id,
-      subjectID: selectedSubject.id,
-          assessmentScore 
-        })
-      });
-      console.log("Data saved successfully");
-    } catch (err) {
-      console.error('Data save nahi hua (Backend Error):', err);
+const handleSubmitAssessment = async () => {
+  setShowResult(true);
+  try {
+    const response = await fetch('http://localhost:8080/api/assessments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        emailId: emailId,
+        topicID: selectedTopic?.id || 1015,
+        subjectID: selectedSubject?.id,
+        assessmentScore: assessmentScore 
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Server status: ${response.status}`);
     }
-  };
-
+  } catch (err) {
+    console.error('Error:', err);
+  }
+};
   const [showResult, setShowResult] = useState(false);
   
   const [topicProgress, setTopicProgress] = useState<Record<number, { solved: number, total: number }>>({});
@@ -133,7 +134,7 @@ const Practice = () => {
             setTopicProgress(progressMap);
           }
         } catch (error) {
-          console.error('Topic progress load nahi hui:', error);
+          console.error('Topic progress not loaded:', error);
         } finally {
           setIsLoadingProgress(false);
         }
@@ -263,44 +264,61 @@ const Practice = () => {
           </Button>
         </div>
 
-        <Dialog open={showResult} onOpenChange={setShowResult}>
-          <DialogContent className="bg-[#1a1a2e] border border-gray-800 text-white sm:max-w-md p-0 overflow-hidden">
-            <div className="flex flex-col items-center justify-center p-8 space-y-6">
-              <div className="relative">
-                <div className="absolute inset-0 bg-red-600 blur-2xl opacity-20 rounded-full"></div>
-                <div className="relative bg-[#2a2a3e] p-5 rounded-full border border-gray-700 shadow-xl">
-                  <Trophy className="h-10 w-10 text-red-500" />
-                </div>
-              </div>
 
-              <div className="text-center">
-                <h2 className="text-2xl font-bold">Assessment Submitted!</h2>
-                <p className="text-gray-400 text-sm">
-                  Here is your final score
-                </p>
-              </div>
+<Dialog
+  open={showResult}
+  onOpenChange={(open) => setShowResult(open)}
+>
+  <DialogContent className="bg-[#1a1a2e] border border-gray-800 text-white sm:max-w-md p-0 overflow-hidden">
+    <div className="flex flex-col items-center justify-center p-8 space-y-6">
+      <div className="relative">
+        <div className="absolute inset-0 bg-red-600 blur-2xl opacity-20 rounded-full"></div>
+        <div className="relative bg-[#2a2a3e] p-5 rounded-full border border-gray-700 shadow-xl">
+          <Trophy className="h-10 w-10 text-red-500" />
+        </div>
+      </div>
 
-              <div className="bg-[#0f0f1a] w-full py-6 rounded-xl border border-gray-800 flex flex-col items-center">
-                <span className="text-gray-500 text-xs uppercase font-bold mb-2">
-                  Total Score
-                </span>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-extrabold text-red-500">
-                    {assessmentScore}
-                  </span>
-                  <span className="text-xl text-gray-600">Points</span>
-                </div>
-              </div>
+      <div className="text-center">
+        <DialogTitle className="text-2xl font-bold">
+  Assessment Submitted!
+</DialogTitle>
+        <p className="text-gray-400 text-sm">
+          Here is your final score
+        </p>
+      </div>
 
-              <button
-                onClick={() => setShowResult(false)}
-                className="w-full py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold"
-              >
-                Close Result
-              </button>
-            </div>
-          </DialogContent>
-        </Dialog>
+      <div className="bg-[#0f0f1a] w-full py-6 rounded-xl border border-gray-800 flex flex-col items-center">
+        <span className="text-gray-500 text-xs uppercase font-bold mb-2">
+          Total Score
+        </span>
+        <div className="flex items-baseline gap-2">
+          <span className="text-5xl font-extrabold text-red-500">
+            {assessmentScore}
+          </span>
+          <span className="text-xl text-gray-600">Points</span>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => {
+          setShowResult(false);
+
+  setStartQuiz(false);
+  setSelectedSubject(null);
+  setSelectedTopic(null);
+
+        }}
+        className="w-full py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold"
+      >
+        Close Result
+      </button>
+    </div>
+  </DialogContent>
+</Dialog>
+
+
+
       </div>
     );
   }
@@ -376,7 +394,6 @@ const Practice = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {selectedSubject.topics.map((topic) => {
-              // API se data lo, warna default 0/10 dikhao
               const prog = topicProgress[topic.id] || { solved: 0, total: 10 };
               const progressPercentage = Math.round((prog.solved / Math.max(prog.total, 1)) * 100);
               const isCompleted = prog.solved > 0 && prog.solved === prog.total;
@@ -446,8 +463,7 @@ const Practice = () => {
       </div>
     );
   }
-  
- 
+
   /* ================= SUBJECT HOME ================= */
   return (
     <div className="min-h-screen bg-background pt-20 pb-16">

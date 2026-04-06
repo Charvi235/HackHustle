@@ -469,59 +469,8 @@ const Auth = () => {
                     <Input placeholder="Email" value={signupData.emailId} onBlur={() => setSignupTouched({...signupTouched, emailId: true})} onChange={(e) => setSignupData({ ...signupData, emailId: e.target.value })} className={getInputClass(signupTouched.emailId && (signupData.emailId === '' || !isValidGmail(signupData.emailId)))} />
                     {renderError(signupTouched.emailId && signupData.emailId === '')}
 
-                    <div>
-                      <Input
-                        placeholder="First Name"
-                        value={signupData.firstName}
-                        onBlur={() => setSignupTouched({...signupTouched, firstName: true})}
-                        onChange={(e) => setSignupData({ ...signupData, firstName: e.target.value })}
-                        
-                        className={getInputClass(signupTouched.firstName && (signupData.firstName === '' || !isValidName(signupData.firstName)))}
-                      />
-                      
-                      {renderError(signupTouched.firstName && signupData.firstName === '', "This field is mandatory")}
-                      {renderError(signupTouched.firstName && signupData.firstName !== '' && !isValidName(signupData.firstName), "Invalid first name (Only letters allowed)")}
-                    </div>
-                   <div>
-                      <Input
-                        placeholder="Last Name"
-                        value={signupData.lastName}
-                        onBlur={() => setSignupTouched({...signupTouched, lastName: true})}
-                        onChange={(e) => setSignupData({ ...signupData, lastName: e.target.value })}
-                        className={getInputClass(signupTouched.lastName && (signupData.lastName === '' || !isValidName(signupData.lastName)))}
-                      />
-                      {renderError(signupTouched.lastName && signupData.lastName === '', "This field is mandatory")}
-                      {renderError(signupTouched.lastName && signupData.lastName !== '' && !isValidName(signupData.lastName), "Invalid last name (Only letters allowed)")}
-                    </div>
-                    <div>
-                     
-                      <Input
-                          placeholder="Email"
-                          value={signupData.emailId}
-                          disabled 
-                          className={`opacity-50 cursor-not-allowed ${getInputClass(signupTouched.emailId && (signupData.emailId === '' || !isValidGmail(signupData.emailId)))}`} 
-                        />
-                      {renderError(signupTouched.emailId && signupData.emailId === '', "This field is mandatory")}
-                      {renderError(signupTouched.emailId && signupData.emailId !== '' && !isValidGmail(signupData.emailId), "Invalid Email (Must end with @gmail.com)")}
-                    </div>
-                    <div className="relative">
-                      <Input
-                        type={showStudentSignupPassword ? 'text' : 'password'}
-                        placeholder="Password"
-                        value={signupData.password}
-                        onBlur={() => setSignupTouched({...signupTouched, password: true})}
-                        onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
+                   
 
-                        className={`pr-10 ${getInputClass(signupTouched.password && (signupData.password === '' || !isValidPassword(signupData.password)))}`}
-                      />
-                      <button type="button" onClick={() => setShowStudentSignupPassword(!showStudentSignupPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                        {showStudentSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                      
-                      {renderError(signupTouched.password && signupData.password === '', "This field is mandatory")}
-
-                      {renderError(signupTouched.password && signupData.password !== '' && !isValidPassword(signupData.password), "Password must be atleast 8 chars and It should have 1 uppercase and  1 special char")}
-                    </div>  
                     <div className="relative">
                       <Input type={showStudentSignupPassword ? 'text' : 'password'} placeholder="Password" value={signupData.password} onBlur={() => setSignupTouched({...signupTouched, password: true})} onChange={(e) => setSignupData({ ...signupData, password: e.target.value })} className={`pr-10 ${getInputClass(signupTouched.password && (signupData.password === '' || !isValidPassword(signupData.password)))}`} />
                       <button type="button" onClick={() => setShowStudentSignupPassword(!showStudentSignupPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">{showStudentSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
@@ -549,39 +498,7 @@ const Auth = () => {
                     <Input placeholder="Email" value={teacherSignupData.emailId} onBlur={() => setTeacherTouched({...teacherTouched, emailId: true})} onChange={(e) => setTeacherSignupData({ ...teacherSignupData, emailId: e.target.value })} className={getInputClass(teacherTouched.emailId && (teacherSignupData.emailId === '' || !isValidGmail(teacherSignupData.emailId)))} />
                     {renderError(teacherTouched.emailId && teacherSignupData.emailId === '')}
 
-                    <div>
-                      <Input
-                        placeholder="First Name"
-                        value={teacherSignupData.firstName}
-                        onBlur={() => setTeacherTouched({...teacherTouched, firstName: true})}
-                        onChange={(e) => setTeacherSignupData({ ...teacherSignupData, firstName: e.target.value })}
-                        className={getInputClass(teacherTouched.firstName && (teacherSignupData.firstName === '' || !isValidName(teacherSignupData.firstName)))}
-                      />
-                      {renderError(teacherTouched.firstName && teacherSignupData.firstName === '', "This field is mandatory")}
-                      {renderError(teacherTouched.firstName && teacherSignupData.firstName !== '' && !isValidName(teacherSignupData.firstName), "Invalid first name (Only letters allowed)")}
-                    </div>
-                    <div>
-                      <Input
-                        placeholder="Last Name"
-                        value={teacherSignupData.lastName}
-                        onBlur={() => setTeacherTouched({...teacherTouched, lastName: true})}
-                        onChange={(e) => setTeacherSignupData({ ...teacherSignupData, lastName: e.target.value })}
-                        
-                        className={getInputClass(teacherTouched.lastName && (teacherSignupData.lastName === '' || !isValidName(teacherSignupData.lastName)))}
-                      />
-                      {renderError(teacherTouched.lastName && teacherSignupData.lastName === '', "This field is mandatory")}
-                      {renderError(teacherTouched.lastName && teacherSignupData.lastName !== '' && !isValidName(teacherSignupData.lastName), "Invalid last name (Only letters allowed)")}
-                    </div>
-                    <div>
-                       <Input
-                          placeholder="Email"
-                          value={teacherSignupData.emailId}
-                          disabled 
-                          className={`opacity-50 cursor-not-allowed ${getInputClass(teacherTouched.emailId && (teacherSignupData.emailId === '' || !isValidGmail(teacherSignupData.emailId)))}`}  
-                        />
-                        {renderError(teacherTouched.emailId && teacherSignupData.emailId === '', "This field is mandatory")}
-                        {renderError(teacherTouched.emailId && teacherSignupData.emailId !== '' && !isValidGmail(teacherSignupData.emailId), "Invalid Email (Must end with @gmail.com)")}
-                    </div>
+                    
                    {/* Teacher Password */}
                     <div className="relative">
                       <Input type={showTeacherSignupPassword ? 'text' : 'password'} placeholder="Password" value={teacherSignupData.password} onBlur={() => setTeacherTouched({...teacherTouched, password: true})} onChange={(e) => setTeacherSignupData({ ...teacherSignupData, password: e.target.value })} className={`pr-10 ${getInputClass(teacherTouched.password && (teacherSignupData.password === '' || !isValidPassword(teacherSignupData.password)))}`} />
@@ -590,44 +507,10 @@ const Auth = () => {
                     {renderError(teacherTouched.password && teacherSignupData.password === '')}
 
                     {/* Teacher Confirm Password */}
-                    <div className="relative mt-2">
-                      <Input
-                        type={showTeacherConfirmPassword ? 'text' : 'password'}
-                        placeholder="Confirm Password"
-                        value={teacherSignupData.confirmPassword}
-                        onBlur={() => setTeacherTouched({...teacherTouched, confirmPassword: true})}
-                        onChange={(e) => setTeacherSignupData({ ...teacherSignupData, confirmPassword: e.target.value })}
-                        className={`pr-10 ${getInputClass(teacherTouched.confirmPassword && (teacherSignupData.confirmPassword === '' || teacherSignupData.password !== teacherSignupData.confirmPassword))}`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowTeacherConfirmPassword(!showTeacherConfirmPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        {showTeacherConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                      {renderError(teacherTouched.confirmPassword && teacherSignupData.confirmPassword === '', "This field is mandatory")}
-                      {renderError(teacherSignupData.confirmPassword !== '' && teacherSignupData.password !== teacherSignupData.confirmPassword, "Passwords don't match")}
-                    </div>
+                    
                     
                       
-                      <div className="space-y-2">
-                        <Select 
-                          onValueChange={(value) => setTeacherSignupData({ ...teacherSignupData, subjectAssociated: value })}
-                          value={teacherSignupData.subjectAssociated}
-                        >
-                          <SelectTrigger className="w-full bg-zinc-950 border-zinc-800 text-zinc-300">
-                            <SelectValue placeholder="Select Subject" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-300">
-                            <SelectItem value="OOPS">OOPS</SelectItem>
-                            <SelectItem value="Data Structures">Data Structures</SelectItem>
-                            <SelectItem value="DBMS">DBMS</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      {renderError(teacherTouched.subjectAssociated && teacherSignupData.subjectAssociated === '', "This field is mandatory")}
-                    <div className="relative">
+                     <div className="relative">
                       <Input type={showTeacherConfirmPassword ? 'text' : 'password'} placeholder="Confirm Password" value={teacherSignupData.confirmPassword} onBlur={() => setTeacherTouched({...teacherTouched, confirmPassword: true})} onChange={(e) => setTeacherSignupData({ ...teacherSignupData, confirmPassword: e.target.value })} className={`pr-10 ${getInputClass(teacherTouched.confirmPassword && (teacherSignupData.confirmPassword === '' || teacherSignupData.password !== teacherSignupData.confirmPassword))}`} />
                       <button type="button" onClick={() => setShowTeacherConfirmPassword(!showTeacherConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">{showTeacherConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
                     </div>
