@@ -136,6 +136,7 @@ const Auth = () => {
       toast({ title: 'Invalid Password', description: 'Password must be 8+ chars, with uppercase and special char', variant: 'destructive' });
       return;
     }
+   
 
     setIsLoading(true);
     try {
@@ -162,7 +163,10 @@ const Auth = () => {
       toast({ title: 'Validation Error', description: 'All fields are mandatory', variant: 'destructive' });
       return;
     }
-
+    if (!isValidName(signupData.firstName)) {
+      toast({ title: 'Invalid Name', description: 'Name must contain alphabets only, no special character allowed', variant: 'destructive' });
+      return;
+    }
     if (signupData.password !== signupData.confirmPassword) {
         toast({ title: 'Password Mismatch', description: 'Passwords do not match', variant: 'destructive' });
         return;
@@ -460,34 +464,76 @@ const Auth = () => {
                   </TabsList>
                   
                   {/* STUDENT SIGNUP */}
-                  <TabsContent value="STUDENT" className="space-y-4">
+                  {/* STUDENT SIGNUP - Inside TabsContent */}
+<TabsContent value="STUDENT" className="space-y-4">
+  
+  {/* First Name */}
+  <div className="space-y-1">
+    <Input 
+      placeholder="First Name" 
+      value={signupData.firstName} 
+      onBlur={() => setSignupTouched({...signupTouched, firstName: true})} 
+      onChange={(e) => setSignupData({ ...signupData, firstName: e.target.value })} 
+      className={getInputClass(signupTouched.firstName && (signupData.firstName === '' || !isValidName(signupData.firstName)))} 
+    />
+    {renderError(signupTouched.firstName && signupData.firstName === '', "First name is required")}
+    {renderError(signupTouched.firstName && signupData.firstName !== '' && !isValidName(signupData.firstName), "Name should only contain letters")}
+  </div>
 
-                    <Input placeholder="First Name" value={signupData.firstName} onBlur={() => setSignupTouched({...signupTouched, firstName: true})} onChange={(e) => setSignupData({ ...signupData, firstName: e.target.value })} className={getInputClass(signupTouched.firstName && (signupData.firstName === '' || !isValidName(signupData.firstName)))} />
-                    {renderError(signupTouched.firstName && signupData.firstName === '')}
-                    <Input placeholder="Last Name" value={signupData.lastName} onBlur={() => setSignupTouched({...signupTouched, lastName: true})} onChange={(e) => setSignupData({ ...signupData, lastName: e.target.value })} className={getInputClass(signupTouched.lastName && (signupData.lastName === '' || !isValidName(signupData.lastName)))} />
-                    {renderError(signupTouched.lastName && signupData.lastName === '')}
-                    <Input placeholder="Email" value={signupData.emailId} onBlur={() => setSignupTouched({...signupTouched, emailId: true})} onChange={(e) => setSignupData({ ...signupData, emailId: e.target.value })} className={getInputClass(signupTouched.emailId && (signupData.emailId === '' || !isValidGmail(signupData.emailId)))} />
-                    {renderError(signupTouched.emailId && signupData.emailId === '')}
+  {/* Email */}
+  <div className="space-y-1">
+    <Input 
+      placeholder="Email" 
+      value={signupData.emailId} 
+      onBlur={() => setSignupTouched({...signupTouched, emailId: true})} 
+      onChange={(e) => setSignupData({ ...signupData, emailId: e.target.value })} 
+      className={getInputClass(signupTouched.emailId && (signupData.emailId === '' || !isValidGmail(signupData.emailId)))} 
+    />
+    {renderError(signupTouched.emailId && signupData.emailId === '', "Email is required")}
+    {renderError(signupTouched.emailId && signupData.emailId !== '' && !isValidGmail(signupData.emailId), "Must be a valid @gmail.com address")}
+  </div>
 
-                   
+  {/* Password */}
+  <div className="space-y-1">
+    <div className="relative">
+      <Input 
+        type={showStudentSignupPassword ? 'text' : 'password'} 
+        placeholder="Password" 
+        value={signupData.password} 
+        onBlur={() => setSignupTouched({...signupTouched, password: true})} 
+        onChange={(e) => setSignupData({ ...signupData, password: e.target.value })} 
+        className={`pr-10 ${getInputClass(signupTouched.password && (signupData.password === '' || !isValidPassword(signupData.password)))}`} 
+      />
+      <button type="button" onClick={() => setShowStudentSignupPassword(!showStudentSignupPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+        {showStudentSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+      </button>
+    </div>
+    {renderError(signupTouched.password && signupData.password === '', "Password is required")}
+    {renderError(signupTouched.password && signupData.password !== '' && !isValidPassword(signupData.password), "8+ chars, 1 Uppercase, 1 Special Char, 1 Number")}
+  </div>
 
-                    <div className="relative">
-                      <Input type={showStudentSignupPassword ? 'text' : 'password'} placeholder="Password" value={signupData.password} onBlur={() => setSignupTouched({...signupTouched, password: true})} onChange={(e) => setSignupData({ ...signupData, password: e.target.value })} className={`pr-10 ${getInputClass(signupTouched.password && (signupData.password === '' || !isValidPassword(signupData.password)))}`} />
-                      <button type="button" onClick={() => setShowStudentSignupPassword(!showStudentSignupPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">{showStudentSignupPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
-                    </div>
-                    {renderError(signupTouched.password && signupData.password === '')}
-
-                    <div className="relative">
-                      <Input type={showStudentConfirmPassword ? 'text' : 'password'} placeholder="Confirm Password" value={signupData.confirmPassword} onBlur={() => setSignupTouched({...signupTouched, confirmPassword: true})} onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })} className={`pr-10 ${getInputClass(signupTouched.confirmPassword && (signupData.confirmPassword === '' || signupData.password !== signupData.confirmPassword))}`} />
-                      <button type="button" onClick={() => setShowStudentConfirmPassword(!showStudentConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">{showStudentConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
-                    </div>
-                    {renderError(signupData.confirmPassword !== '' && signupData.password !== signupData.confirmPassword, "Passwords don't match")}
-                    
-                    <Button className="w-full" onClick={handleStudentSignup} disabled={isLoading}>
-                      {isLoading ? 'Signing up...' : 'Sign Up as Student'}
-                    </Button>
-                  </TabsContent>
-
+  {/* Confirm Password */}
+  <div className="space-y-1">
+    <div className="relative">
+      <Input 
+        type={showStudentConfirmPassword ? 'text' : 'password'} 
+        placeholder="Confirm Password" 
+        value={signupData.confirmPassword} 
+        onBlur={() => setSignupTouched({...signupTouched, confirmPassword: true})} 
+        onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })} 
+        className={`pr-10 ${getInputClass(signupTouched.confirmPassword && (signupData.confirmPassword === '' || signupData.password !== signupData.confirmPassword))}`} 
+      />
+      <button type="button" onClick={() => setShowStudentConfirmPassword(!showStudentConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+        {showStudentConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+      </button>
+    </div>
+    {renderError(signupTouched.confirmPassword && signupData.confirmPassword !== '' && signupData.password !== signupData.confirmPassword, "Passwords do not match")}
+  </div>
+  
+  <Button className="w-full" onClick={handleStudentSignup} disabled={isLoading}>
+    {isLoading ? 'Signing up...' : 'Sign Up as Student'}
+  </Button>
+</TabsContent>
                   {/* TEACHER SIGNUP */}
                   <TabsContent value="TEACHER" className="space-y-4">
 

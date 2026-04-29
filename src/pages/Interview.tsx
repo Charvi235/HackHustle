@@ -225,10 +225,6 @@ const Interview = () => {
                   AI Interviewer
                 </span>
               </h1>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Get personalized feedback on your interview performance. Our AI analyzes 
-                your responses, body language, and communication skills.
-              </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
               <Card className="p-6 text-center bg-gradient-card">

@@ -1,6 +1,6 @@
 import { HeroSection } from '@/components/home/HeroSection';
 import { FeaturesSection } from '@/components/home/FeaturesSection';
-import { StatsSection } from '@/components/home/StatsSection';
+// import { StatsSection } from '@/components/home/StatsSection';
 
 const Index = () => {
   return (
@@ -9,7 +9,7 @@ const Index = () => {
       <div id="about">
         <FeaturesSection />
       </div>
-      <StatsSection />
+      {/* <StatsSection /> */}
     </div>
   );
 };
