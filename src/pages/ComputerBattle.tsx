@@ -118,7 +118,7 @@ export const ComputerBattle = ({ questions, studentId, studentEmail, firstName, 
           winnerId={winnerId}
           playerNames={{
               [String(studentId)]: firstName || "You",
-              "999": "🤖 AI Bot"
+              "999": " AI Bot"
           }}
           onBack={onBack}
           onPlayAgain={onBack}
@@ -150,7 +150,7 @@ export const ComputerBattle = ({ questions, studentId, studentEmail, firstName, 
         {[studentId, 999].map(id => (
           <Card key={id} className={`p-3 border-2 ${id === studentId ? 'border-primary' : 'border-transparent'}`}>
             <div className="flex justify-between items-center">
-              <span className="font-bold">{id === 999 ? "🤖 AI Bot" : "You"}</span>
+              <span className="font-bold">{id === 999 ? " AI Bot" : "You"}</span>
               <Badge>{liveScores[id]}</Badge>
             </div>
           </Card>
