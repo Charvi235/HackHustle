@@ -133,7 +133,6 @@ const handleSubmitAssessment = async () => {
             name: t.topicName
           }))
         }))
-        // 🔥 "na" filter
         .filter((sub: SubjectConfig) => sub.name?.trim().toLowerCase() !== "na");
 
       setSubjects(formatted);
