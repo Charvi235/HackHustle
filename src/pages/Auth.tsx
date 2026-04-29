@@ -167,6 +167,10 @@ const Auth = () => {
       toast({ title: 'Invalid Name', description: 'Name must contain alphabets only, no special character allowed', variant: 'destructive' });
       return;
     }
+    if (!isValidName(signupData.lastName)) {
+      toast({ title: 'Invalid Name', description: 'Name must contain alphabets only, no special character allowed', variant: 'destructive' });
+      return;
+    }
     if (signupData.password !== signupData.confirmPassword) {
         toast({ title: 'Password Mismatch', description: 'Passwords do not match', variant: 'destructive' });
         return;
@@ -479,7 +483,18 @@ const Auth = () => {
     {renderError(signupTouched.firstName && signupData.firstName === '', "First name is required")}
     {renderError(signupTouched.firstName && signupData.firstName !== '' && !isValidName(signupData.firstName), "Name should only contain letters")}
   </div>
-
+  {/* Last Name */}
+  <div className="space-y-1">
+    <Input 
+      placeholder="Last Name" 
+      value={signupData.lastName} 
+      onBlur={() => setSignupTouched({...signupTouched, lastName: true})} 
+      onChange={(e) => setSignupData({ ...signupData, lastName: e.target.value })} 
+      className={getInputClass(signupTouched.lastName && (signupData.lastName === '' || !isValidName(signupData.lastName)))} 
+    />
+    {renderError(signupTouched.lastName && signupData.lastName === '', "Last name is required")}
+    {renderError(signupTouched.lastName && signupData.lastName !== '' && !isValidName(signupData.lastName), "Name should only contain letters")}
+  </div>
   {/* Email */}
   <div className="space-y-1">
     <Input 
