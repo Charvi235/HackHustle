@@ -1,0 +1,200 @@
+import { useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Zap, Info, Mail, User, Pencil, LogOut, ChevronDown, ChevronUp } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useEffect } from "react";
+import { getStudentByEmail } from "@/services/studentService";
+
+export const Header = () => {
+  const { isAuthenticated, user, isFaculty, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const unreadDoubtsCount = 3; // Mock count
+  const [isContactOpen, setIsContactOpen] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+ const [student, setStudent] = useState<any>(null);
+  const handleAboutClick = () => {
+    
+    if (location.pathname !== '/') {
+      navigate('/');
+      
+     
+      setTimeout(() => {
+      
+        const element = document.getElementById('about');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } 
+   
+    else {
+      const element = document.getElementById('about');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+  useEffect(() => {
+  const fetchStudent = async () => {
+    if (user?.emailId) {
+      try {
+        const data = await getStudentByEmail(user.emailId);
+        setStudent(data);
+      } catch (err) {
+        console.error("Header student fetch failed", err);
+      }
+    }
+  };
+
+  fetchStudent();
+}, [user]);
+//   const getUserInitials = () => {
+//   if (!user) return "U";
+
+//   const first = user.first_name || "";
+//   const last = user.last_name || "";
+
+//   if (first && last) {
+//     return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
+//   }
+
+//   if (first) {
+//     return first.charAt(0).toUpperCase();
+//   }
+  
+//   return "U";
+// };
+
+
+const getUserInitials = () => {
+  if (!student) return "U";
+  return `${student.firstName?.[0] || ""}${student.lastName?.[0] || ""}`.toUpperCase();
+};
+  return (
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          
+          <div className="flex items-center space-x-4">
+           
+            {isAuthenticated && <SidebarTrigger />}
+            
+        
+            <Link to="/" className="flex items-center space-x-2 font-bold text-xl cursor-pointer hover:opacity-80 transition-opacity">
+              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+                <Zap className="h-5 w-5 text-white" />
+              </div>
+              <span className="bg-gradient-primary bg-clip-text text-transparent">
+                HackHustle
+              </span>
+            </Link>
+          </div>
+          <div className="hidden md:flex items-center space-x-6 relative">
+            <Button variant="ghost" onClick={handleAboutClick}>
+              <Info className="h-4 w-4 mr-2" />
+              About Us
+            </Button>
+            
+            <div className="relative">
+              <Button 
+                variant="ghost" 
+                onClick={() => setIsContactOpen(!isContactOpen)}
+                className="flex items-center"
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                Contact Us
+                {isContactOpen ? (
+                  <ChevronUp className="h-4 w-4 ml-1" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 ml-1" />
+                )}
+              </Button>
+              <div 
+                className={`absolute top-full left-0 mt-2 bg-card border border-border rounded-lg shadow-lg p-4 min-w-[280px] z-50 transition-all duration-200 ease-in-out ${
+                  isContactOpen 
+                    ? 'opacity-100 translate-y-0' 
+                    : 'opacity-0 -translate-y-2 pointer-events-none'
+                }`}
+              >
+                <p className="text-sm text-muted-foreground">
+                  Need help? Contact us at{' '}
+                  <a 
+                    href="mailto:contact@hackhustle.com" 
+                    className="text-primary hover:underline font-medium"
+                  >
+                    hackhustle062@gmail.com
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative rounded-full hover:bg-zinc-800 transition-all duration-300 p-0"
+                >
+                  <Avatar className="h-9 w-9 border border-zinc-800">
+                    <AvatarFallback className="bg-zinc-900 text-zinc-400 font-bold text-xs tracking-widest border border-zinc-800">
+                      {getUserInitials()}
+                    </AvatarFallback>
+                  </Avatar>
+                {unreadDoubtsCount > 0 && (
+                  <span className="absolute top-0 right-0 h-2 w-2 bg-blue-500 rounded-full border border-zinc-950" />
+                )}
+              </Button>
+ 
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 bg-background border border-border">
+                 
+                <DropdownMenuItem 
+                  onClick={() => navigate(isFaculty ? '/teacher-profile' : '/profile')} 
+                  className="cursor-pointer"
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  View Profile
+                </DropdownMenuItem>
+
+
+              
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Button variant="ghost" onClick={() => navigate('/auth')}>
+                  Sign In
+                </Button>
+                <Button onClick={() => navigate('/auth')}>Get Started</Button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
