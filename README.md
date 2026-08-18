@@ -186,5 +186,11 @@ HackHustle/
 
 ---
 
+## Documentation
+- [ER Diagram](./docs/ER-Diagram.png)
+- [SRS & SDS Report](./docs/SRS-SDS-Report.pdf)
+
+---
+
 ## Final Note
 Hack Hustle is designed to strengthen core subject understanding through structured MCQ-based practice and engaging quiz experiences. The platform focuses on building strong fundamentals in technical subjects while keeping learning interactive, consistent, and performance-driven.
